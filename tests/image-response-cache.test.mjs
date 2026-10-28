@@ -77,28 +77,28 @@ function brandingState({ custom = false, iconKey = null, assetStatus = 200, obje
 }
 const iconRequest = () => new Request("https://mail.test/api/branding/icon");
 
-test("default branding icon overrides revalidation-only asset headers for unlicensed and licensed installs", async () => {
+test("default branding icon revalidates immediately for unlicensed and licensed installs", async () => {
 	for (const custom of [false, true]) {
 		brandingState({ custom });
 		const response = await getBrandingIcon(iconRequest());
-		assert.equal(response.headers.get("Cache-Control"), "public, max-age=3600");
+		assert.equal(response.headers.get("Cache-Control"), "no-store, max-age=0");
 		assert.equal(response.headers.get("Content-Type"), "image/png");
 		assert.equal(response.headers.get("ETag"), '"packaged-etag"');
 		assert.equal(await response.text(), "packaged-icon");
 	}
 });
 
-test("missing custom icon uses the same cacheable fallback", async () => {
+test("missing custom icon uses the same fresh fallback", async () => {
 	brandingState({ custom: true, iconKey: "missing" });
 	const response = await getBrandingIcon(iconRequest());
-	assert.equal(response.headers.get("Cache-Control"), "public, max-age=3600");
+	assert.equal(response.headers.get("Cache-Control"), "no-store, max-age=0");
 	assert.equal(await response.text(), "packaged-icon");
 });
 
-test("custom branding icon keeps its existing cache policy and content", async () => {
+test("custom branding icon stays fresh and preserves its content", async () => {
 	brandingState({ custom: true, iconKey: "custom", object: { body: "custom-icon", httpMetadata: { contentType: "image/webp" } } });
 	const response = await getBrandingIcon(iconRequest());
-	assert.equal(response.headers.get("Cache-Control"), "public, max-age=3600");
+	assert.equal(response.headers.get("Cache-Control"), "no-store, max-age=0");
 	assert.equal(response.headers.get("Content-Type"), "image/webp");
 	assert.equal(await response.text(), "custom-icon");
 });

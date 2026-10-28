@@ -260,24 +260,27 @@ test("configuration access does not grant message access, sending rights or shar
 	assert.equal(await getMailboxAccessLevel(f.db, { id: "primary", role: "admin" }, "m-other-shared"), null);
 });
 
-test("free plan selection is owner-scoped, validated and does not grant roles or mailbox access", async t => {
+test("retired plan selection is authenticated, immutable and does not grant roles or mailbox access", async t => {
  const f=await fixture(t,"community");
  f.sql.exec("UPDATE users SET insomail_plan='professional'");
  const path="/api/settings/plan";
  assert.equal((await planRoute.GET(new Request("https://mail.test"+path,{headers:{Authorization:"Bearer invalid"}}))).status,401);
- assert.equal((await planRoute.PATCH(f.request("sam",path,"PATCH",{plan:"paid"}))).status,400);
- assert.equal((await planRoute.PATCH(f.request("sam",path,"PATCH",{plan:"team",userId:"remote"}))).status,400);
+ assert.equal((await planRoute.PATCH(f.request("sam",path,"PATCH",{plan:"paid"}))).status,410);
+ assert.equal((await planRoute.PATCH(f.request("sam",path,"PATCH",{plan:"team",userId:"remote"}))).status,410);
  const cross=f.request("sam",path,"PATCH",{plan:"team"});cross.headers.set("Authorization","Bearer invalid");cross.headers.set("Origin","https://evil.test");
  assert.equal((await planRoute.PATCH(cross)).status,401);
- assert.equal((await planRoute.PATCH(f.request("sam",path,"PATCH",{plan:"team"}))).status,200);
- assert.equal((await planRoute.GET(f.request("sam",path))).status,200);
+ assert.equal((await planRoute.PATCH(f.request("sam",path,"PATCH",{plan:"team"}))).status,410);
+ const response=await planRoute.GET(f.request("sam",path));
+ assert.equal(response.status,200);
+ assert.deepEqual(await response.json(),{featureSet:"standard",selectionRequired:false});
+ assert.equal(f.sql.prepare("SELECT insomail_plan FROM users WHERE id='sam'").get().insomail_plan,"professional");
  assert.equal(f.sql.prepare("SELECT insomail_plan FROM users WHERE id='remote'").get().insomail_plan,"professional");
  assert.equal(f.sql.prepare("SELECT role FROM users WHERE id='sam'").get().role,"user");
  assert.equal(await getMailboxAccessLevel(f.db,{id:"sam",role:"user"},"m-shared"),null);
  assert.equal(await getMailboxAccessLevel(f.db,{id:"sam",role:"user"},"m-remote"),null);
  assert.equal(f.sql.prepare("SELECT plan FROM license_settings WHERE id='default'").get().plan,"community");
 });
-test("free Team keeps each mailbox permission and does not leak delegated notifications", async t => {
+test("single feature set keeps each mailbox permission independent of inert legacy plan values", async t => {
  const f=await fixture(t,"community");
  const user={id:"sam",role:"user"};
  f.sql.exec("INSERT INTO mailbox_access (id,mailbox_id,user_id,permission,created_by_user_id,created_at) VALUES ('grant','m-shared','sam','read_only','primary',1)");
@@ -288,8 +291,8 @@ test("free Team keeps each mailbox permission and does not leak delegated notifi
  }
  assert.ok((await getMailboxNotificationUserIds(f.env,"m-shared","primary")).includes("sam"));
  f.sql.exec("UPDATE users SET insomail_plan='professional' WHERE id='sam'");
- assert.equal(await getMailboxAccessLevel(f.db,user,"m-shared"),null);
- assert.equal((await getMailboxNotificationUserIds(f.env,"m-shared","primary")).includes("sam"),false);
+ assert.equal((await getMailboxAccessLevel(f.db,user,"m-shared")).canManage,true);
+ assert.equal((await getMailboxNotificationUserIds(f.env,"m-shared","primary")).includes("sam"),true);
  assert.equal(f.sql.prepare("SELECT count(*) AS n FROM mailbox_access WHERE id='grant'").get().n,1);
 });
 test("free features retain booking-host and branding authorization", async t=>{
