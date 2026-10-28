@@ -67,7 +67,16 @@ export default {
 			return hub.fetch(hubRequest);
 		}
 
-		return vinextHandler.fetch(request, env, ctx);
+		const response = await vinextHandler.fetch(request, env, ctx);
+		if (response.headers.get("Content-Type")?.includes("text/html")) {
+			// Visitor analytics is disabled for insoMail. Prevent edge HTML injection
+			// without permitting analytics scripts in CSP or changing cache privacy.
+			const headers = new Headers(response.headers);
+			const cacheControl = headers.get("Cache-Control") ?? "private, no-store";
+			if (!/(?:^|,)\s*no-transform(?:,|$)/i.test(cacheControl)) headers.set("Cache-Control", `${cacheControl}, no-transform`);
+			return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+		}
+		return response;
 	},
 
 	async email(message: ForwardableEmailMessage, rawEnv: CloudflareEnv, ctx: ExecutionContext) {
