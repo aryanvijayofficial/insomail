@@ -12,7 +12,8 @@ import { analyzeUrls } from "./analyzers/urls";
 import { classifyTokens } from "./classifier";
 import { buildFingerprint, getDomain, prepareSpamContent, tokenizeMessage } from "./tokenizer";
 import type { SpamAnalysisInput, SpamAnalysisResult, SpamSignal } from "./types";
-import { SPAM_THRESHOLDS, SPAM_WEIGHTS } from "./weights";
+import { spamVerdict } from "./verdict";
+import { SPAM_WEIGHTS } from "./weights";
 import { LocalSpamIntelligenceProvider } from "./providers/local";
 
 const MAX_KNOWN_DOMAINS = 2000;
@@ -88,6 +89,6 @@ export async function analyzeSpam(db: AppDatabase, input: SpamAnalysisInput): Pr
 		score: score - rawScore,
 		reason: rawScore > 100 ? "Score is capped at 100" : "Score cannot be lower than 0",
 	});
-	const verdict = score >= SPAM_THRESHOLDS.spam ? "spam" : score >= SPAM_THRESHOLDS.suspicious ? "suspicious" : "inbox";
+	const verdict = spamVerdict(score, signals);
 	return { score, verdict, signals: signals.filter((signal) => Math.abs(signal.score) >= 2 || signal.id === "score_boundary"), contentProbability: bayesian.probability, fingerprint };
 }
