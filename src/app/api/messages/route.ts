@@ -14,6 +14,7 @@ import { getRequestTimeZone } from "@/lib/time/utils";
 import { scheduledMessageCondition } from "@/lib/email/scheduled";
 import { getMessageListColumns, loadConversationPage } from "./utils";
 import type { ListMessage } from "./types";
+import { loadInBatches } from "@/lib/messages/batches";
 import { getOpenCounts } from "@/lib/tracking/open-tracking";
 
 export async function GET(request: Request) {
@@ -163,15 +164,15 @@ export async function GET(request: Request) {
 	// These enrichments depend only on the selected page, not on each other.
 	const [countRows, jobs, openCounts, contactMaps] = await Promise.all([
 		threadIds.length > 0
-			? db
+			? loadInBatches(threadIds, async batch => await db
 				.select({
 					threadId: messages.threadId,
 					total: count(),
 					unread: sum(sql`case when ${messages.read} then 0 else 1 end`),
 				})
 				.from(messages)
-				.where(and(scope, inArray(messages.threadId, threadIds), isNotNull(messages.threadId), notInArray(messages.status, ["draft", "trash"])))
-				.groupBy(messages.threadId)
+				.where(and(scope, inArray(messages.threadId, batch), isNotNull(messages.threadId), notInArray(messages.status, ["draft", "trash"])))
+				.groupBy(messages.threadId))
 			: [],
 		scheduled === "true" && rows.length > 0
 			? db
