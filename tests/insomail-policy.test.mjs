@@ -27,3 +27,24 @@ test('Worker source streaming is public and declares complete archive length',()
  assert.match(route,/"Content-Length": String\(archive.size\)/);
  assert.doesNotMatch(route,/searchParams|request\.json/);
 });
+
+test('InsoMail maintenance never offers source-replacing updater or false missing-secret warning',()=>{
+ const card=readFileSync('src/components/admin-update-card.tsx','utf8');
+ assert.doesNotMatch(card,/triggerApplicationUpdate|GITHUB_UPDATE_TOKEN|update.completeConfig/);
+ assert.match(card,/Manual updates are intentional/);
+ assert.match(card,/getMigrationStatus/);
+ const post=readFileSync('src/app/api/admin/update/POST.ts','utf8');
+ assert.match(post,/authorizeAdminRequest/);
+ assert.doesNotMatch(post,/dispatchUpdateWorkflow/);
+ assert.match(post,/status:409/);
+ const workflow=readFileSync('.github/workflows/deploy-update.yml','utf8');
+ assert.doesNotMatch(workflow,/git read-tree|git push|secrets\./);
+});
+test('free-plan overview copy cannot regress to paid requirements in another locale',async()=>{
+ const result=await build({entryPoints:['src/lib/i18n/utils.ts'],bundle:true,write:false,format:'esm',platform:'node'});
+ const {createTranslator}=await import('data:text/javascript;base64,'+Buffer.from(result.outputFiles[0].text).toString('base64'));
+ const t=createTranslator('en',{'admin.nav.licenses':'Licenses','admin.section.accounts':'Pay for Pro'});
+ assert.equal(t('admin.nav.licenses'),'Free plans');
+ assert.match(t('admin.section.accounts'),/Admin-only/);
+ assert.doesNotMatch(t('admin.section.accounts'),/license|Pay/);
+});

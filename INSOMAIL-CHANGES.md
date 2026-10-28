@@ -18,3 +18,7 @@ Runtime credentials such as CF_TOKEN and RESEND_API_KEY must be separately suppl
 ## Source archive maintenance
 
 After committing a change, run `node scripts/build-insomail-source.mjs`. It packages tracked source files, including this notice, all migration files, dependencies lockfile and build scripts, but excludes repository metadata and generated files. Upload the archive to the private BUCKET under the configured INSOMAIL_SOURCE_KEY before deploying the matching Worker. Use a fresh key per release and update wrangler.jsonc before committing. Never package `.env`, `.dev.vars`, database exports, credentials, mail data or node_modules. Keep the public source download working for all network users.
+
+## Maintenance policy
+
+InsoMail intentionally uses reviewed manual updates. The upstream one-click workflow replaces the full tracked tree and can discard local changes, so it is replaced with a non-mutating notice and its app dispatch endpoint is disabled. GitHub updater credentials are optional and are not needed for mail or free plans. Keep database migration checks separate. Review and merge upstream changes, run tests, rebuild the source archive, and deploy the reviewed InsoMail revision.
