@@ -47,3 +47,17 @@ test('calendar editor sits above page headers and reserves time input width',()=
  assert.doesNotMatch(source,/eventFieldClass\} pl-14/);
  assert.match(source,/adding && createPortal/);
 });
+
+
+test('timezone picker keeps readable labels separate from canonical selection and visible search',()=>{
+ const combo=read('src/components/ui/combobox.tsx');
+ assert.match(combo,/const \[query,setQuery\]=useState\(""\)/);
+ assert.match(combo,/searchLabel/);
+ assert.match(combo,/onChange\(option.value\)/);
+ assert.match(combo,/createPortal/);
+ const form=read('src/components/settings/time-zone-form.tsx');
+ assert.match(form,/value:zone,label:timeZoneLabel\(zone\)/);
+ assert.match(form,/initialTimeZone \? \[initialTimeZone\]/);
+ assert.match(form,/value:"",label:t/);
+ assert.match(read('src/components/ui/select.tsx'),/relative inline-flex min-w-0 w-full/);
+});

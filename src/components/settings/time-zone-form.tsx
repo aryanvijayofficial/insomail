@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
 import { Label } from "@/components/ui/label";
 import { saveUserTimeZonePreference } from "@/lib/time/client";
-import { formatCurrentTimeInZone, listTimeZones, updateUserTimeZone } from "./time-zone-form-utils";
+import { formatCurrentTimeInZone, listTimeZones, timeZoneLabel, updateUserTimeZone } from "./time-zone-form-utils";
 import type { TimeZoneFormProps } from "./time-zone-form-types";
 
 export function TimeZoneForm({ userId, initialTimeZone }: TimeZoneFormProps) {
@@ -37,7 +37,7 @@ export function TimeZoneForm({ userId, initialTimeZone }: TimeZoneFormProps) {
 		<div className="space-y-2">
 			<Label htmlFor="account-time-zone">{t("settings.timeZone.title")}</Label>
 			<p className="text-sm leading-6 text-neutral-500">{t("settings.timeZone.description", { zone: deviceTimeZone })}</p>
-            <Combobox id="account-time-zone" value={timeZone} onChange={(value) => { setTimeZone(value); setStatus(null); }} options={listTimeZones(deviceTimeZone)} placeholder={t("settings.timeZone.placeholder", { zone: deviceTimeZone })} disabled={saving} />
+            <Combobox id="account-time-zone" value={timeZone} onChange={(value) => { setTimeZone(value); setStatus(null); }} options={[{value:"",label:t("settings.timeZone.placeholder", {zone:timeZoneLabel(deviceTimeZone)})},...[...new Set([...listTimeZones(deviceTimeZone),...(initialTimeZone ? [initialTimeZone] : [])])].map(zone=>({value:zone,label:timeZoneLabel(zone)}))]} searchLabel={t("settings.timeZone.search")} placeholder={t("settings.timeZone.placeholder", { zone: deviceTimeZone })} disabled={saving} />
 			{validZone && <p className="text-sm text-neutral-500">{t("settings.timeZone.current", { time: validZone })}</p>}
 		</div>
 		<div className="flex items-center gap-3">

@@ -485,6 +485,7 @@
 	"settings.autoReply.save": "Save",
 	"settings.autoReply.needFullAccess": "Full access is required to edit auto-reply.",
 	"settings.timeZone.failed": "Could not save timezone",
+	"settings.timeZone.search": "Search time zones...",
 	"settings.timeZone.title": "Time zone",
 	"settings.timeZone.description": "Choose the time zone used for dates, search, and scheduling. Leave blank to follow this device ({zone}).",
 	"settings.timeZone.placeholder": "Device time zone ({zone})",

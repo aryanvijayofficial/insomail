@@ -30,7 +30,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(function 
     formElement?.addEventListener("reset",reset);
     return()=>formElement?.removeEventListener("reset",reset);
   },[defaultValue,options[0]?.value]);
-  return <span className={cn("inline-flex min-w-0 w-full", containerClassName)}>
+  return <span className={cn("relative inline-flex min-w-0 w-full", containerClassName)}>
     <select {...props} onInvalid={event=>{event.preventDefault();triggerRef.current?.focus();triggerRef.current?.setAttribute("aria-invalid","true");props.onInvalid?.(event);}} ref={(node) => { nativeRef.current = node; if (typeof forwardedRef === "function") forwardedRef(node); else if (forwardedRef) forwardedRef.current = node; }} value={selected} onChange={onChange} disabled={disabled} name={name} required={required} form={form} aria-hidden="true" tabIndex={-1} className="sr-only pointer-events-none" style={{position:"absolute",width:1,height:1,opacity:0}}>{children}</select>
     <Primitive.Root value={selected === "" ? EMPTY : selected} disabled={disabled} onValueChange={(next) => {
       const actual = next === EMPTY ? "" : next;

@@ -7,6 +7,10 @@ export function listTimeZones(deviceTimeZone: string): string[] {
 	return [...new Set(["UTC", deviceTimeZone, ...supported])].sort((a, b) => a.localeCompare(b));
 }
 
+export function timeZoneLabel(zone: string): string {
+ return zone.replaceAll("_", " ").replaceAll("/", " / ");
+}
+
 export function formatCurrentTimeInZone(timeZone: string): string {
 	return new Intl.DateTimeFormat(undefined, { timeZone, dateStyle: "full", timeStyle: "short" }).format(new Date());
 }
