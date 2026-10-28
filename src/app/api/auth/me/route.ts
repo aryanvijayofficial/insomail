@@ -9,6 +9,11 @@ export async function GET(request: Request) {
 	const env = getEnv();
 	const user = await getCurrentUser(env, request);
 	if (!user) {
+		// Public home needs an optional session probe, not a failed protected request.
+		// Other callers retain the normal 401 contract; no account data is returned.
+		if (new URL(request.url).searchParams.get("optional") === "1") {
+			return NextResponse.json({ user: null }, { headers: { "Cache-Control": "private, no-store" } });
+		}
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	}
 

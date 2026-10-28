@@ -54,6 +54,17 @@ export default function DrivePage() {
 	const uploadSeq = useRef(0);
 	const [sortKey, setSortKey] = useState<DriveSortKey>("name");
 	const columns = useDriveColumns();
+	const paneRef = useRef<HTMLDivElement>(null);
+	const [paneWidth, setPaneWidth] = useState(0);
+	// The sidebar and assistant can narrow this pane independently of the viewport.
+	const compactColumns = paneWidth < columns.widths.owner + columns.widths.updatedAt + columns.widths.size + 352;
+	useEffect(() => {
+		const pane = paneRef.current;
+		if (!pane) return;
+		const observer = new ResizeObserver(([entry]) => setPaneWidth(entry.contentRect.width));
+		observer.observe(pane);
+		return () => observer.disconnect();
+	}, []);
 	const [ascending, setAscending] = useState(true);
 	const [dragging, setDragging] = useState(false);
 	const [search, setSearch] = useState(query);
@@ -240,10 +251,10 @@ export default function DrivePage() {
 	const headerButton = (key: DriveSortKey, label: string) => (
 		<button type="button" onClick={() => toggleSort(key)} className="flex min-w-0 items-center gap-1 font-medium text-neutral-600 hover:text-neutral-900"><span className="truncate">{label}</span>{sortKey === key && <SortIcon size={12} className="shrink-0" />}</button>
 	);
-	const gridStyle = { "--drive-columns": columns.template } as React.CSSProperties;
+	const gridStyle = { gridTemplateColumns: compactColumns ? "2rem minmax(0,1fr) 2.5rem" : columns.template };
 
 	return (
-		<div className="relative flex h-full min-h-0 flex-col" onDragEnter={onDragEnter} onDragOver={(event) => { if (canWrite && event.dataTransfer.types.includes("Files")) event.preventDefault(); }} onDragLeave={onDragLeave} onDrop={onDrop}>
+		<div ref={paneRef} className="relative flex h-full min-h-0 min-w-0 flex-col" onDragEnter={onDragEnter} onDragOver={(event) => { if (canWrite && event.dataTransfer.types.includes("Files")) event.preventDefault(); }} onDragLeave={onDragLeave} onDrop={onDrop}>
 			<Toaster position="bottom-left" containerClassName="text-sm" />
 			
 			{headerTarget && createPortal(
@@ -280,23 +291,23 @@ export default function DrivePage() {
 					</div>
 				</div>
 				{view === "trash" && !folder && <p className="shrink-0 border-b border-neutral-200 bg-neutral-50 px-5 py-2 text-xs text-neutral-600">{t("drive.trashNotice", { days: 30 })}</p>}
-				<div style={gridStyle} className="grid shrink-0 grid-cols-[2rem_minmax(0,1fr)_2.5rem] items-center gap-x-4 border-b border-neutral-200 px-5 py-2 text-sm md:grid-cols-[var(--drive-columns)]">
+				<div style={gridStyle} className="grid shrink-0 grid-cols-[2rem_minmax(0,1fr)_2.5rem] items-center gap-x-4 border-b border-neutral-200 px-5 py-2 text-sm">
 					<Checkbox ref={selectAllRef} checked={allSelected} onChange={() => setSelectedIds(allSelected ? new Set() : new Set(selectable.map((item) => item.id)))} disabled={selectable.length === 0} aria-label={t("drive.selectAll")} className="ml-1" />
 					<span className="min-w-0 pl-7">{headerButton("name", t("drive.name"))}</span>
-					<span className="relative hidden min-w-0 md:block">{headerButton("owner", attachmentsView ? t("drive.from") : t("drive.owner"))}<ColumnResizeHandle column="owner" width={columns.widths.owner} onResize={columns.resize} label={t("drive.owner")} /></span>
-					<span className="relative hidden min-w-0 md:block">{headerButton("updatedAt", t("drive.modified"))}<ColumnResizeHandle column="updatedAt" width={columns.widths.updatedAt} onResize={columns.resize} label={t("drive.modified")} /></span>
-					<span className="relative hidden min-w-0 md:block">{headerButton("size", t("drive.fileSize"))}<ColumnResizeHandle column="size" width={columns.widths.size} onResize={columns.resize} label={t("drive.fileSize")} /></span>
+					<span className={clsx("relative min-w-0", compactColumns && "hidden")}>{headerButton("owner", attachmentsView ? t("drive.from") : t("drive.owner"))}<ColumnResizeHandle column="owner" width={columns.widths.owner} onResize={columns.resize} label={t("drive.owner")} /></span>
+					<span className={clsx("relative min-w-0", compactColumns && "hidden")}>{headerButton("updatedAt", t("drive.modified"))}<ColumnResizeHandle column="updatedAt" width={columns.widths.updatedAt} onResize={columns.resize} label={t("drive.modified")} /></span>
+					<span className={clsx("relative min-w-0", compactColumns && "hidden")}>{headerButton("size", t("drive.fileSize"))}<ColumnResizeHandle column="size" width={columns.widths.size} onResize={columns.resize} label={t("drive.fileSize")} /></span>
 					<span />
 				</div>
 				<div role={!failed && !loading && sorted.length > 0 ? "list" : undefined} aria-label={!failed && !loading && sorted.length > 0 ? t("drive.title") : undefined} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 space-y-px pt-px">
 					{failed ? <p className="p-8 text-center text-sm text-neutral-500">{t("drive.loadFailed")}</p>
 						: loading ? Array.from({ length: 8 }, (_, index) => (
-							<div key={index} aria-hidden="true" style={gridStyle} className="grid grid-cols-[2rem_minmax(0,1fr)_2.5rem] items-center gap-x-4 px-3 py-3.5 md:grid-cols-[var(--drive-columns)]">
+							<div key={index} aria-hidden="true" style={gridStyle} className="grid grid-cols-[2rem_minmax(0,1fr)_2.5rem] items-center gap-x-4 px-3 py-3.5">
 								<Skeleton className="ml-1 h-4 w-4" />
 								<span className="flex items-center gap-3"><Skeleton className="h-4 w-4 shrink-0" /><Skeleton className="h-4" style={{ width: `${45 + ((index * 17) % 40)}%` }} /></span>
-								<Skeleton className="hidden h-6 w-6 rounded-full md:block" />
-								<Skeleton className="hidden h-4 w-24 md:block" />
-								<Skeleton className="hidden h-4 w-14 md:block" />
+								<Skeleton className={clsx("h-6 w-6 rounded-full", compactColumns && "hidden")} />
+								<Skeleton className={clsx("h-4 w-24", compactColumns && "hidden")} />
+								<Skeleton className={clsx("h-4 w-14", compactColumns && "hidden")} />
 								<span />
 							</div>
 						))
@@ -308,16 +319,16 @@ export default function DrivePage() {
 								? driveDropHandlers({ kind: "folder", id: item.id }, () => canDropDrive({ kind: "folder", id: item.id }), t, (over) => setDropFolder((current) => (over ? item.id : current === item.id ? null : current)))
 								: {};
 							return (
-								<div key={item.id} role="listitem" style={gridStyle} draggable={isDriveDraggable(item)} onDragStart={(event) => onItemDragStart(event, item)} onDragEnd={onItemDragEnd} {...dropTarget} className={clsx("group grid grid-cols-[2rem_minmax(0,1fr)_2.5rem] items-center gap-x-4 rounded-lg px-3 text-sm md:grid-cols-[var(--drive-columns)]", dropFolder === item.id ? "bg-blue-100 ring-2 ring-inset ring-blue-500" : selectedIds.has(item.id) ? "bg-blue-50" : "hover:bg-neutral-50", movingIds.has(item.id) && "opacity-50")}>
+								<div key={item.id} role="listitem" style={gridStyle} draggable={isDriveDraggable(item)} onDragStart={(event) => onItemDragStart(event, item)} onDragEnd={onItemDragEnd} {...dropTarget} className={clsx("group grid grid-cols-[2rem_minmax(0,1fr)_2.5rem] items-center gap-x-4 rounded-lg px-3 text-sm", dropFolder === item.id ? "bg-blue-100 ring-2 ring-inset ring-blue-500" : selectedIds.has(item.id) ? "bg-blue-50" : "hover:bg-neutral-50", movingIds.has(item.id) && "opacity-50")}>
 									<Checkbox checked={selectedIds.has(item.id)} onChange={() => toggleItem(item.id)} disabled={!selectable.includes(item)} aria-label={t("drive.selectItem", { name: item.name })} className={clsx("ml-1", !selectable.includes(item) && "invisible")} />
 									<button type="button" onClick={() => open(item)} aria-disabled={item.trashedAt ? true : undefined} className="flex min-w-0 items-center gap-3 py-3 text-left aria-disabled:cursor-default">
 										<Icon size={16} className={clsx("shrink-0", className)} fill={item.kind === "folder" ? "currentColor" : "none"} />
 										<span className="truncate text-neutral-900">{item.name}</span>
 										{item.shared && item.role === "owner" && <Share2 size={12} className="shrink-0 text-neutral-500" aria-label={t("drive.share")} />}
 									</button>
-									<span className="hidden md:block"><DriveOwnerAvatar item={item} /></span>
-									<span className="hidden text-neutral-600 md:block">{dateFormat.format(new Date(item.updatedAt))}</span>
-									<span className="hidden text-neutral-600 md:block">{item.kind === "file" ? formatDriveSize(item.size) : "—"}</span>
+									<span className={compactColumns ? "hidden" : undefined}><DriveOwnerAvatar item={item} /></span>
+									<span className={clsx("truncate text-neutral-600", compactColumns && "hidden")}>{dateFormat.format(new Date(item.updatedAt))}</span>
+									<span className={clsx("truncate text-neutral-600", compactColumns && "hidden")}>{item.kind === "file" ? formatDriveSize(item.size) : "—"}</span>
 									<DropdownMenu.Root>
 										<DropdownMenu.Trigger asChild>
 											<button type="button" aria-label={t("drive.actions")} className="flex h-9 w-9 items-center justify-center rounded-full text-neutral-600 hover:bg-neutral-200"><MoreVertical size={16} /></button>

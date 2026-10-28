@@ -133,8 +133,11 @@ test("preference cookie persists for a year, covers every path and is Secure on 
 test("provider server rendering uses initial locale and labels the native language selector", async () => {
 	const pt = await i18n.renderLanguage("pt-BR");
 	assert.match(pt, /<span>Entrada<\/span>/);
-	assert.match(pt, /<label for="[^"]+"[^>]*>Idioma<\/label>/);
-	assert.match(pt, /<select id="[^"]+"/);
+	const label = pt.match(/<label\b[^>]*\bfor="([^"]+)"[^>]*>Idioma<\/label>/);
+	assert.ok(label, "translated label has a for attribute regardless of attribute order");
+	const select = pt.match(/<select\b[^>]*\bid="([^"]+)"/);
+	assert.ok(select, "native language selector has an id");
+	assert.equal(label[1], select[1], "translated label targets the language selector");
 	assert.match(pt, /value="pt-BR" lang="pt-BR" selected=""/);
 	assert.match(await i18n.renderLanguage("en"), /value="en" lang="en" selected=""/);
 });

@@ -12,7 +12,7 @@ export function HomeAuthProvider({ children }: HomeAuthProviderProps) {
 
 	useEffect(() => {
 		let cancelled = false;
-		void authFetch("/api/auth/me", { redirectOnUnauthorized: false })
+		void authFetch("/api/auth/me?optional=1", { redirectOnUnauthorized: false })
 			.then(async (response) => response.ok ? await response.json() as HomeAuthResponse : null)
 			.then((data) => {
 				if (!cancelled) setUser(data?.user ?? null);

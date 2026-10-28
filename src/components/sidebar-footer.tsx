@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useSidebar } from "./sidebar-state";
 import { useShortcuts } from "./shortcuts";
 import { Keyboard } from "lucide-react";
@@ -35,5 +36,5 @@ export function SidebarFooter() {
 
 /** Legal and source navigation shared by the mail and Drive sidebars. */
 export function PoweredBy({ className = "px-1" }: { className?: string }) {
- return <p className={`${className} text-[11px] text-neutral-500`}><a href="/about" className="underline">About &amp; License</a></p>;
+ return <p className={`${className} text-[11px] text-neutral-500`}><Link href="/about" className="underline">About &amp; License</Link></p>;
 }

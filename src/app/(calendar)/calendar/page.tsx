@@ -393,7 +393,7 @@ export default function CalendarPage() {
       <h1 className="sr-only">{t("account.calendar")}</h1>
       {loading && <RouteLoadingBarPortal />}
       {headerTarget && createPortal(
-        <div className="flex min-w-0 flex-1 items-center justify-between gap-3 ">
+        <div className="flex min-w-0 flex-1 flex-wrap items-center justify-between gap-x-3 gap-y-2 ">
           <div className="flex shrink-0 items-center gap-2">
           <div ref={monthPickerRef} className="relative shrink-0">
             <button type="button" onClick={(event) => {
@@ -446,20 +446,20 @@ export default function CalendarPage() {
           <div className="flex shrink-0 items-center gap-1.5">
             <button type="button" aria-label={t(view === "week" ? "calendar.previousView.week" : "calendar.previousView.day")} onClick={() => setVisibleDate(addDays(visibleDate, view === "week" ? -7 : -1))} className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-600 hover:bg-white"><ChevronLeft className="h-6 w-6" /></button>
             <button type="button" aria-label={t(view === "week" ? "calendar.nextView.week" : "calendar.nextView.day")} onClick={() => setVisibleDate(addDays(visibleDate, view === "week" ? 7 : 1))} className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-600 hover:bg-white"><ChevronRight className="h-6 w-6" /></button>
-            <button type="button" onClick={() => setVisibleDate(new Date())} className="h-10 rounded-full max-md:hidden bg-white px-4 text-sm font-medium text-neutral-700 hover:bg-neutral-50">{t("calendar.today")}</button>
+            <button type="button" onClick={() => setVisibleDate(new Date())} className="h-10 rounded-full max-lg:hidden bg-white px-4 text-sm font-medium text-neutral-700 hover:bg-neutral-50">{t("calendar.today")}</button>
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
-                <button type="button" aria-label={t("calendar.options")} className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-600 hover:bg-white md:hidden"><MoreVertical className="h-5 w-5" /></button>
+                <button type="button" aria-label={t("calendar.options")} className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-600 hover:bg-white lg:hidden"><MoreVertical className="h-5 w-5" /></button>
               </DropdownMenu.Trigger>
               <DropdownMenu.Portal>
-                <DropdownMenu.Content align="end" sideOffset={4} className="z-[130] min-w-40 rounded-xl border border-neutral-200 bg-white p-1 text-sm shadow-xl md:hidden">
+                <DropdownMenu.Content align="end" sideOffset={4} className="z-[130] min-w-40 rounded-xl border border-neutral-200 bg-white p-1 text-sm shadow-xl lg:hidden">
                   <DropdownMenu.Item onSelect={() => setVisibleDate(new Date())} className="cursor-pointer rounded-lg px-3 py-2 text-neutral-700 outline-none data-[highlighted]:bg-neutral-100">{t("calendar.today")}</DropdownMenu.Item>
                   <DropdownMenu.Separator className="my-1 h-px bg-neutral-100" />
                   {(["week", "day"] as const).map((option) => <DropdownMenu.Item key={option} onSelect={() => setView(option)} className="flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-neutral-700 outline-none data-[highlighted]:bg-neutral-100">{option === "week" ? t("calendar.week") : t("calendar.day")}{view === option && <Check className="h-4 w-4 text-blue-600" />}</DropdownMenu.Item>)}
                 </DropdownMenu.Content>
               </DropdownMenu.Portal>
             </DropdownMenu.Root>
-            <div className="relative max-md:hidden">
+            <div className="relative max-lg:hidden">
               <select value={view} onChange={(event) => setView(event.target.value as CalendarView)} aria-label={t("calendar.view")} className="h-10 appearance-none rounded-full border-0 bg-white pl-4 pr-10 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
                 <option value="week">{t("calendar.week")}</option>
                 <option value="day">{t("calendar.day")}</option>
