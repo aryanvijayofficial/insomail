@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getEnv } from "@/lib/cloudflare";
-import { requireUser } from "@/lib/auth/cookies";
+import { getCurrentUser, requireUser } from "@/lib/auth/cookies";
 import { canManageDomains } from "@/lib/auth/admin";
 import { addDomainSchema } from "@/lib/validators";
 import { addDomainForUser, listUserDomains } from "@/lib/domains/service";
@@ -11,7 +11,8 @@ import { hasValidSessionMutationOrigin } from "@/lib/auth/origin";
 
 export async function GET(request: NextRequest) {
 	const env = getEnv();
-	const user = await requireUser(env, request);
+	const user = await getCurrentUser(env, request);
+	if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	const domainOwnerId = user.canManageMailboxes && user.createdByUserId ? user.createdByUserId : user.id;
 	const domains = await listUserDomains(env, domainOwnerId);
 

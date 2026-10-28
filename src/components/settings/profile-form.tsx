@@ -161,7 +161,6 @@ export function ProfileForm({
             type="email"
             readOnly
             aria-readonly="true"
-            className="bg-neutral-50"
           />
         </div>
 

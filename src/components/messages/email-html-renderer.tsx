@@ -18,8 +18,10 @@ img, video { max-width:100%; height:auto; }
 .email-quote-content { display:flow-root; }
 `;
 
-export function EmailHtmlRenderer({ html, className, preserveLeadingQuote = false, autoAllowRemote = false, onAllowRemote }: {
+export function EmailHtmlRenderer({ html, className, preserveLeadingQuote = false, autoAllowRemote = false, onAllowRemote, paperPadding = 0 }: {
 	html: string; className?: string; preserveLeadingQuote?: boolean;
+	/** Inset inside the light paper, independent of surrounding app chrome. */
+	paperPadding?: number;
 	/** Load remote content without a click; the reader can still block it. */
 	autoAllowRemote?: boolean;
 	/** Called when the reader chooses to load remote content. */
@@ -76,6 +78,6 @@ export function EmailHtmlRenderer({ html, className, preserveLeadingQuote = fals
 				{allowRemote ? null : t("message.allowRemote")}
 			</button>
 		</div>}
-		<div className="max-w-full overflow-x-auto" ref={host} />
+		<div className="max-w-full overflow-x-auto" style={{ padding: paperPadding }} ref={host} />
 	</div>;
 }

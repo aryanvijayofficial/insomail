@@ -382,12 +382,12 @@ export function MailboxSelector({ initialUser }: MailboxSelectorProps = {}) {
 						</div>
 					)}
 
-					<div className="mt-2 overflow-hidden rounded-[22px] bg-white">
+					<div className="mt-2 space-y-1 overflow-hidden rounded-[22px] bg-white p-3">
 						{user?.role === "admin" && (
 							<Link
 								href="/admin"
 								onClick={() => setOpen(false)}
-								className={`flex items-center gap-3 border-t border-neutral-100 px-5 py-4 text-sm font-medium text-neutral-800 hover:bg-[#f2f6fc] ${adminActive ? "bg-blue-50" : ""}`}
+								className={`flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-neutral-800 hover:bg-[#f2f6fc] ${adminActive ? "bg-blue-50" : ""}`}
 							>
 								<ShieldCheck size={18} className="text-neutral-600" />
 								{t("account.admin")}
@@ -397,7 +397,7 @@ export function MailboxSelector({ initialUser }: MailboxSelectorProps = {}) {
 						<Link
 							href="/login?add=1"
 							onClick={() => setOpen(false)}
-							className="flex items-center gap-3 px-5 py-4 text-sm font-medium text-neutral-800 hover:bg-[#f2f6fc]"
+							className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-neutral-800 hover:bg-[#f2f6fc]"
 						>
 							<UserPlus size={18} className="text-neutral-600" />
 							{t("account.addAnother")}
@@ -405,7 +405,7 @@ export function MailboxSelector({ initialUser }: MailboxSelectorProps = {}) {
 						<button
 							type="button"
 							onClick={logout}
-							className="flex w-full items-center gap-3 border-t border-neutral-100 px-5 py-4 text-left text-sm font-medium text-neutral-800 hover:bg-[#f2f6fc]"
+							className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-medium text-neutral-800 hover:bg-[#f2f6fc]"
 						>
 							<LogOut size={18} className="text-neutral-600" />
 							{t("account.signOut")}

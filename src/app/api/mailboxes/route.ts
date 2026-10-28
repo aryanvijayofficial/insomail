@@ -3,7 +3,7 @@ import { and, eq } from "drizzle-orm";
 import { getEnv } from "@/lib/cloudflare";
 import { getDb } from "@/db";
 import { domains, mailboxAliases, mailboxes, users } from "@/db/schema";
-import { requireUser } from "@/lib/auth/cookies";
+import { getCurrentUser, requireUser } from "@/lib/auth/cookies";
 import { newId } from "@/lib/ids";
 import { getLicenseEntitlements } from "@/lib/licenses/service";
 import { tracksAccountIdentity } from "@/lib/profile/identity-utils";
@@ -13,7 +13,8 @@ import { ensurePersonalMailbox } from "./utils";
 
 export async function GET(request: Request) {
 	const env = getEnv();
-	const user = await requireUser(env, request);
+	const user = await getCurrentUser(env, request);
+	if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	const db = getDb(env);
 	const rows = await ensurePersonalMailbox(env, db, user);
 	const entitlements = await getLicenseEntitlements(env);

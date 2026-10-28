@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useLanguage } from "@/components/language-provider";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Combobox } from "@/components/ui/combobox";
 import { Label } from "@/components/ui/label";
 import { saveUserTimeZonePreference } from "@/lib/time/client";
 import { formatCurrentTimeInZone, listTimeZones, updateUserTimeZone } from "./time-zone-form-utils";
@@ -37,8 +37,7 @@ export function TimeZoneForm({ userId, initialTimeZone }: TimeZoneFormProps) {
 		<div className="space-y-2">
 			<Label htmlFor="account-time-zone">{t("settings.timeZone.title")}</Label>
 			<p className="text-sm leading-6 text-neutral-500">{t("settings.timeZone.description", { zone: deviceTimeZone })}</p>
-            <Input id="account-time-zone" list="account-time-zone-options" value={timeZone} onChange={(event) => { setTimeZone(event.target.value); setStatus(null); }} placeholder={t("settings.timeZone.placeholder", { zone: deviceTimeZone })} autoComplete="off" />
-			<datalist id="account-time-zone-options">{listTimeZones(deviceTimeZone).map((zone) => <option key={zone} value={zone} />)}</datalist>
+            <Combobox id="account-time-zone" value={timeZone} onChange={(value) => { setTimeZone(value); setStatus(null); }} options={listTimeZones(deviceTimeZone)} placeholder={t("settings.timeZone.placeholder", { zone: deviceTimeZone })} disabled={saving} />
 			{validZone && <p className="text-sm text-neutral-500">{t("settings.timeZone.current", { time: validZone })}</p>}
 		</div>
 		<div className="flex items-center gap-3">

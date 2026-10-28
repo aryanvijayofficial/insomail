@@ -68,6 +68,7 @@ export function MailboxSignatureForm() {
 					<EmailHtmlRenderer
 						className="rounded-md border border-neutral-200 bg-white p-4 text-sm text-neutral-900"
 						html={signature}
+						paperPadding={16}
 					/>
 				</div>
 			)}

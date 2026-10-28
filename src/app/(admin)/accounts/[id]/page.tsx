@@ -89,7 +89,7 @@ export default function AccountDetailsPage() {
 				</div>
 				<div className="space-y-2">
 					<Label htmlFor="account-email">{t("auth.email")}</Label>
-					<Input id="account-email" value={account.email} readOnly className="bg-neutral-50 text-neutral-500" />
+					<Input id="account-email" value={account.email} readOnly />
 				</div>
 				<div className="space-y-2">
 					<Label htmlFor="account-name">{t("common.name")}</Label>
