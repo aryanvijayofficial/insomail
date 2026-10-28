@@ -44,14 +44,14 @@ test('free-plan overview copy cannot regress to paid requirements in another loc
  const result=await build({entryPoints:['src/lib/i18n/utils.ts'],bundle:true,write:false,format:'esm',platform:'node'});
  const {createTranslator}=await import('data:text/javascript;base64,'+Buffer.from(result.outputFiles[0].text).toString('base64'));
  const t=createTranslator('en',{'admin.nav.licenses':'Licenses','admin.section.accounts':'Pay for Pro'});
- assert.equal(t('admin.nav.licenses'),'Plans');
+ assert.equal(t('admin.nav.licenses'),'About & License');
  assert.match(t('admin.section.accounts'),/Admin-only/);
  assert.doesNotMatch(t('admin.section.accounts'),/license|Pay/);
 });
 
 test('plan badge reflects selected plan without changing it and notices remain convenient',()=>{
  const badge=readFileSync('src/components/license-indicator.tsx','utf8');
- assert.match(badge,/api\/settings\/plan/); assert.match(badge,/insomail:plan-changed/);assert.doesNotMatch(badge,/Free plans|method:/);
+ assert.match(badge,/return null/);assert.doesNotMatch(badge,/authFetch|method:|<Link/);
  const footer=readFileSync('src/components/sidebar-footer.tsx','utf8');assert.match(footer,/About &amp; License/);assert.doesNotMatch(footer,/api\/source/);
  const about=readFileSync('src/app/about/page.tsx','utf8');assert.match(about,/Copyright \(C\) 2026 Hieu Nguyen/);assert.match(about,/no warranty/);assert.match(about,/about\/license/); const license=readFileSync("src/app/about/license/page.tsx","utf8");assert.match(license,/AGPL_LICENSE/);
 });

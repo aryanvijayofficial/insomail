@@ -44,21 +44,9 @@ export async function getLicenseStatus(env: CloudflareEnv): Promise<LicenseStatu
 	return toLicenseStatus(await getOrCreateLicenseSettings(env));
 }
 
-export async function getLicenseEntitlements(env: CloudflareEnv): Promise<LicenseEntitlements> {
-	try {
-		const status = await getLicenseStatus(env);
-		// Pro adds accounts up to its seat limit; Team is unlimited and also unlocks shared mailboxes.
-		return applyInsoMailAccountPolicy({
-			plan: status.plan,
-			canCustomizeBranding: status.active,
-			canManageAccounts: status.active,
-			canShareMailboxes: status.active && status.plan === "team",
-			accountSeatLimit: status.seatLimit,
-			canForwardEmail: status.active,
-		});
-	} catch {
-		return applyInsoMailAccountPolicy({ plan: "community", canCustomizeBranding: false, canManageAccounts: false, canShareMailboxes: false, accountSeatLimit: 0, canForwardEmail: false });
-	}
+// One local capability set. Legacy vendor license rows do not gate features.
+export async function getLicenseEntitlements(_env: CloudflareEnv): Promise<LicenseEntitlements> {
+ return applyInsoMailAccountPolicy({ plan: "community", canCustomizeBranding: false, canManageAccounts: false, canShareMailboxes: false, accountSeatLimit: 0, canForwardEmail: false });
 }
 
 async function updateLicenseFromPaymug(

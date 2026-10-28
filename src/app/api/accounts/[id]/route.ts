@@ -69,7 +69,7 @@ export async function PATCH(request: Request, { params }: AccountRouteParams) {
 	}
 	const canForwardEmail = (await getLicenseEntitlements(access.env)).canForwardEmail;
 	if (!canForwardEmail && parsed.data.forwardingEmail && parsed.data.forwardingEmail !== account.forwardingEmail) {
-		return NextResponse.json({ error: "A Pro or Team license is required for email forwarding" }, { status: 403 });
+		return NextResponse.json({ error: "Email forwarding is not allowed" }, { status: 403 });
 	}
 	if (account.disabled && !parsed.data.disabled) {
 		const seatError = await getAccountSeatError(access.env);

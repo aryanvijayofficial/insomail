@@ -1,4 +1,3 @@
-import { hasInsoMailTeamPlan } from "@/lib/insomail/user-plan";
 import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { domains, mailboxAccess, mailboxes } from "@/db/schema";
@@ -42,12 +41,11 @@ export async function getMailboxNotificationUserIds(
 			.map((access) => access.userId)
 		: [];
 
-	const teamSelections = await Promise.all(sharedUserIds.map(id => hasInsoMailTeamPlan(db, id)));
 	return [
 		...new Set([
 			ownerUserId,
 			mailboxRows[0]?.domainOwnerUserId,
-			...sharedUserIds.filter((_, index) => teamSelections[index]),
+			...sharedUserIds,
 		].filter((userId): userId is string => !!userId)),
 	];
 }

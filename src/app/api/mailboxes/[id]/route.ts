@@ -1,4 +1,3 @@
-import { hasInsoMailTeamPlan } from "@/lib/insomail/user-plan";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
@@ -36,7 +35,7 @@ export async function GET(request: Request, { params }: MailboxRouteParams) {
 			displayName: identity ? ownerName : mailbox.displayName,
 			hasAvatar: identity ? !!ownerAvatarKey : !!avatarKey,
 			permission: access.permission,
-			canManageSharing: user.role === "admin" && mailbox.type === "shared" && mailbox.userId === user.id && await hasInsoMailTeamPlan(db, user.id),
+			canManageSharing: user.role === "admin" && mailbox.type === "shared" && mailbox.userId === user.id,
 			isPrimary: isPrimaryMailbox(mailbox, ownerEmail),
 		},
 	});

@@ -1,4 +1,3 @@
-import { hasInsoMailTeamPlan } from "@/lib/insomail/user-plan";
 import { NextResponse } from "next/server";
 import { and, eq } from "drizzle-orm";
 import { getEnv } from "@/lib/cloudflare";
@@ -26,7 +25,7 @@ export async function GET(request: Request) {
 				: {}),
 			senderAddresses: await getMailboxDomainAddresses(db, mailbox),
 		}))),
-		canCreateShared: user.role === "admin" && entitlements.canShareMailboxes && await hasInsoMailTeamPlan(db, user.id),
+		canCreateShared: user.role === "admin" && entitlements.canShareMailboxes,
 	});
 }
 
@@ -42,8 +41,8 @@ export async function POST(request: Request) {
 	const mailboxType = parsed.data.type ?? "personal";
 	if (mailboxType === "shared") {
 		const entitlements = await getLicenseEntitlements(env);
-		if (user.role !== "admin" || !entitlements.canShareMailboxes || !(await hasInsoMailTeamPlan(db, user.id))) {
-			return NextResponse.json({ error: "Choose the free Team plan to create shared inboxes" }, { status: 403 });
+		if (user.role !== "admin" || !entitlements.canShareMailboxes) {
+			return NextResponse.json({ error: "Shared inbox creation is not allowed" }, { status: 403 });
 		}
 	}
 	const ownerUserId = mailboxType === "shared" ? user.id : parsed.data.ownerUserId ?? user.id;

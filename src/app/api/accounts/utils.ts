@@ -1,4 +1,3 @@
-import { hasInsoMailTeamPlan } from "@/lib/insomail/user-plan";
 import { and, desc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
@@ -84,12 +83,12 @@ export function accountListItemFromUser(user: {
 	};
 }
 
-/** Admin session on an installation licensed for Team-only mailbox sharing. */
+/** Admin session with shared mailbox management capability. */
 export async function requireTeamSharingAdmin(request: Request) {
 	const access = await requireTeamAdmin(request);
 	if (access.error) return access;
-	if (!(await getLicenseEntitlements(access.env)).canShareMailboxes || !(await hasInsoMailTeamPlan(getDb(access.env), access.user!.id))) {
-		return { ...access, error: NextResponse.json({ error: "Choose the free Team plan to manage shared inboxes" }, { status: 403 }) };
+	if (!(await getLicenseEntitlements(access.env)).canShareMailboxes) {
+		return { ...access, error: NextResponse.json({ error: "Shared inbox management is not allowed" }, { status: 403 }) };
 	}
 	return access;
 }
@@ -103,7 +102,7 @@ export async function requireTeamAdmin(request: Request) {
 			return {
 				env,
 				user,
-				error: NextResponse.json({ error: "A Pro or Team license is required to manage accounts" }, { status: 403 }),
+				error: NextResponse.json({ error: "Account management is not allowed" }, { status: 403 }),
 			};
 		}
 		return { env, user, error: null };

@@ -26,7 +26,7 @@ export async function PATCH(request: Request) {
 	const db = getDb(env);
 	const canForwardEmail = (await getLicenseEntitlements(env)).canForwardEmail;
 	if (!canForwardEmail && parsed.forwardingEmail && parsed.forwardingEmail !== user.forwardingEmail) {
-		return NextResponse.json({ error: "A Pro or Team license is required for email forwarding" }, { status: 403 });
+		return NextResponse.json({ error: "Email forwarding is not allowed" }, { status: 403 });
 	}
 	const forwardingEmail = parsed.forwardingEmail === undefined ? user.forwardingEmail : parsed.forwardingEmail;
 	await syncPersonalIdentity(db, {

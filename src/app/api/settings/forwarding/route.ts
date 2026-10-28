@@ -25,7 +25,7 @@ export async function PATCH(request: Request) {
 	}
 
 	if (!(await getLicenseEntitlements(env)).canForwardEmail) {
-		return NextResponse.json({ error: "A Pro or Team license is required for email forwarding" }, { status: 403 });
+		return NextResponse.json({ error: "Email forwarding is not allowed" }, { status: 403 });
 	}
 
 	await getDb(env)
