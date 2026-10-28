@@ -1,5 +1,6 @@
 "use client";
 
+import { useConfirmDialog } from "@/components/ui/use-confirm-dialog";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { MouseEvent } from "react";
@@ -304,6 +305,7 @@ export function MessageFolderPage({
 	selection,
 }: MessageFolderPageProps) {
 	const { t } = useLanguage();
+	const {confirm, confirmationDialog} = useConfirmDialog();
 	const title = config.titleKey ? t(config.titleKey) : config.title;
 	const { selectedMailbox, isLoading: mailboxesLoading } = useSelectedMailbox();
 	const { query } = useMailSearch();
@@ -421,17 +423,14 @@ export function MessageFolderPage({
 	const permanentDeleteFolder = !config.folderId && supportsPermanentDelete(config.folder) ? config.folder : null;
 	async function emptyFolder() {
 		if (!permanentDeleteFolder || !selectedMailbox?.id) return;
-		if (!window.confirm(getEmptyFolderConfirmText(permanentDeleteFolder, titleTotal, t))) return;
-		setEmptyingFolder(true);
-		try {
-			await emptyMessageFolder(selectedMailbox.id, permanentDeleteFolder);
-			setOffset(0);
-		} catch (error) {
-			console.error(error);
-			window.alert(t("list.emptyFailed", { folder: getPermanentDeleteFolderLabel(permanentDeleteFolder, t) }));
-		} finally {
-			setEmptyingFolder(false);
-		}
+		const mailboxId = selectedMailbox.id;
+		const folder = permanentDeleteFolder;
+		await confirm({title:getEmptyFolderLabel(folder,t), description:getEmptyFolderConfirmText(folder,titleTotal,t), confirmLabel:getEmptyFolderLabel(folder,t), action:async()=>{
+			setEmptyingFolder(true);
+			try { await emptyMessageFolder(mailboxId,folder); setOffset(0); }
+			catch { throw new Error(t("list.emptyFailed",{folder:getPermanentDeleteFolderLabel(folder,t)})); }
+			finally {setEmptyingFolder(false);}
+		}});
 	}
 
 	useEffect(() => {
@@ -453,7 +452,7 @@ export function MessageFolderPage({
 		if (selectedIds.length === 0) return;
 		if (action === "delete") {
 			const ids = expandSelectedIds(selectedIds);
-			if (!window.confirm(getPermanentDeleteConfirmText(ids.length, t))) return;
+			if (!await confirm({title:t("common.deleteForever"),description:getPermanentDeleteConfirmText(ids.length,t),confirmLabel:t("common.deleteForever")})) return;
 		}
 
 		setPendingBulkAction(true);
@@ -489,6 +488,7 @@ export function MessageFolderPage({
 
 	return (
 		<div className="flex h-full min-h-0 flex-col">
+			{confirmationDialog}
 			<div className={`flex h-14 shrink-0 items-center justify-between border-b border-neutral-200 ${compact ? "px-4" : "px-4.5 md:px-6"}`}>
 				{selectedMessageId ? <h2 className="sr-only">{title}</h2> : <h1 className="sr-only">{title}</h1>}
 				<div className="flex items-center gap-3 w-full">

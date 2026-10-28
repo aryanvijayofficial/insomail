@@ -1,6 +1,7 @@
 "use client";
 
 import { mobilePrimaryActionAboveNavClass } from "@/components/page-header-utils";
+import { useConfirmDialog } from "@/components/ui/use-confirm-dialog";
 import { useEffect, useState } from "react";
 import { Copy, KeyRound, Plus, Trash2 } from "lucide-react";
 import { useLanguage } from "@/components/language-provider";
@@ -21,6 +22,7 @@ import { createManagedApiKey, keyPermissions, loadManagedApiKeys, MCP_KEY_SCOPES
 
 export function ApiKeysSettings() {
 	const { t } = useLanguage();
+	const {confirm,confirmationDialog}=useConfirmDialog();
 	const { mailboxes, selectedMailbox } = useSelectedMailbox();
 	const [keys, setKeys] = useState<ManagedApiKey[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -62,7 +64,7 @@ export function ApiKeysSettings() {
 	}
 
 	async function revoke(key: ManagedApiKey) {
-		if (!window.confirm(t("apiKeys.revokeConfirm", { name: key.name }))) return;
+		if (!await confirm({title:t("common.revoke"),description:t("apiKeys.revokeConfirm",{name:key.name}),confirmLabel:t("common.revoke")})) return;
 		setRevokingId(key.id);
 		setError(null);
 		try {
@@ -73,7 +75,7 @@ export function ApiKeysSettings() {
 		} finally { setRevokingId(null); }
 	}
 
-	return <div className="space-y-6">
+	return <div className="space-y-6">{confirmationDialog}
 		<div className="flex items-center justify-between gap-4">
 			<h1 className="text-2xl md:text-3xl font-medium">{t("apiKeys.title")}</h1>
 		<Dialog open={createOpen} onOpenChange={(open) => { if (busy) return; setCreateOpen(open); setError(null); if (open && mailboxIds.length === 0) setMailboxIds([selectedMailbox?.id ?? mailboxes[0]?.id].filter((id): id is string => !!id)); if (!open) { setNewKey(null); setCopied(false); } }}>

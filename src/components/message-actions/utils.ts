@@ -61,12 +61,6 @@ export function openUnsubscribeUrl(url: string) {
   window.open(url, "_blank", "noopener,noreferrer");
 }
 
-export function confirmTrashWithoutUnsubscribe() {
-  return window.confirm(
-    "This email does not provide an unsubscribe link. It will be moved to Trash, and future emails from this sender will also be moved to Trash.",
-  );
-}
-
 export async function createTrashSenderRule({
   mailboxId,
   senderAddress,

@@ -12,10 +12,12 @@ import { formatScheduledSendTime } from "./scheduled-send-utils";
 export function ScheduledSendBanner({ messageId, scheduledAt }: { messageId: string; scheduledAt: string }) {
 	const { t } = useLanguage();
 	const router = useRouter();
+	const [error,setError]=useState<string|null>(null);
 	const [cancelling, setCancelling] = useState(false);
 
 	async function cancelSend() {
 		setCancelling(true);
+		setError(null);
 		try {
 			const response = await authFetch(`/api/messages/${messageId}/cancel-schedule`, { method: "POST" });
 			if (!response.ok) throw new Error("Unable to cancel");
@@ -23,13 +25,14 @@ export function ScheduledSendBanner({ messageId, scheduledAt }: { messageId: str
 			window.dispatchEvent(new Event("mailflare:messages-changed"));
 			router.push("/drafts");
 		} catch {
-			window.alert(t("schedule.cancelFailed"));
+			setError(t("schedule.cancelFailed"));
 			setCancelling(false);
 		}
 	}
 
 	return (
 		<div className="mx-6 mb-2 flex items-center gap-3 rounded-lg bg-neutral-100 px-4 py-3 text-sm text-neutral-600">
+			{error&&<span role="alert" className="text-red-600">{error}</span>}
 			<CalendarClock className="h-5 w-5 shrink-0 text-neutral-500" />
 			<span className="min-w-0 flex-1">{t("schedule.sendScheduledFor", { when: formatScheduledSendTime(scheduledAt, t) })}</span>
 			<button

@@ -1,5 +1,6 @@
 "use client";
 
+import { useConfirmDialog } from "@/components/ui/use-confirm-dialog";
 import { createElement, useState, useMemo, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Archive, Ban, BellOff, Clock, FileCode2, Forward, Mail, MailOpen, MoreVertical, Reply, ReplyAll, ShieldAlert, Trash2 } from "lucide-react";
@@ -17,7 +18,6 @@ import type { BulkMessageAction } from "@/app/api/messages/bulk/types";
 import type { MessageActionsProps, ReplyMode } from "./types";
 import { getPermanentDeleteConfirmText, PartialDeleteError, supportsPermanentDelete } from "@/lib/messages/permanent-delete-utils";
 import {
-	confirmTrashWithoutUnsubscribe,
 	blockMessageContact,
 	createForwardDraft,
 	createReplyDraft,
@@ -49,6 +49,7 @@ export function MessageActions({
 	bodyHtml,
 }: MessageActionsProps) {
 	const { t } = useLanguage();
+	const {confirm,confirmationDialog}=useConfirmDialog();
 	const router = useRouter();
 	const isMobile = useIsMobile();
 	const { openDraftComposer } = useCompose();
@@ -84,7 +85,7 @@ export function MessageActions({
 	// being a no-op, after the user confirms.
 	const canDeleteForever = supportsPermanentDelete(status);
 	const deleteForever = useCallback(async () => {
-		if (!window.confirm(getPermanentDeleteConfirmText(1, t))) return;
+		if (!await confirm({title:t("common.deleteForever"),description:getPermanentDeleteConfirmText(1,t),confirmLabel:t("common.deleteForever")})) return;
 		setMoreOpen(false);
 		setPendingAction("delete");
 		setError(null);
@@ -96,7 +97,7 @@ export function MessageActions({
 			setError(deleteError instanceof PartialDeleteError ? t("actions.error.deleteSkipped") : t("actions.error.delete"));
 			setPendingAction(null);
 		}
-	}, [messageId, direction, status, router, t]);
+	}, [messageId, direction, status, router, t, confirm]);
 	const onTrashClick = () => (canDeleteForever ? void deleteForever() : void runAction("trash"));
 	const trashLabel = canDeleteForever ? t("common.deleteForever") : t("actions.moveToTrash");
 
@@ -195,7 +196,7 @@ export function MessageActions({
 			return;
 		}
 
-		if (!confirmTrashWithoutUnsubscribe()) return;
+		if (!await confirm({title:t("actions.moveToTrash"),description:"This email does not provide an unsubscribe link. It will be moved to Trash, and future emails from this sender will also be moved to Trash.",confirmLabel:t("actions.moveToTrash")})) return;
 		setPendingAction("unsubscribe");
 		if (!mailboxId) {
 			setError(t("actions.error.trashRule"));
@@ -258,6 +259,7 @@ export function MessageActions({
 
 	return (
 		<div className="flex flex-wrap items-center gap-3 text-neutral-600 flex-1 min-w-0">
+			{confirmationDialog}
 			{error && <span role="alert" className="text-xs text-red-600">{error}</span>}
 
 			{isMobile && (

@@ -1,5 +1,6 @@
 "use client";
 
+import { useConfirmDialog } from "@/components/ui/use-confirm-dialog";
 import { useEffect, useState } from "react";
 import { Bell, Smartphone } from "lucide-react";
 import { useLanguage } from "@/components/language-provider";
@@ -15,6 +16,7 @@ import { loadDevices, signOutDevice } from "./device-settings-utils";
  */
 export function DeviceSettings() {
 	const { t } = useLanguage();
+	const {confirm,confirmationDialog}=useConfirmDialog();
 	const [devices, setDevices] = useState<MobileDevice[] | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [busy, setBusy] = useState<string | null>(null);
@@ -24,7 +26,7 @@ export function DeviceSettings() {
 	}, [t]);
 
 	async function remove(device: MobileDevice) {
-		if (!window.confirm(t("devices.signOutConfirm", { name: device.name }))) return;
+		if (!await confirm({title:t("devices.signOut"),description:t("devices.signOutConfirm",{name:device.name}),confirmLabel:t("devices.signOut")})) return;
 		setBusy(device.id);
 		try {
 			await signOutDevice(device.id);
@@ -40,7 +42,7 @@ export function DeviceSettings() {
 	if (devices.length === 0) return <p className="text-sm text-neutral-500">{t("devices.empty")}</p>;
 
 	return (
-		<div className="space-y-3">
+		<div className="space-y-3">{confirmationDialog}
 			{error ? <p className="text-sm text-red-600">{error}</p> : null}
 			<ul className="divide-y divide-neutral-100 rounded-2xl bg-neutral-50">
 				{devices.map((device) => (

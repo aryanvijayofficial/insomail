@@ -418,6 +418,7 @@
 	"common.saved": "Saved",
 	"common.saving": "Saving...",
 	"common.name": "Name",
+	"common.processing": "Working...",
 	"common.cancel": "Cancel",
 	"common.loading": "Loading...",
 	"settings.account.switchInbox": "Switch inbox",
