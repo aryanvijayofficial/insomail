@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Noto_Sans } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { isNodeRuntime } from "@/lib/runtime";
 import { LanguageProvider } from "@/components/language-provider";
@@ -10,14 +10,10 @@ import { themeBootstrapScript } from "@/components/theme-utils";
 import { getHomeBranding } from "./home-server-utils";
 import "./globals.css";
 
-const geistSans = Geist({
-	variable: "--font-geist-sans",
-	subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-	variable: "--font-geist-mono",
-	subsets: ["latin"],
+const notoSans = Noto_Sans({
+ variable: "--font-noto-sans",
+ subsets: ["latin"],
+ display: "swap",
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -59,7 +55,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 				<script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
 				<link rel="icon" href="/api/branding/icon?v=insomail-current"></link>
 			</head>
-			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+			<body className={`${notoSans.variable} antialiased`}>
 				<LanguageProvider initialLocale={locale} initialMessages={messages}><Providers initialBranding={branding}>{children}</Providers></LanguageProvider>
 			</body>
 		</html>

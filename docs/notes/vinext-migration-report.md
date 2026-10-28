@@ -16,7 +16,7 @@ Impact: the project cannot use its normal type-check command to find migration o
 
 | Check | Result |
 | --- | --- |
-| `npm run build` (vinext) | Passed; generated `dist/server/wrangler.json` and client assets. Geist font files were emitted locally under `dist/client/_next/static/_vinext_fonts`. |
+| `npm run build` (vinext) | Passed; generated `dist/server/wrangler.json` and client assets. Primary font files were emitted locally under `dist/client/_next/static/_vinext_fonts`. |
 | `vite preview` of that build | `/`, `/login`, `/api/setup/status`, `/api/branding/icon`, and a local font returned 200. Unauthenticated `/api/auth/me` and `/api/messages` returned 401. JMAP discovery redirected to `/jmap/session`, which returned 401 without credentials. `/mcp` returned 401. The realtime endpoint returned 426 without an upgrade and logged 401 for an unauthenticated upgrade. Security headers appeared on page and API responses. |
 | `wrangler deploy --dry-run` | Passed using the generated Wrangler config. Output included the custom Worker, 219 static assets, and the expected D1, R2, Queues, Durable Object, AI, Email, Assets, and rate-limit bindings. No upload occurred. |
 | `wrangler dev --local` with isolated persistence | Passed. All 44 D1 migrations applied. A test Email Routing event returned `outcome: ok`, stored a 265-byte raw MIME object in R2, and dispatched one inbound queue message (`1/1`). The message had no configured recipient, so this did **not** prove inbox delivery. A `*/5 * * * *` scheduled invocation returned `outcome: ok`. `/` and `/api/setup/status` returned 200; `/api/realtime` returned 426 without an upgrade. |
