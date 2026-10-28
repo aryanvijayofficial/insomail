@@ -500,8 +500,8 @@ export function MessageFolderPage({
 	return (
 		<div className="flex h-full min-h-0 flex-col">
 			{confirmationDialog}
+			<div className={`relative flex min-h-14 shrink-0 flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-neutral-200 py-2 ${compact ? "px-4" : "px-4.5 md:px-6"}`}>
 			<BulkActionFeedback message={actionError ?? bulkStatus} pending={pendingBulkAction} error={Boolean(actionError)} dismissLabel={t("navigation.close")} onDismiss={() => { setBulkStatus(null); setActionError(null); }} />
-			<div className={`flex min-h-14 shrink-0 flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-neutral-200 py-2 ${compact ? "px-4" : "px-4.5 md:px-6"}`}>
 				{selectedMessageId ? <h2 className="sr-only">{title}</h2> : <h1 className="sr-only">{title}</h1>}
 				<div className="flex min-w-0 flex-[1_1_10rem] items-center gap-3">
 					<Tooltip label={t("list.selectAll")}>
