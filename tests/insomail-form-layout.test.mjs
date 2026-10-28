@@ -17,3 +17,9 @@ test('compose footer wraps on narrow phones and sender label has a real gap',()=
  assert.match(read('src/components/compose/rich-text-editor.tsx'), /shrink-0 items-center gap-0.5 max-md:flex-wrap/);
  assert.match(read('src/components/compose/compose-form.tsx'), /px-4 py-1 flex flex-row items-center gap-2/);
 });
+
+
+test('booking editor replaces the list at narrow widths instead of clipping save controls',()=>{
+ assert.match(read('src/app/(calendar)/booking/page.tsx'), /form && "max-xl:hidden"/);
+ assert.match(read('src/app/(calendar)/booking/booking-editor.tsx'), /w-full xl:w-\[392px\]/);
+});
