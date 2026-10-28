@@ -16,7 +16,7 @@ export function extractUrlDomains(message: ParsedEmail): string[] {
 	const result = new Set<string>();
 	for (const match of source.matchAll(URL_RE)) {
 		try {
-			const domain = new URL(match[0]).hostname.toLowerCase().replace(/^www\./, "");
+			const domain = new URL(match[0]).hostname.toLowerCase().replace(/\.$/, "").replace(/^www\./, "");
 			if (domain) result.add(domain);
 		} catch {}
 		if (result.size >= 50) break;

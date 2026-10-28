@@ -13,6 +13,7 @@ after(() => rmSync(outDir, { recursive: true, force: true }));
 await build({
 	stdin: {
 		contents: [
+			`export { extractUrlDomains } from "./src/lib/spam/tokenizer";`,
 			`export { analyzeAuthentication } from "./src/lib/spam/analyzers/authentication";`,
 			`export { analyzeImpersonation } from "./src/lib/spam/analyzers/impersonation";`,
 			`export { extractSenderIp, isLookalikeDomain, registrableDomain } from "./src/lib/spam/domain-utils";`,
@@ -199,4 +200,10 @@ test("DBL retains exact sender/link hostnames while RDAP retains registrable dom
  assert.ok(asked.includes('listed.sender-specific.example.org.fixture-key.dbl.dq.spamhaus.net'));
  assert.ok(asked.includes('listed.link-specific.example.net.fixture-key.dbl.dq.spamhaus.net'));
  assert.ok(signals.some(s=>s.id==='spamhaus_domain_spam'));
+});
+
+test('body URL DNS root dot is normalized before reputation validation', () => {
+ const message = { text: 'The bad domain is http://dbltest-dqs.com. Also https://EXAMPLE.org./path', html: null };
+ assert.deepEqual(spam.extractUrlDomains(message), ['dbltest-dqs.com', 'example.org']);
+ assert.deepEqual(spam.extractUrlDomains({text:'http://dbl-dqs.blt.spamhaus.net. https://sub.example.org/path.',html:null}), ['dbl-dqs.blt.spamhaus.net','sub.example.org']);
 });
