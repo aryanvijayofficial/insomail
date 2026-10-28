@@ -77,8 +77,8 @@ export async function saveSpamIntelligenceSettings(env: CloudflareEnv, values: P
 }
 
 /**
- * Spamhaus answers its permanent test entry 127.0.0.2 with a listing for any working key; an unknown key gets
- * no answer and a blocked one an error code in 127.255.255.0/24.
+ * Spamhaus lists permanent test entry 127.0.0.2 for keys with active ZEN access.
+ * No listing does not verify access; a refused zone can surface as SERVFAIL.
  */
 export async function checkSpamhausKey(key: string): Promise<boolean> {
 	const answers = await queryDns(`2.0.0.127.${key}.zen.dq.spamhaus.net`, "A");

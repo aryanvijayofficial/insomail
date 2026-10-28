@@ -12,6 +12,14 @@ type DohResponse = {
 	Answer?: DohAnswer[];
 };
 
+/** DNS errors never include the queried name: DQS names can contain private keys. */
+export class DnsQueryError extends Error {
+	constructor(readonly dnsStatus?: number, readonly httpStatus?: number) {
+		super(dnsStatus !== undefined ? `DNS resolver returned status ${dnsStatus}` : `DNS resolver request failed (${httpStatus ?? "network"})`);
+		this.name = "DnsQueryError";
+	}
+}
+
 const DOH_ENDPOINT = "https://cloudflare-dns.com/dns-query";
 const DOH_TIMEOUT_MS = 5000;
 
@@ -39,11 +47,11 @@ export async function queryDns(name: string, type: DnsQueryType): Promise<string
 			},
 		);
 		if (!response.ok) {
-			throw new Error(`DNS query for ${name} ${type} failed (${response.status})`);
+			throw new DnsQueryError(undefined, response.status);
 		}
 		const json = (await response.json()) as DohResponse;
 		if (json.Status !== 0 && json.Status !== 3) {
-			throw new Error(`DNS query for ${name} ${type} returned status ${json.Status}`);
+			throw new DnsQueryError(json.Status);
 		}
 		return (json.Answer ?? []).map((answer) =>
 			type === "TXT" ? decodeTxt(answer.data) : answer.data,

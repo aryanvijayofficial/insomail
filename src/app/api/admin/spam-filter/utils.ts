@@ -5,6 +5,8 @@ import { isPrimaryAdmin } from "@/lib/auth/admin";
 import { hasValidSessionMutationOrigin } from "@/lib/auth/origin";
 import { checkAbuseChKey, checkSpamhausKey, getSpamIntelligenceStatus, MAX_SPAM_BRANDS, saveSpamIntelligenceSettings, spamBrandSchema } from "@/lib/spam/settings";
 
+import { spamhausCheckError } from "@/lib/spam/key-check-error";
+
 const keySchema = z.string().trim().min(8).max(200).regex(/^[A-Za-z0-9_-]+$/);
 
 const schema = z.object({
@@ -43,9 +45,12 @@ export async function PUT(request: Request) {
 	}
 
 	if (input.spamhausDqsKey) {
-		const valid = await checkSpamhausKey(input.spamhausDqsKey).catch(() => null);
-		if (valid === null) return Response.json({ error: "Could not reach Spamhaus to check the key" }, { status: 502 });
-		if (!valid) return Response.json({ error: "Spamhaus did not accept this DQS key" }, { status: 400 });
+		try {
+			const valid = await checkSpamhausKey(input.spamhausDqsKey);
+			if (!valid) return Response.json({ error: "Spamhaus did not confirm access for this DQS query key. Check the query key and ZEN access in Spamhaus. Nothing was saved." }, { status: 400 });
+		} catch (error) {
+			return Response.json({ error: spamhausCheckError(error) }, { status: 502 });
+		}
 	}
 	if (input.abuseChAuthKey) {
 		const valid = await checkAbuseChKey(input.abuseChAuthKey).catch(() => null);
