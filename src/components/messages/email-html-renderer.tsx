@@ -8,6 +8,7 @@ import { collapseQuotedEmailHtml } from "@/app/(dashboard)/inbox/[messageId]/quo
 const BASE_STYLE = `
 :host { display:block; min-width:0; isolation:isolate; contain:paint; }
 :host { background:#fff; color:#202124; color-scheme:light; border-radius:8px; }
+table { color:inherit; }
 a { overflow-wrap:anywhere; }
 img, video { max-width:100%; height:auto; }
 .email-quote-toggle { margin-top:1.4em; }
