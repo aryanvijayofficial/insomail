@@ -36,8 +36,6 @@ export default {
 		const url = new URL(request.url);
 		// InsoMail source download bypasses framework stream wrapping for large archives.
 		if (url.pathname === "/api/source" && request.method === "GET") {
-			const user = await getUserFromSession(env, getSessionTokenFromRequest(request));
-			if (!user || user.disabled) return new Response("Unauthorized", { status: 401 });
 			const key = (env as CloudflareEnv & { INSOMAIL_SOURCE_KEY?: string }).INSOMAIL_SOURCE_KEY;
 			if (!key) return new Response("Source archive not configured", { status: 503 });
 			const archive = await env.BUCKET.get(key);
@@ -46,7 +44,7 @@ export default {
 				"Content-Type": "application/gzip",
 				"Content-Length": String(archive.size),
 				"Content-Disposition": 'attachment; filename="insomail-source.tar.gz"',
-				"Cache-Control": "private, no-store",
+				"Cache-Control": "public, max-age=0, must-revalidate",
 				"X-Content-Type-Options": "nosniff",
 			} });
 		}

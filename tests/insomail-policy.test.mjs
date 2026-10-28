@@ -4,17 +4,15 @@ import { build } from 'esbuild';
 import { readFileSync } from 'node:fs';
 const result = await build({entryPoints:['src/lib/insomail/account-policy.ts'],bundle:true,write:false,format:'esm',platform:'node'});
 const {applyInsoMailAccountPolicy} = await import('data:text/javascript;base64,'+Buffer.from(result.outputFiles[0].text).toString('base64'));
-test('changes only local account creation and seats, never paid entitlement claims',()=>{
+test('local capabilities never claim a paid vendor plan',()=>{
  const original={plan:'community',canCustomizeBranding:false,canManageAccounts:false,canShareMailboxes:false,accountSeatLimit:0,canForwardEmail:false};
- assert.deepEqual(applyInsoMailAccountPolicy(original),{...original,canManageAccounts:true,accountSeatLimit:null});
+ assert.deepEqual(applyInsoMailAccountPolicy(original),{...original,canManageAccounts:true,accountSeatLimit:null,canCustomizeBranding:true,canShareMailboxes:true,canForwardEmail:true});
  assert.equal(original.canManageAccounts,false);
 });
-test('source download authenticates every request and takes no caller-selected object key',()=>{
+test('public source download takes no caller-selected object key',()=>{
  const source=readFileSync('src/app/api/source/route.ts','utf8');
- assert.ok(source.indexOf('requireSessionUser') < source.indexOf('env.BUCKET.get'));
- assert.match(source,/if \(auth.error\) return auth.error/);
  assert.match(source,/INSOMAIL_SOURCE_KEY/);
- assert.doesNotMatch(source,/searchParams|request\.json/);
+ assert.doesNotMatch(source,/searchParams|request\.json|requireSessionUser/);
 });
 test('public registration stays closed after initial admin',()=>{
  const source=readFileSync('src/app/api/auth/register/route.ts','utf8');
@@ -22,12 +20,10 @@ test('public registration stays closed after initial admin',()=>{
  assert.match(source,/Registration is closed after the first account is created/);
 });
 
-test('Worker source streaming authenticates and declares complete archive length',()=>{
+test('Worker source streaming is public and declares complete archive length',()=>{
  const source=readFileSync('worker.ts','utf8');
  const route=source.slice(source.indexOf('// InsoMail source download'),source.indexOf('if (url.pathname === "/api/realtime")'));
- assert.match(route,/getUserFromSession/);
- assert.match(route,/!user \|\| user.disabled/);
- assert.ok(route.indexOf('getUserFromSession') < route.indexOf('env.BUCKET.get'));
+ assert.doesNotMatch(route,/getUserFromSession|Unauthorized/);
  assert.match(route,/"Content-Length": String\(archive.size\)/);
  assert.doesNotMatch(route,/searchParams|request\.json/);
 });

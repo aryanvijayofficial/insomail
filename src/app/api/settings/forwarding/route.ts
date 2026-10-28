@@ -1,3 +1,4 @@
+import { hasValidSessionMutationOrigin } from "@/lib/auth/origin";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
@@ -12,6 +13,7 @@ import { parseUpdateForwardingEmailRequest } from "./utils";
 export async function PATCH(request: Request) {
 	const env = getEnv();
 	const user = await requireUser(env, request);
+	if (!hasValidSessionMutationOrigin(request)) return NextResponse.json({error:"Invalid origin"},{status:403});
 	let input: UpdateForwardingEmailInput;
 	try {
 		input = await parseUpdateForwardingEmailRequest(request);

@@ -1,11 +1,8 @@
-// InsoMail modification, 2026-10-29. AGPL-3.0 source offer to every signed-in user.
+// InsoMail modification, 2026-10-29. AGPL-3.0 source offer to every network user.
 import { getEnv } from "@/lib/cloudflare";
-import { requireSessionUser } from "@/lib/api/auth";
 
 export async function GET(request: Request) {
   const env = getEnv();
-  const auth = await requireSessionUser(env, request);
-  if (auth.error) return auth.error;
   const key = (env as CloudflareEnv & { INSOMAIL_SOURCE_KEY?: string }).INSOMAIL_SOURCE_KEY;
   if (!key) return new Response("Source archive not configured", { status: 503 });
   const archive = await env.BUCKET.get(key);

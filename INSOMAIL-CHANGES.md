@@ -3,9 +3,9 @@
 Based on Mailflare v0.5.3, upstream commit 2b4c479904d396db3e4f690731d62e6c7f380c99.
 This modified version remains under GNU AGPL version 3. The LICENSE and upstream credits remain.
 
-- InsoMail's local account policy permits admin-created accounts without an application seat cap. It does not assert an active Pro or Team license or contact a license service to claim one.
-- Existing authorization, private inbox ownership, closed public registration and password handling remain. Shared inboxes, branding and forwarding keep their original feature policies.
-- Every signed-in user can download this version's corresponding source using the Source code link in the sidebar. Large archive downloads stream directly from the Worker with an explicit byte length, after validating the session. The archive excludes secrets, database contents, uploaded mail and build artifacts.
+- InsoMail's local capability policy permits admin-created accounts without an application seat cap. It does not assert an active Pro or Team license or contact a license service to claim one.
+- Existing authorization, private inbox ownership, closed public registration and password handling remain. Professional and Team are free local InsoMail plans. Users select their own plan; no checkout, paid license claim or role change occurs. Team enables delegated shared inbox access and admin-selected booking hosts. Global branding and administration remain restricted to their existing roles.
+- Every network user can download this version's corresponding source using the Source code link in the sidebar. Large archive downloads stream directly from the Worker with an explicit byte length, without sign-in, including from public booking pages. The archive excludes secrets, database contents, uploaded mail and build artifacts.
 - Application account count does not remove infrastructure, storage or sending quotas or billing.
 
 ## Build and deploy
@@ -17,4 +17,4 @@ Runtime credentials such as CF_TOKEN and RESEND_API_KEY must be separately suppl
 
 ## Source archive maintenance
 
-After committing a change, run `node scripts/build-insomail-source.mjs`. It packages tracked source files, including this notice, all migration files, dependencies lockfile and build scripts, but excludes repository metadata and generated files. Upload the archive to the private BUCKET under the configured INSOMAIL_SOURCE_KEY before deploying the matching Worker. Use a fresh key per release and update wrangler.jsonc before committing. Never package `.env`, `.dev.vars`, database exports, credentials, mail data or node_modules. Keep the authenticated source download working for every app user.
+After committing a change, run `node scripts/build-insomail-source.mjs`. It packages tracked source files, including this notice, all migration files, dependencies lockfile and build scripts, but excludes repository metadata and generated files. Upload the archive to the private BUCKET under the configured INSOMAIL_SOURCE_KEY before deploying the matching Worker. Use a fresh key per release and update wrangler.jsonc before committing. Never package `.env`, `.dev.vars`, database exports, credentials, mail data or node_modules. Keep the public source download working for all network users.

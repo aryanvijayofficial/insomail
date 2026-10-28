@@ -10,6 +10,7 @@ export const users = sqliteTable("users", {
 	id: text("id").primaryKey(),
 	email: text("email").notNull().unique(),
 	resetEmail: text("reset_email"),
+	insomailPlan: text("insomail_plan", { enum: ["professional", "team"] }).notNull().default("professional"),
 	forwardingEmail: text("forwarding_email"),
 	passwordHash: text("password_hash").notNull(),
 	name: text("name").notNull(),

@@ -17,7 +17,12 @@ await build({
 			export { createSession } from "./src/lib/auth/session.ts";
 			export { getMailboxAccessLevel, listAccessibleMailboxIds } from "./src/lib/mailboxes/access.ts";
 			export { getAuthorizedSenderAddress } from "./src/lib/email/sender.ts";
-			export * as detail from "./src/app/api/mailboxes/[id]/route.ts";
+			export * as planRoute from "./src/app/api/settings/plan/route.ts";
+            export { validBookingHostIds } from "./src/lib/booking/hosts.ts";
+            export { getMailboxNotificationUserIds } from "./src/lib/realtime/utils.ts";
+            export * as brandingRoute from "./src/app/api/branding/route.ts";
+            export * as forwardingRoute from "./src/app/api/settings/forwarding/route.ts";
+            export * as detail from "./src/app/api/mailboxes/[id]/route.ts";
 			export * as aliases from "./src/app/api/mailboxes/[id]/aliases/route.ts";
 			export * as avatar from "./src/app/api/mailboxes/[id]/avatar/route.ts";
 			export * as accountMailboxes from "./src/app/api/accounts/[id]/mailboxes/route.ts";
@@ -36,7 +41,7 @@ await build({
 	logLevel: "silent",
 });
 const { SqliteDatabase, applyMigrations, getDb, createSession, getMailboxAccessLevel, listAccessibleMailboxIds,
-	getAuthorizedSenderAddress, detail, aliases, avatar, accountMailboxes } = await import(pathToFileURL(join(directory, "entry.mjs")).href);
+	getAuthorizedSenderAddress, planRoute, validBookingHostIds, getMailboxNotificationUserIds, brandingRoute, forwardingRoute, detail, aliases, avatar, accountMailboxes } = await import(pathToFileURL(join(directory, "entry.mjs")).href);
 const context = id => ({ params: Promise.resolve({ id }) });
 
 async function fixture(t, plan = "team") {
@@ -70,6 +75,7 @@ async function fixture(t, plan = "team") {
 			('m-disabled', 'sam', 'one', 'disabled', 'Disabled', 'personal', 0, 1, 1),
 			('m-shared', 'primary', 'one', 'support', 'Support', 'shared', 0, 0, 1),
 			('m-other-shared', 'other-admin', 'two', 'team', 'Team', 'shared', 0, 0, 1);
+		UPDATE users SET insomail_plan='team';
 		UPDATE users SET avatar_key='avatars/sam' WHERE id='sam';
 		INSERT INTO license_settings (id, instance_id, plan, state, features, updated_at)
 			VALUES ('default', 'settings-test', 'team', 'active', '[]', 1);
@@ -252,4 +258,45 @@ test("configuration access does not grant message access, sending rights or shar
 	assert.equal(mailbox.permission, null);
 	assert.equal(mailbox.displayName, "Managed Team");
 	assert.equal(await getMailboxAccessLevel(f.db, { id: "primary", role: "admin" }, "m-other-shared"), null);
+});
+
+test("free plan selection is owner-scoped, validated and does not grant roles or mailbox access", async t => {
+ const f=await fixture(t,"community");
+ f.sql.exec("UPDATE users SET insomail_plan='professional'");
+ const path="/api/settings/plan";
+ assert.equal((await planRoute.GET(new Request("https://mail.test"+path,{headers:{Authorization:"Bearer invalid"}}))).status,401);
+ assert.equal((await planRoute.PATCH(f.request("sam",path,"PATCH",{plan:"paid"}))).status,400);
+ assert.equal((await planRoute.PATCH(f.request("sam",path,"PATCH",{plan:"team",userId:"remote"}))).status,400);
+ const cross=f.request("sam",path,"PATCH",{plan:"team"});cross.headers.set("Authorization","Bearer invalid");cross.headers.set("Origin","https://evil.test");
+ assert.equal((await planRoute.PATCH(cross)).status,401);
+ assert.equal((await planRoute.PATCH(f.request("sam",path,"PATCH",{plan:"team"}))).status,200);
+ assert.equal((await planRoute.GET(f.request("sam",path))).status,200);
+ assert.equal(f.sql.prepare("SELECT insomail_plan FROM users WHERE id='remote'").get().insomail_plan,"professional");
+ assert.equal(f.sql.prepare("SELECT role FROM users WHERE id='sam'").get().role,"user");
+ assert.equal(await getMailboxAccessLevel(f.db,{id:"sam",role:"user"},"m-shared"),null);
+ assert.equal(await getMailboxAccessLevel(f.db,{id:"sam",role:"user"},"m-remote"),null);
+ assert.equal(f.sql.prepare("SELECT plan FROM license_settings WHERE id='default'").get().plan,"community");
+});
+test("free Team keeps each mailbox permission and does not leak delegated notifications", async t => {
+ const f=await fixture(t,"community");
+ const user={id:"sam",role:"user"};
+ f.sql.exec("INSERT INTO mailbox_access (id,mailbox_id,user_id,permission,created_by_user_id,created_at) VALUES ('grant','m-shared','sam','read_only','primary',1)");
+ for(const [permission,sendAs,sendOnBehalf,manage] of [["read_only",false,false,false],["send_on_behalf",false,true,false],["send_as",true,true,false],["full_access",true,true,true]]){
+  f.sql.prepare("UPDATE mailbox_access SET permission=? WHERE id='grant'").run(permission);
+  const access=await getMailboxAccessLevel(f.db,user,"m-shared");
+  assert.equal(access.canRead,true);assert.equal(access.canSendAs,sendAs);assert.equal(access.canSendOnBehalf,sendOnBehalf);assert.equal(access.canManage,manage);
+ }
+ assert.ok((await getMailboxNotificationUserIds(f.env,"m-shared","primary")).includes("sam"));
+ f.sql.exec("UPDATE users SET insomail_plan='professional' WHERE id='sam'");
+ assert.equal(await getMailboxAccessLevel(f.db,user,"m-shared"),null);
+ assert.equal((await getMailboxNotificationUserIds(f.env,"m-shared","primary")).includes("sam"),false);
+ assert.equal(f.sql.prepare("SELECT count(*) AS n FROM mailbox_access WHERE id='grant'").get().n,1);
+});
+test("free features retain booking-host and branding authorization", async t=>{
+ const f=await fixture(t,"community");
+ assert.equal(await validBookingHostIds(f.db,"sam",["remote"],false),null);
+ assert.deepEqual(await validBookingHostIds(f.db,"primary",["sam"],true),["primary","sam"]);
+ assert.equal(await validBookingHostIds(f.db,"primary",["unknown"],true),null);
+ assert.equal((await brandingRoute.PUT(f.request("sam","/api/branding","PUT",new FormData()))).status,403);
+ assert.equal((await brandingRoute.PUT(f.request("manager","/api/branding","PUT",new FormData()))).status,403);
 });

@@ -1,3 +1,4 @@
+import { hasValidSessionMutationOrigin } from "@/lib/auth/origin";
 import { NextResponse } from "next/server";
 import { assertPrimaryAdmin } from "@/lib/auth/admin";
 import { requireUser } from "@/lib/auth/cookies";
@@ -19,6 +20,7 @@ export async function PUT(request: Request) {
 		return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 	}
 
+	if (!hasValidSessionMutationOrigin(request)) return NextResponse.json({error:"Invalid origin"},{status:403});
 	const form = await request.formData();
 	const appName = String(form.get("appName") ?? "").trim();
 	const iconValue = form.get("icon");

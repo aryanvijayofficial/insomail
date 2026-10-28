@@ -41,5 +41,6 @@ export default function PublicBookingListPage() {
 				<span className="truncate font-semibold">{branding.appName}</span>
 			</div>
 		</div>
+		<a href="/api/source" className="mx-auto mt-5 block w-fit text-xs text-neutral-500 underline">InsoMail source code (AGPL)</a>
 	</main>;
 }

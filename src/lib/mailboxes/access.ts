@@ -1,3 +1,4 @@
+import { hasInsoMailTeamPlan } from "@/lib/insomail/user-plan";
 import { and, eq } from "drizzle-orm";
 import type { AppDatabase } from "@/db";
 import { domains, mailboxAccess, mailboxes } from "@/db/schema";
@@ -26,7 +27,7 @@ export async function getMailboxAccessLevel(
 
 	const isOwner = mailbox.userId === user.id;
 	if (isOwner) return buildAccess(mailbox, "full_access", true);
-	if (mailbox.type !== "shared" || !(await isTeamMailboxSharingEnabled(db))) return null;
+	if (mailbox.type !== "shared" || !(await isTeamMailboxSharingEnabled(db)) || !(await hasInsoMailTeamPlan(db, user.id))) return null;
 
 	const [delegatedAccess] = await db
 		.select({ permission: mailboxAccess.permission })
@@ -71,7 +72,7 @@ export async function listAccessibleMailboxes(db: AppDatabase, user: Pick<Sessio
 			};
 		});
 
-	if (!(await isTeamMailboxSharingEnabled(db))) return owned;
+	if (!(await isTeamMailboxSharingEnabled(db)) || !(await hasInsoMailTeamPlan(db, user.id))) return owned;
 	const sharedRows = await db
 		.select({
 			id: mailboxes.id,

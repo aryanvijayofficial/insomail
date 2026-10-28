@@ -1,3 +1,4 @@
+import { hasInsoMailTeamPlan } from "@/lib/insomail/user-plan";
 import { NextResponse } from "next/server";
 import { and, eq, or } from "drizzle-orm";
 import { getEnv } from "@/lib/cloudflare";
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
 	if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 	const db = getDb(env);
 	const mailboxType = parsed.data.type ?? "personal";
-	if (mailboxType === "shared" && !(await canShareAdminMailboxes(env))) return NextResponse.json({ error: "A Team license is required to create shared inboxes" }, { status: 403 });
+	if (mailboxType === "shared" && (!(await canShareAdminMailboxes(env)) || !(await hasInsoMailTeamPlan(db, auth.userId)))) return NextResponse.json({ error: "Choose the free Team plan to create shared inboxes" }, { status: 403 });
 	const ownerUserId = mailboxType === "shared" ? auth.userId : parsed.data.ownerUserId ?? auth.userId;
 	if (ownerUserId !== auth.userId) {
 		const [owner] = await db.select({ id: users.id }).from(users).where(and(eq(users.id, ownerUserId), eq(users.createdByUserId, auth.userId))).limit(1);

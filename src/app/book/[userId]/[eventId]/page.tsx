@@ -130,7 +130,7 @@ export default function PublicBookingEventPage() {
 
 							<img src={branding.iconUrl} width={24} height={24} alt={branding.appName || "Mailflare"} />
 
-							<span className="truncate font-semibold">{branding.appName}</span>
+							<span className="truncate font-semibold">{branding.appName}</span><a href="/api/source" className="text-xs text-neutral-500 underline">Source code</a>
 						</div>
 					</aside>
 					{done ? <section className="flex min-h-0 flex-col items-center justify-center px-8 py-20 text-center"><div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-green-700"><Check className="h-7 w-7" /></div><h2 className="text-2xl font-semibold">{t("public.booked")}</h2><p className="mt-3 text-sm text-neutral-500">{t("public.scheduledFor", { when: selectedSlot ? new Intl.DateTimeFormat(getDisplayLocale(), { dateStyle: "full", timeStyle: "short", timeZone }).format(new Date(selectedSlot.startsAt)) : "" })}</p></section> : selectedSlot ?
@@ -163,5 +163,6 @@ export default function PublicBookingEventPage() {
 						</>}
 				</div>}
 		</div>
+		<a href="/api/source" className="mx-auto mt-5 block w-fit text-xs text-neutral-500 underline">InsoMail source code (AGPL)</a>
 	</main>;
 }
