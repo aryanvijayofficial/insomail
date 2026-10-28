@@ -65,7 +65,7 @@
 	],
 	"observability": {
 		"enabled": true,
-		"traces": { "enabled": true },
+		"traces": { "enabled": true, "head_sampling_rate": 0.05 },
 	},
 	"upload_source_maps": true,
 	"send_email": [
