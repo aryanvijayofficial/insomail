@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { MouseEvent } from "react";
-import { Archive, ChevronLeft, ChevronRight, ListFilter, Mail, MailOpen, Trash2 } from "lucide-react";
+import { Archive, ChevronLeft, ChevronRight, ListFilter, Mail, MailOpen, RefreshCw, Trash2 } from "lucide-react";
 import { useLanguage } from "@/components/language-provider";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -318,7 +318,7 @@ export function MessageFolderPage({
 	const [unreadOnly, setUnreadOnly] = useState(false);
 	const [conversationView] = useConversationView();
 	const grouped = conversationView && config.folder !== "drafts";
-	const { messages, isLoading, total, limit, updateMessages } = useMessages(config.folder, selectedMailbox?.id, {
+	const { messages, isLoading, isRefreshing, refresh, total, limit, updateMessages } = useMessages(config.folder, selectedMailbox?.id, {
 		query,
 		limit: pageSize,
 		offset,
@@ -501,6 +501,25 @@ export function MessageFolderPage({
 							aria-label={t("list.selectAll")}
 						/>
 					</Tooltip>
+					<Tooltip label={t("list.refresh")}>
+						<Button
+							type="button"
+							variant="ghost"
+							size="sm"
+							aria-label={t("list.refresh")}
+							aria-busy={isRefreshing}
+							disabled={mailboxesLoading || isLoading || isRefreshing || pendingBulkAction || emptyingFolder}
+							className="h-8 w-8 shrink-0 p-0 text-neutral-600"
+							onClick={async () => {
+								setActionError(null);
+								try { await refresh(); }
+								catch { setActionError(t("list.refreshFailed")); }
+							}}
+						>
+							<RefreshCw aria-hidden="true" className={`h-4 w-4 ${isRefreshing ? "animate-spin motion-reduce:animate-none" : ""}`} />
+						</Button>
+					</Tooltip>
+					<span role="status" className="sr-only">{isRefreshing ? t("list.refreshing") : ""}</span>
 					{selectedIds.length > 0 && !compact ? (
 						<BulkMessageToolbar
 							selectedCount={selectedIds.length}

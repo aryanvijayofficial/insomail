@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Message, MessageFilterOptions, MessageFolder } from "./types";
 import {
 	clearMessageCountsCache,
@@ -16,6 +16,11 @@ export function useMessages(
 	enabled = true,
 	folderId?: string | null,
 ) {
+	const refreshRef = useRef<(() => Promise<void>) | null>(null);
+	const [isRefreshing, setIsRefreshing] = useState(false);
+	const refresh = useCallback(async () => {
+		await refreshRef.current?.();
+	}, []);
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [total, setTotal] = useState(0);
@@ -29,6 +34,8 @@ export function useMessages(
 		let cancelled = false;
 		let refreshTimer: number | null = null;
 		let requestNumber = 0;
+		let manualRefreshPending = false;
+		setIsRefreshing(false);
 		async function loadMessages(force = false, showLoading = false) {
 			const currentRequest = ++requestNumber;
 			if (showLoading) setIsLoading(true);
@@ -46,6 +53,21 @@ export function useMessages(
 			}
 		}
 
+		refreshRef.current = async () => {
+			if (manualRefreshPending || cancelled) return;
+			manualRefreshPending = true;
+			setIsRefreshing(true);
+			try {
+				clearMessageListCache();
+				await loadMessages(true);
+				if (!cancelled) {
+					window.dispatchEvent(new Event("mailflare:message-counts-changed"));
+				}
+			} finally {
+				manualRefreshPending = false;
+				if (!cancelled) setIsRefreshing(false);
+			}
+		};
 		void loadMessages(false, true);
 		function onMessagesChanged() {
 			clearMessageListCache();
@@ -61,10 +83,11 @@ export function useMessages(
 
 		return () => {
 			cancelled = true;
+			refreshRef.current = null;
 			window.removeEventListener("mailflare:messages-changed", onMessagesChanged);
 			if (refreshTimer) window.clearTimeout(refreshTimer);
 		};
 	}, [enabled, filters?.group, filters?.limit, filters?.offset, filters?.query, filters?.read, filters?.title, folder, folderId, mailboxId]);
 
-	return { messages, unreadCount, isLoading, total, limit, offset, updateMessages: setMessages };
+	return { messages, unreadCount, isLoading, isRefreshing, refresh, total, limit, offset, updateMessages: setMessages };
 }

@@ -170,7 +170,10 @@ export async function fetchMessageList(params: URLSearchParams, force = false): 
 
 	const requestGeneration = messageCacheGeneration;
 	const request = authFetch(`/api/messages?${key}`)
-		.then((res) => res.json())
+		.then((res) => {
+			if (!res.ok) throw new Error("Could not load emails");
+			return res.json();
+		})
 		.then((data) => {
 			const response = data as MessageListResponse;
 			if (requestGeneration === messageCacheGeneration) {
