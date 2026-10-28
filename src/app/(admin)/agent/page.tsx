@@ -93,8 +93,8 @@ export default function AdminAgentPage() {
 
 	return <div className="space-y-6">
 		<div className="flex items-start justify-between gap-4"><div><h1 className="text-2xl md:text-3xl font-medium text-neutral-900">{t("agentAdmin.title")}</h1><p className="mt-2 text-sm text-neutral-500">{t("agentAdmin.description")}</p></div><Link href="/ai-usage" className="shrink-0 rounded-xl border border-neutral-200 bg-white px-4 py-2 text-sm font-medium text-neutral-800 hover:bg-neutral-50">{t("agentAdmin.viewUsage")}</Link></div>
-		<Card className="rounded-3xl border-0 bg-white p-6">
-			<CardContent className="flex items-center justify-between gap-4 p-0">
+		<Card className="rounded-2xl border-neutral-200 bg-white ">
+			<CardContent className="flex flex-wrap items-center justify-between gap-3 p-0">
 				<div><p className="font-medium text-neutral-900">{t("agentAdmin.enable")}</p><p className="mt-1 text-sm text-neutral-500">{t("agentAdmin.enableHint")}</p></div>
 				<Switch checked={assistantEnabled} disabled={!loaded || enabledSaving} onCheckedChange={(checked) => {
 					setEnabledSaving(true);
@@ -104,7 +104,7 @@ export default function AdminAgentPage() {
 			</CardContent>
 			{enabledStatus && <p role="status" className="mt-3 text-sm text-red-700">{enabledStatus}</p>}
 		</Card>
-		<Card className="rounded-3xl border-0 bg-white p-6">
+		<Card className="rounded-2xl border-neutral-200 bg-white ">
 			<CardHeader className="py-0"><CardTitle className="flex items-center gap-2"><Bot className="h-5 w-5" />{t("agentAdmin.provider")}</CardTitle><CardDescription>{t("agentAdmin.providerWarning")}</CardDescription></CardHeader>
 			<CardContent className="pt-6"><form onSubmit={submit} className="space-y-5">
 				<div className="space-y-2"><Label htmlFor="agent-provider">{t("agentAdmin.providerLabel")}</Label><select id="agent-provider" className="flex h-10 w-full rounded-md border border-neutral-200 bg-transparent px-3 text-sm shadow-sm shadow-neutral-200/50 focus-visible:border-blue-600 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50" value={form.provider} disabled={!loaded} onChange={(event) => setForm((current) => ({ ...current, provider: event.target.value as AgentAdminForm["provider"], baseUrl: event.target.value === "compatible" ? baseUrlForPreset(current.preset, current.baseUrl) : "", model: event.target.value === "cloudflare" ? DEFAULT_CLOUDFLARE_MODEL : "" }))}><option value="cloudflare">{t("agentAdmin.cloudflareAi")}</option><option value="compatible">{t("agentAdmin.openaiCompatible")}</option></select>{form.provider === "cloudflare" && !cloudflareAvailable && <p className="text-xs text-amber-700">{t("agentAdmin.needsBinding")}</p>}</div>

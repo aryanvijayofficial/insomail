@@ -1,3 +1,4 @@
+import { sanitizeSignatureHtml } from "@/lib/email/signature";
 import { eq } from "drizzle-orm";
 import { domains, mailboxes, users } from "@/db/schema";
 import type { getDb } from "@/db";
@@ -37,7 +38,7 @@ export function selectMailboxById(db: Db, mailboxId: string) {
 export function getMailboxUpdateValues(input: MailboxUpdateValues): MailboxUpdateValues {
 	const values: MailboxUpdateValues = {};
 	if ("displayName" in input) values.displayName = input.displayName?.trim() || null;
-	if ("signature" in input) values.signature = input.signature?.trim() || null;
+	if ("signature" in input) values.signature = input.signature && /<\/?[a-z][a-z0-9]*[\s>/]/i.test(input.signature) ? sanitizeSignatureHtml(input.signature.trim()) || null : input.signature?.trim() || null;
 	if ("autoReplyEnabled" in input) values.autoReplyEnabled = input.autoReplyEnabled;
 	if ("autoReplySubject" in input) values.autoReplySubject = input.autoReplySubject?.trim() || "Out of office";
 	if ("autoReplyBody" in input) values.autoReplyBody = input.autoReplyBody?.trim() || "";

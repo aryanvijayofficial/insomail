@@ -150,7 +150,7 @@ export default function MailboxSettingsPage() {
         </p>
       )}
 
-      <Card className="rounded-3xl border-0 bg-white p-6">
+      <Card className="rounded-2xl border-neutral-200 bg-white ">
         <CardHeader className="py-0">
           <CardTitle>{t("mailbox.account")}</CardTitle>
         </CardHeader>
@@ -208,7 +208,7 @@ export default function MailboxSettingsPage() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-3xl border-0 bg-white p-6">
+      <Card className="rounded-2xl border-neutral-200 bg-white ">
         <CardHeader className="py-0">
           <CardTitle>{t("mailbox.aliases")}</CardTitle>
           <CardDescription>
@@ -220,7 +220,7 @@ export default function MailboxSettingsPage() {
           {(aliases.data?.aliases ?? []).map((alias) => (
             <div
               key={alias.id}
-              className="flex items-center justify-between gap-3 rounded-2xl bg-neutral-50 px-4 py-3"
+              className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-neutral-50 px-4 py-3"
             >
               <div className="flex min-w-0 items-center gap-2">
                 <AtSign className="h-4 w-4 shrink-0 text-neutral-400" />
@@ -297,7 +297,7 @@ export default function MailboxSettingsPage() {
       </Card>
 
       {mailbox.data?.canManageSharing && (
-        <Card className="rounded-3xl border-0 bg-white p-6">
+        <Card className="rounded-2xl border-neutral-200 bg-white ">
           <CardHeader className="py-0">
             <CardTitle>{t("mailbox.sharedAccess")}</CardTitle>
             <CardDescription>
@@ -309,7 +309,7 @@ export default function MailboxSettingsPage() {
             {(sharedAccess.data?.members ?? []).map((member) => (
               <div
                 key={member.userId}
-                className="flex items-center justify-between gap-3 rounded-2xl bg-neutral-50 px-4 py-3"
+                className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-neutral-50 px-4 py-3"
               >
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-neutral-900">
@@ -376,7 +376,7 @@ export default function MailboxSettingsPage() {
           </CardContent>
         </Card>
       )}
-      <Card className="rounded-3xl border-0 bg-white p-6">
+      <Card className="rounded-2xl border-neutral-200 bg-white ">
         <CardHeader className="py-0">
           <CardTitle className="text-red-700">{t("mailbox.dangerZone")}</CardTitle>
           <CardDescription>
@@ -412,7 +412,7 @@ export default function MailboxSettingsPage() {
       </Card>
 
 {/* 
-      <Card className="rounded-3xl border-0 bg-white p-6">
+      <Card className="rounded-2xl border-neutral-200 bg-white ">
         <CardHeader className="py-0">
           <CardTitle>Address</CardTitle>
           <CardDescription>

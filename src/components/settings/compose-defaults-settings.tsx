@@ -67,6 +67,7 @@ export function ComposeDefaultsSettings() {
 					<span className="mt-1 block text-sm text-neutral-500">{t("settings.compose.undoDescription")}</span>
 				</span>
 				<Select
+                containerClassName="w-auto shrink-0"
 					id="compose-undo-send"
 					value={String(preferences.undoSendSeconds)}
 					disabled={loading || saving}

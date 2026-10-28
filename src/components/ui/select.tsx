@@ -1,13 +1,14 @@
 import * as React from "react";
+import { fieldContainerClass } from "./design-tokens";
 import { cn } from "@/lib/utils";
 import type { SelectProps } from "./select-types";
 
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, containerClassName, ...props }, ref) => (
-    <span className={cn("rounded-lg border border-neutral-200 px-2 inline-flex", containerClassName)}>
+    <span className={cn(fieldContainerClass, containerClassName)}>
       <select
         className={cn(
-          "flex w-full rounded-md bg-transparent focus-visible:border-blue-600 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+          "flex h-full min-w-0 w-full rounded-[inherit] bg-transparent px-3 py-2 text-sm text-neutral-900 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
           className,
         )}
         ref={ref}

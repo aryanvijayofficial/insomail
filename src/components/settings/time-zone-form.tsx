@@ -22,7 +22,7 @@ export function TimeZoneForm({ userId, initialTimeZone }: TimeZoneFormProps) {
 		catch { return null; }
 	})();
 
-	return <form className="space-y-4 rounded-lg bg-white p-6" onSubmit={(event) => {
+	return <form className="space-y-4 rounded-2xl border border-neutral-200 bg-white p-5 sm:p-6" onSubmit={(event) => {
 		event.preventDefault();
 		setSaving(true);
 		setStatus(null);

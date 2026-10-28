@@ -32,7 +32,7 @@ export default function AccountPasswordPage() {
 			</div>
 			<form
 				onSubmit={(event) => void saveAccountPassword({ event, account, password, setPassword, setSaving, setMessage, t })}
-				className="space-y-5 rounded-3xl bg-white p-6"
+				className="space-y-5 rounded-2xl bg-white p-6"
 			>
 				{account && !account.editable ? (
 					<p className="text-sm text-neutral-500">{t("account.password.onlyPrimary")}</p>

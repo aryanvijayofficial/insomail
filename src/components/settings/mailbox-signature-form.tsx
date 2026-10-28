@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/components/language-provider";
 import { useSelectedMailbox } from "@/components/mailbox-provider";
 import { isHtmlSignature } from "@/components/compose/rich-text-utils";
 import { EmailHtmlRenderer } from "@/components/messages/email-html-renderer";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { SignatureEditor } from "./signature-editor";
 import { updateMailboxSignature } from "./utils";
 
 export function MailboxSignatureForm() {
@@ -17,6 +17,7 @@ export function MailboxSignatureForm() {
 	const [savedSignature, setSavedSignature] = useState("");
 	const [status, setStatus] = useState<string | null>(null);
 	const [saving, setSaving] = useState(false);
+ const currentMailboxId=useRef(selectedMailbox?.id);currentMailboxId.current=selectedMailbox?.id;
 
 	useEffect(() => {
 		const nextSignature = selectedMailbox?.signature ?? "";
@@ -27,17 +28,19 @@ export function MailboxSignatureForm() {
 
 	async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
-		if (!selectedMailbox) return;
+		if (!selectedMailbox || selectedMailbox.permission !== "full_access") return;
+ const savingMailboxId=selectedMailbox.id;
 		setSaving(true);
 		setStatus(null);
 		try {
-			const saved = await updateMailboxSignature(selectedMailbox.id, signature);
+			const saved = await updateMailboxSignature(savingMailboxId, signature);
+ if(currentMailboxId.current!==savingMailboxId)return;
 			setSignature(saved);
 			setSavedSignature(saved);
 			setSelectedMailbox({ ...selectedMailbox, signature: saved });
 			setStatus(t("common.saved"));
 		} catch (error) {
-			setStatus(error instanceof Error ? error.message : t("settings.signature.failed"));
+			if(currentMailboxId.current===savingMailboxId)setStatus(error instanceof Error ? error.message : t("settings.signature.failed"));
 		} finally {
 			setSaving(false);
 		}
@@ -53,16 +56,10 @@ export function MailboxSignatureForm() {
 		<form onSubmit={onSubmit} className="space-y-4">
 			<div className="space-y-2">
 				<Label htmlFor="mailboxSignature">{t("settings.signature.for", { address })}</Label>
-				<Textarea
-					id="mailboxSignature"
-					value={signature}
-					onChange={(event) => setSignature(event.target.value)}
-					placeholder={t("settings.signature.placeholder")}
-					rows={6}
-					disabled={!canManage || saving}
-				/>
+                <SignatureEditor key={selectedMailbox.id} id="mailboxSignature" value={signature} onChange={setSignature} disabled={!canManage || saving}/>
+
 				<p className="text-xs leading-5 text-neutral-500">
-					{t("settings.signature.hint")}
+					Use the toolbar to format your signature. Images use HTTPS URLs; external images stay blocked until you load the preview.
 				</p>
 			</div>
 			{isHtmlSignature(signature) && (

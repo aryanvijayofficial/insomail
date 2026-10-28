@@ -87,7 +87,7 @@ export default function AccountMailboxesPage() {
           {t("account.mailboxes.manage", { name: account?.name ?? t("account.password.thisAccount") })}
         </p>
       </div>
-      <section className="space-y-4 rounded-3xl bg-white p-6">
+      <section className="space-y-4 rounded-2xl bg-white p-6">
         <h2 className="text-base font-semibold text-neutral-900">{t("account.mailboxes.current")}</h2>
         <div className="space-y-2">
           {mailboxes.map((mailbox) => (

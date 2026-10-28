@@ -9,7 +9,7 @@ export default async function EmailAppsSettingsPage() {
 				<h1 className="text-xl font-semibold text-neutral-900">{t("settingsPage.appPasswords.title")}</h1>
 				<p className="mt-1 text-sm text-neutral-500">{t("settingsPage.appPasswords.description")}</p>
 			</div>
-			<div className="space-y-4 rounded-3xl bg-white p-6">
+			<div className="space-y-4 rounded-2xl bg-white p-6">
 				<EmailClientsSettings />
 			</div>
 		</section>

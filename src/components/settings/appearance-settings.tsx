@@ -38,6 +38,7 @@ export function AppearanceSettings() {
 				</span>
 			</span>
 			<Select
+                containerClassName="w-auto shrink-0"
 				value={preference}
 				aria-label={t("settings.theme.label")}
 				className="py-1.5 text-sm text-neutral-900"

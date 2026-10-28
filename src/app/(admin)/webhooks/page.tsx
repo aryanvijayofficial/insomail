@@ -134,7 +134,7 @@ export default function WebhooksPage() {
 					</CardContent>
 				</Card>
 			) : (
-				<section className="divide-y divide-neutral-100 overflow-hidden rounded-3xl bg-white">
+				<section className="divide-y divide-neutral-100 overflow-hidden rounded-2xl bg-white">
 					{webhooks.data.map((hook) => (
 						<div key={hook.id} className="px-5 py-6 sm:px-6">
 							<div className="flex flex-wrap items-start justify-between gap-4">

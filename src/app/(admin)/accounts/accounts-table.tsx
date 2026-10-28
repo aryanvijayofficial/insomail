@@ -33,7 +33,7 @@ export function AccountsTable({ accounts, currentUserId, isPrimaryAdmin, loading
 		onSelectedChange(next);
 	}
 
-	return <div className="overflow-hidden rounded-3xl bg-white">
+	return <div className="overflow-hidden rounded-2xl bg-white">
 		<div className={`${COLUMNS} border-b border-neutral-100 px-5 py-3 text-xs font-medium uppercase text-neutral-500`}>
 			<Checkbox aria-label={t("accounts.selectAll")} checked={allSelected} disabled={!selectable.length} onChange={(event) => onSelectedChange(event.target.checked ? new Set(selectable.map((account) => account.id)) : new Set())} />
 			<span>{selected.size ? t("common.selectedCount", { count: selected.size }) : t("accounts.colAccount")}</span>

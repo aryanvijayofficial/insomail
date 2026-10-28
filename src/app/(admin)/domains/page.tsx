@@ -1,4 +1,5 @@
 "use client";
+import { Select } from "@/components/ui/select";
 
 import { mobilePrimaryActionClass } from "@/components/page-header-utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -274,7 +275,7 @@ export default function DomainsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl md:text-3xl font-medium">{t("domains.title")}</h1>
           <p className="mt-1 text-sm text-neutral-500">
@@ -313,7 +314,7 @@ export default function DomainsPage() {
                   placeholder="example.com"
                 />
               </div>
-              <div className="flex items-center justify-between gap-4 rounded-xl bg-neutral-50 px-4 py-3">
+              <div className="flex flex-col items-stretch gap-3 rounded-xl bg-neutral-50 sm:flex-row sm:items-center sm:justify-between px-4 py-3">
                 <div>
                   <Label htmlFor="skip-dns">{t("setup.skipDns")}</Label>
                   <p className="mt-1 text-xs leading-5 text-neutral-500">
@@ -331,7 +332,7 @@ export default function DomainsPage() {
               </div>
               {!skipDns && (
                 <>
-              <div className="flex items-center justify-between gap-4 rounded-xl bg-neutral-50 px-4 py-3">
+              <div className="flex flex-col items-stretch gap-3 rounded-xl bg-neutral-50 sm:flex-row sm:items-center sm:justify-between px-4 py-3">
                 <div>
                   <Label htmlFor="receiving-provider">{t("domains.receiveWith")}</Label>
                   <p className="mt-1 text-xs leading-5 text-neutral-500">
@@ -342,19 +343,19 @@ export default function DomainsPage() {
                         : t("domains.providerHintLater")}
                   </p>
                 </div>
-                <select
+                <Select
                   id="receiving-provider"
                   value={receivingProvider}
                   onChange={(e) => setReceivingProvider(e.target.value as ReceivingProvider)}
-                  className="h-9 shrink-0 rounded-md border border-neutral-200 bg-white px-3 text-sm"
+                  containerClassName="w-auto shrink-0"
                 >
                   <option value="cloudflare">{t("domains.cloudflareRouting")}</option>
                   <option value="resend">Resend</option>
                   <option value="ses">Amazon SES</option>
                   <option value="none">{t("domains.notSelected")}</option>
-                </select>
+                </Select>
               </div>
-              <div className="flex items-center justify-between gap-4 rounded-xl bg-neutral-50 px-4 py-3">
+              <div className="flex flex-col items-stretch gap-3 rounded-xl bg-neutral-50 sm:flex-row sm:items-center sm:justify-between px-4 py-3">
                 <div>
                   <Label htmlFor="sending-provider">{t("domains.sendWith")}</Label>
                   <p className="mt-1 text-xs leading-5 text-neutral-500">
@@ -368,17 +369,17 @@ export default function DomainsPage() {
                   </p>
                 </div>
                 {domainChecking && <LoaderCircle className="h-4 w-4 shrink-0 animate-spin text-neutral-500" />}
-                <select
+                <Select
                   id="sending-provider"
                   value={sendingProvider}
                   onChange={(e) => setSendingProvider(e.target.value as SendingProvider)}
-                  className="h-9 shrink-0 rounded-md border border-neutral-200 bg-white px-3 text-sm"
+                  containerClassName="w-auto shrink-0"
                 >
                   <option value="cloudflare">{t("domains.cloudflareSending")}</option>
                   <option value="resend">Resend</option>
                   <option value="ses">Amazon SES</option>
                   <option value="none">{t("domains.notSelected")}</option>
-                </select>
+                </Select>
               </div>
                 </>
               )}

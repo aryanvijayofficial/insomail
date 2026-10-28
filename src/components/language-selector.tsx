@@ -1,5 +1,7 @@
 "use client";
 
+import { Select } from "./ui/select";
+import { Label } from "./ui/label";
 import { useId } from "react";
 import { ChevronDown } from "lucide-react";
 import { locales, supportedLocales } from "@/lib/i18n/locales";
@@ -27,11 +29,11 @@ export function LanguageSelector({ variant = "field" }: { variant?: "field" | "t
 	}
 
 	return (
-		<div className="flex flex-col gap-1 px-1">
-			<label htmlFor={id} className="text-xs text-neutral-600">{t("language.label")}</label>
-			<select id={id} value={locale} onChange={(event) => setLocale(resolveLocale(event.target.value))} className="min-h-11 w-full rounded-lg border border-neutral-300 bg-white px-2 text-sm text-neutral-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+		<div className="flex flex-col gap-2">
+			<Label htmlFor={id}>{t("language.label")}</Label>
+			<Select id={id} value={locale} onChange={(event) => setLocale(resolveLocale(event.target.value))}>
 				{options}
-			</select>
+			</Select>
 		</div>
 	);
 }

@@ -76,7 +76,7 @@ export function ApiKeysSettings() {
 	}
 
 	return <div className="space-y-6">{confirmationDialog}
-		<div className="flex items-center justify-between gap-4">
+		<div className="flex flex-wrap items-center justify-between gap-3">
 			<h1 className="text-2xl md:text-3xl font-medium">{t("apiKeys.title")}</h1>
 		<Dialog open={createOpen} onOpenChange={(open) => { if (busy) return; setCreateOpen(open); setError(null); if (open && mailboxIds.length === 0) setMailboxIds([selectedMailbox?.id ?? mailboxes[0]?.id].filter((id): id is string => !!id)); if (!open) { setNewKey(null); setCopied(false); } }}>
 			<DialogTrigger asChild><Button type="button" className={mobilePrimaryActionAboveNavClass}><Plus className="h-4 w-4" />{t("apiKeys.new")}</Button></DialogTrigger>

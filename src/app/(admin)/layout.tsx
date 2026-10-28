@@ -63,11 +63,13 @@ export default function DashboardLayout({
               <SidebarResizeBoundary />
             </SidebarAside>
             <div className="flex min-h-0 min-w-0 flex-col">
-                            <MobileTopBar title={mobileTitle} />
-              <header className="fixed top-2 right-4 flex items-center gap-4 z-90">
+                            <header className="relative z-40 flex h-16 shrink-0 items-center justify-between gap-3 px-4">
+                <MobileTopBar title={mobileTitle} />
+                <div className="ml-auto shrink-0">
                 <MailboxSelector />
+                </div>
               </header>
-              <main id="main-content" tabIndex={-1} className={clsx("focus:outline-none page-flush min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain rounded-tl-3xl max-md:rounded-t-3xl max-md:bg-white max-md:pb-24 px-6 py-10 scrollbar-gutter-stable lg:px-12", mobileTitle && "max-md:[&_h1]:sr-only")}>
+              <main id="main-content" tabIndex={-1} className={clsx("focus:outline-none page-flush min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain rounded-tl-3xl max-md:rounded-t-3xl max-md:bg-white max-md:pb-24 px-4 py-5 sm:px-6 sm:py-6 scrollbar-gutter-stable lg:px-12", mobileTitle && "max-md:[&_h1]:sr-only")}>
                 <div className="w-full max-w-3xl">{children}</div>
               </main>
             </div>

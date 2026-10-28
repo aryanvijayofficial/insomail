@@ -390,7 +390,7 @@ function RuleSection({
 }) {
 	const { t } = useLanguage();
 	return (
-		<Card className={`${className} border-0 bg-white px-6`}>
+		<Card className={`${className} border-neutral-200 bg-white `}>
 			<CardHeader>
 				<div className="flex items-center gap-2">
 					<CardTitle className="text-xs uppercase">{title}</CardTitle>

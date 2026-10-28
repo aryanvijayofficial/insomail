@@ -23,7 +23,7 @@ export default function ProviderCard({ title, description, ok, selected, disable
 	const { t } = useLanguage();
 	return (
 		<li className="rounded-xl bg-neutral-50 px-4 py-3 text-sm">
-			<div className="flex items-center justify-between gap-3">
+			<div className="flex flex-wrap items-center justify-between gap-3">
 				{ok !== null && (ok
 					? <span title={t("domains.setUp")} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-600 text-white"><Check className="h-4 w-4" /></span>
 					: <span title={t("domains.needsSetup")} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-100"><AlertTriangle className="h-4 w-4 text-amber-600" /></span>)}

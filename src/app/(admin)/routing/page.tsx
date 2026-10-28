@@ -33,7 +33,7 @@ export default function RoutingPage() {
 					<h2 className="text-xl font-semibold text-neutral-900">{t("routingAdmin.domain")}</h2>
 					<p className="mt-1 text-sm text-neutral-500">{t("routingAdmin.chooseDomain")}</p>
 				</div>
-				<div className="rounded-3xl bg-white p-6">
+				<div className="rounded-2xl bg-white p-6">
 					{domains.isLoading ? (
 						<Skeleton className="h-10 w-full" />
 					) : domains.isError ? (

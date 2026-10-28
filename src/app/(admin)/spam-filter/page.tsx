@@ -66,7 +66,7 @@ export default function SpamFilterSettingsPage() {
 		{loadError && <p role="alert" className="text-sm text-red-700">{loadError}</p>}
 		{settings && !settings.available && <p role="status" className="rounded-xl bg-amber-50 p-4 text-sm text-amber-800">{t("spamFilter.needsUpdate")}</p>}
 
-		<Card className="rounded-3xl border-0 bg-white p-6">
+		<Card className="rounded-2xl border-neutral-200 bg-white ">
 			<CardHeader className="py-0"><CardTitle>{t("spamFilter.blocklists")}</CardTitle><CardDescription>{t("spamFilter.blocklistsHint")}</CardDescription></CardHeader>
 			<CardContent className="space-y-6 pt-6">
 				<KeyRow field="spamhausDqsKey" envName="SPAMHAUS_DQS_KEY" title={t("spamFilter.spamhaus")} hint={t("spamFilter.spamhausHint")} signupUrl={SPAMHAUS_SIGNUP_URL} source={settings?.spamhaus.source ?? null} disabled={!editable} onSaved={setSettings} />
@@ -74,15 +74,15 @@ export default function SpamFilterSettingsPage() {
 			</CardContent>
 		</Card>
 
-		<Card className="rounded-3xl border-0 bg-white p-6">
-			<CardContent className="flex items-center justify-between gap-4 p-0">
+		<Card className="rounded-2xl border-neutral-200 bg-white ">
+			<CardContent className="flex flex-wrap items-center justify-between gap-3 p-0">
 				<div><p className="font-medium text-neutral-900">{t("spamFilter.domainAge")}</p><p className="mt-1 text-sm text-neutral-500">{t("spamFilter.domainAgeHint")}</p>{settings?.domainAgeForcedOff && <p className="mt-1 text-sm text-amber-700">{t("spamFilter.domainAgeForcedOff")}</p>}</div>
 				<Switch checked={Boolean(settings?.domainAge && !settings.domainAgeForcedOff)} disabled={!editable || ageSaving || settings?.domainAgeForcedOff} onCheckedChange={toggleDomainAge} aria-label={t("spamFilter.domainAge")} />
 			</CardContent>
 			{ageStatus && <p role="status" className="mt-3 text-sm text-red-700">{ageStatus}</p>}
 		</Card>
 
-		<Card className="rounded-3xl border-0 bg-white p-6">
+		<Card className="rounded-2xl border-neutral-200 bg-white ">
 			<CardHeader className="py-0"><CardTitle>{t("spamFilter.brands")}</CardTitle><CardDescription>{t("spamFilter.brandsHint")}</CardDescription></CardHeader>
 			<CardContent className="pt-6"><form onSubmit={saveBrands} className="space-y-4">
 				<div className="space-y-2">

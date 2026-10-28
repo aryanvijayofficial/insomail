@@ -22,7 +22,7 @@ export default async function SettingsInboxPage() {
 					<h2 className="text-xl font-semibold text-neutral-900">{t("settingsPage.inbox.experience")}</h2>
 					<p className="mt-1 text-sm text-neutral-500">{t("settingsPage.inbox.experienceDescription")}</p>
 				</div>
-				<div className="divide-y divide-neutral-100 rounded-3xl bg-white p-6">
+				<div className="divide-y divide-neutral-100 rounded-2xl bg-white p-6">
 					<div className="py-6 first:pt-0 last:pb-0">
 						<div className="mb-4">
 							<h3 className="text-base font-semibold text-neutral-900">{t("settingsPage.inbox.appearance")}</h3>
@@ -82,7 +82,7 @@ export default async function SettingsInboxPage() {
 					<h2 className="text-xl font-semibold text-neutral-900">{t("settingsPage.inbox.handling")}</h2>
 					<p className="mt-1 text-sm text-neutral-500">{t("settingsPage.inbox.handlingDescription")}</p>
 				</div>
-				<div className="divide-y divide-neutral-100 rounded-3xl bg-white p-6">
+				<div className="divide-y divide-neutral-100 rounded-2xl bg-white p-6">
 					<div className="py-6 first:pt-0 last:pb-0">
 						<div className="mb-4">
 							<h3 className="text-base font-semibold text-neutral-900">{t("settingsPage.inbox.spamProtection")}</h3>

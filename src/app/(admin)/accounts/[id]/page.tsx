@@ -64,7 +64,7 @@ export default function AccountDetailsPage() {
 				<h1 className="text-2xl md:text-3xl font-medium text-neutral-900">{t("account.detailsTitle")}</h1>
 				<p className="mt-2 text-sm text-neutral-500">{t("account.detailsDescription")}</p>
 			</div>
-			<section className="space-y-5 rounded-3xl bg-white p-6">
+			<section className="space-y-5 rounded-2xl bg-white p-6">
 				{!account.editable && (
 					<p className="rounded-2xl bg-neutral-50 p-4 text-sm text-neutral-500">
 						{t("account.noPermission")}
@@ -109,7 +109,7 @@ export default function AccountDetailsPage() {
 						{t("settings.forwarding.hint")}
 					</p>
 				</div>}
-				<div className="flex items-center justify-between gap-4 rounded-2xl border border-neutral-200 bg-neutral-50 p-4">
+				<div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-4">
 					<div className="space-y-1">
 						<Label htmlFor="account-enabled" className="font-semibold text-neutral-900">{t("account.enabled")}</Label>
 						<p id="account-enabled-description" className="text-xs leading-5 text-neutral-500">

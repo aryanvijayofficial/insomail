@@ -1,11 +1,12 @@
 import * as React from "react";
+import { cardClass } from "./design-tokens";
 import { cn } from "@/lib/utils";
 
 export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
 	return (
 		<div
 			className={cn(
-				"border-t border-neutral-200",
+				cardClass, "p-5 sm:p-6",
 				className,
 			)}
 			{...props}
@@ -14,7 +15,7 @@ export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElemen
 }
 
 export function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-	return <div className={cn("flex flex-col gap-1.5 py-6", className)} {...props} />;
+	return <div className={cn("flex flex-col gap-1.5", className)} {...props} />;
 }
 
 export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
@@ -26,5 +27,5 @@ export function CardDescription({ className, ...props }: React.HTMLAttributes<HT
 }
 
 export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-	return <div className={cn("pb-0", className)} {...props} />;
+	return <div className={cn("pt-4", className)} {...props} />;
 }

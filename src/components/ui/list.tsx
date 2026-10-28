@@ -6,7 +6,7 @@ export function List({ className, ...props }: React.HTMLAttributes<HTMLDivElemen
 	return (
 		<div
 			className={cn(
-				"grid gap-1 [&>*:first-child]:rounded-t-3xl [&>*:last-child]:rounded-b-3xl",
+				"grid gap-1 [&>*:first-child]:rounded-t-2xl [&>*:last-child]:rounded-b-2xl",
 				className,
 			)}
 			{...props}
@@ -22,7 +22,7 @@ export function ListRow({ className, asChild = false, ...props }: ListRowProps) 
 	const Comp: React.ElementType = asChild ? Slot : "div";
 	return (
 		<Comp
-			className={cn("flex items-center gap-4 rounded-lg bg-white p-5", className)}
+			className={cn("flex items-center gap-4 min-w-0 rounded-xl bg-white p-4 sm:p-5", className)}
 			{...props}
 		/>
 	);

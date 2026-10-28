@@ -1,3 +1,4 @@
+import { useBranding } from "@/components/branding-provider";
 import { Fragment } from "react";
 import { useLanguage } from "@/components/language-provider";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
@@ -45,6 +46,7 @@ export default function DomainItemCard({
   setupMessage,
 }: DomainItemCardProps) {
   const { t } = useLanguage();
+  const branding = useBranding();
   const auth = dns?.auth;
 
   return (
@@ -53,7 +55,7 @@ export default function DomainItemCard({
         <span className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-neutral-100 text-neutral-600">
           <Globe2 className="h-5 w-5" />
           <img
-            src={`https://${item.hostname}/favicon.ico`}
+            src={branding.iconUrl}
             alt=""
             className="absolute inset-0 h-full w-full object-contain p-1"
             onError={(event) => event.currentTarget.remove()}

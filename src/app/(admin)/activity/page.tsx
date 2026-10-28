@@ -28,7 +28,7 @@ export default function ActivityPage() {
         </p>
       </div>
 
-      <section role="region" tabIndex={0} aria-label={t("activity.title")} className="overflow-x-auto rounded-3xl bg-white">
+      <section role="region" tabIndex={0} aria-label={t("activity.title")} className="overflow-x-auto rounded-2xl bg-white">
         <table className="w-full min-w-[760px] table-fixed text-left">
           <thead className="border-b border-neutral-100 bg-neutral-50 text-xs font-semibold uppercase tracking-wide text-neutral-500">
             <tr>

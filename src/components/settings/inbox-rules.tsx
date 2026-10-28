@@ -158,7 +158,7 @@ export function InboxRules() {
           {t("rules.new")}
         </Button>
       </div>
-      <div className="rounded-3xl bg-white p-6">
+      <div className="rounded-2xl bg-white p-6">
         {(rules.data?.rules ?? []).length === 0 && (
           <p className="text-sm text-neutral-500">{t("rules.none")}</p>
         )}

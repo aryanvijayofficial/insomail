@@ -107,10 +107,10 @@ export function ProfileForm({
   }
 
   if (isLoading) {
-    return <p className="rounded-t-3xl rounded-b-lg bg-white p-6 text-sm text-neutral-500">{t("settings.signature.loadingInbox")}</p>;
+    return <p className="rounded-2xl border border-neutral-200 bg-white p-5 sm:p-6 text-sm text-neutral-500">{t("settings.signature.loadingInbox")}</p>;
   }
   if (!selectedMailbox) {
-    return <p className="rounded-t-3xl rounded-b-lg bg-white p-6 text-sm text-neutral-500">{t("settings.signature.selectInbox")}</p>;
+    return <p className="rounded-2xl border border-neutral-200 bg-white p-5 sm:p-6 text-sm text-neutral-500">{t("settings.signature.selectInbox")}</p>;
   }
 
   const address = getMailboxAddress(selectedMailbox);
@@ -120,7 +120,7 @@ export function ProfileForm({
     <>
       <form
         onSubmit={onProfileSubmit}
-        className="space-y-6 rounded-b-lg rounded-t-3xl bg-white p-6"
+        className="space-y-6 rounded-2xl border border-neutral-200 bg-white p-5 sm:p-6"
       >
         <InboxSwitcher />
         <div className="flex items-center gap-4">
@@ -180,7 +180,7 @@ export function ProfileForm({
 
       {isPrimary && <form
         onSubmit={onRecoverySubmit}
-        className="space-y-4 rounded-lg bg-white p-6"
+        className="space-y-4 rounded-2xl border border-neutral-200 bg-white p-5 sm:p-6"
       >
         <div>
           <h3 className="text-lg font-semibold text-neutral-900">

@@ -51,8 +51,8 @@ export function CurrentMailboxForm() {
 		return (
 			<div className="space-y-6">
 				<Skeleton className="h-8 w-32" />
-				<Card className="rounded-3xl border-0 bg-white p-6">
-					<CardContent className="space-y-4 p-6">
+				<Card className="rounded-2xl border-neutral-200 bg-white ">
+					<CardContent className="space-y-4 pt-0">
 						<Skeleton className="h-4 w-24" />
 						<Skeleton className="h-10 w-full" />
 						<Skeleton className="h-9 w-28" />
@@ -66,8 +66,8 @@ export function CurrentMailboxForm() {
 		return (
 			<div className="space-y-6">
 				<h1 className="text-2xl md:text-3xl font-medium text-neutral-900">{t("settings.mailbox.title")}</h1>
-				<Card className="rounded-3xl border-0 bg-white p-6">
-					<CardContent className="p-6 text-sm text-neutral-500">
+				<Card className="rounded-2xl border-neutral-200 bg-white ">
+					<CardContent className="pt-0 text-sm text-neutral-500">
 						{t("settings.mailbox.selectToView")}
 					</CardContent>
 				</Card>
@@ -85,7 +85,7 @@ export function CurrentMailboxForm() {
 				<p className="mt-1 text-sm text-neutral-500">{address}</p>
 			</div>
 
-				<CardContent className="space-y-6 rounded-3xl bg-white p-6">
+				<CardContent className="space-y-6 rounded-2xl bg-white p-6">
 					<ProfileAvatarForm
 						mailboxId={selectedMailbox.id}
 						initialHasAvatar={!!selectedMailbox.hasAvatar}

@@ -74,7 +74,7 @@ export function LicenseActivation({ children }: { children?: ReactNode }) {
 	if (license?.active) {
 		return (
 			<>
-			<Card className="rounded-3xl border-0 bg-white px-6">
+			<Card className="rounded-2xl border-neutral-200 bg-white ">
 				<CardContent className="flex items-start gap-4 py-8">
 					<span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-700">
 						<CheckCircle2 className="h-6 w-6" />
@@ -100,7 +100,7 @@ export function LicenseActivation({ children }: { children?: ReactNode }) {
 	return (
 		<>
 		{children}
-		<Card className="rounded-3xl border-0 bg-white px-6">
+		<Card className="rounded-2xl border-neutral-200 bg-white ">
 			<CardContent className="space-y-5 pb-6">
 				{hasActivation && license && (
 					<p className="rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-800">

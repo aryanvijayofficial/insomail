@@ -57,13 +57,13 @@ export function AccountSettings() {
 					<h2 className="text-xl font-semibold text-neutral-900">{t("settings.account.detailsTitle")}</h2>
 					<p className="mt-1 text-sm text-neutral-500">{t("settings.account.detailsDescription")}</p>
 				</div>
-				<div className="space-y-1 overflow-hidden rounded-3xl">
+				<div className="space-y-4">
 					<ProfileForm
 						accountName={user.name}
 						initialResetEmail={user.resetEmail ?? ""}
 					/>
 
-					<div className="space-y-4 rounded-b-3xl rounded-t-lg bg-white p-6">
+					<div className="space-y-4 rounded-2xl border border-neutral-200 bg-white p-5 sm:p-6">
 						<div>
 							<h3 className="text-lg font-semibold text-neutral-900">{t("settings.account.signatureTitle")}</h3>
 							<p className="mt-1 text-sm text-neutral-500">{t("settings.account.signatureDescription")}</p>
@@ -78,10 +78,10 @@ export function AccountSettings() {
 					<h2 className="text-xl font-semibold text-neutral-900">{t("settings.account.generalTitle")}</h2>
 					<p className="mt-1 text-sm text-neutral-500">{t("settings.account.generalDescription")}</p>
 				</div>
-				<div className="space-y-1 overflow-hidden rounded-3xl">
-					<div className="rounded-t-3xl rounded-b-lg bg-white p-6">
+				<div className="space-y-4">
+					<div className="rounded-2xl border border-neutral-200 bg-white p-5 sm:p-6">
 						<h3 className="mb-3 text-lg font-semibold text-neutral-900">{t("language.label")}</h3>
-						<div className="max-w-xs [&>div]:px-0 [&_label]:sr-only"><LanguageSelector /></div>
+						<div className="w-full [&_label]:sr-only"><LanguageSelector /></div>
 					</div>
 					<TimeZoneForm userId={user.id} initialTimeZone={user.timeZone} />
 				</div>

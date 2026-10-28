@@ -15,7 +15,7 @@ export function McpAgentInstructions(props: McpAgentInstructionsProps) {
 	const prompt = buildMcpAgentPrompt(origin, props);
 
 	return <div className="space-y-2 rounded-lg border border-neutral-200 p-3">
-		<div className="flex items-center justify-between gap-3">
+		<div className="flex flex-wrap items-center justify-between gap-3">
 			<strong className="text-sm">{t("mcp.instructions")}</strong>
 			<Button type="button" size="sm" variant="outline" onClick={() => void navigator.clipboard.writeText(prompt).then(() => setCopied(true))}><Copy className="h-4 w-4" />{copied ? t("common.copied") : t("mcp.copyPrompt")}</Button>
 		</div>

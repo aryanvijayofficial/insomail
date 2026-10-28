@@ -57,7 +57,7 @@ export default function GeneralSettingsPage() {
 
 	return <div className="space-y-6">
 		<div><h1 className="text-2xl md:text-3xl font-medium text-neutral-900">{t("general.title")}</h1><p className="mt-2 text-sm text-neutral-500">{t("general.description")}</p></div>
-		<Card className="rounded-3xl border-0 bg-white p-6">
+		<Card className="rounded-2xl border-neutral-200 bg-white ">
 			<CardHeader className="py-0"><CardTitle>{t("general.attachments")}</CardTitle></CardHeader>
 			<CardContent className="pt-6"><form onSubmit={save} className="space-y-4">
 				<div className="space-y-2"><Label htmlFor="attachment-limit">{t("general.maxAttachments")}</Label><Input id="attachment-limit" type="number" min="1" max="25" step="1" value={maxMb} onChange={(event) => setMaxMb(Number(event.target.value))} disabled={!loaded || saving} className="max-w-40" required /><p className="text-sm text-neutral-500">{t("general.appliesTo")}</p></div>
@@ -66,7 +66,7 @@ export default function GeneralSettingsPage() {
 				<Button type="submit" disabled={!loaded || saving || !Number.isInteger(maxMb) || maxMb < 1 || maxMb > 25}>{saving ? t("common.saving") : t("general.save")}</Button>
 			</form></CardContent>
 		</Card>
-		<Card className="rounded-3xl border-0 bg-white p-6">
+		<Card className="rounded-2xl border-neutral-200 bg-white ">
 			<CardHeader className="py-0"><CardTitle>{t("general.drive")}</CardTitle></CardHeader>
 			<CardContent className="pt-6"><form onSubmit={saveDrive} className="space-y-4">
 				<div className="flex items-center gap-3"><Switch id="drive-unlimited" checked={unlimited} onCheckedChange={setUnlimited} disabled={!loaded || driveSaving} /><Label htmlFor="drive-unlimited">{t("general.driveUnlimited")}</Label></div>

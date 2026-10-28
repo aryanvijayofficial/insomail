@@ -53,7 +53,7 @@ export default function BrandingPage() {
 				<h1 className="text-2xl md:text-3xl font-medium text-neutral-900">{t("branding.title")}</h1>
 				<p className="mt-2 text-sm text-neutral-500">{t("branding.description")}</p>
 			</div>
-			<Card className="rounded-3xl border-0 bg-white p-6">
+			<Card className="rounded-2xl border-neutral-200 bg-white ">
 				<CardHeader className="py-0">
 					<CardTitle className="flex items-center gap-2"><Palette className="h-5 w-5" />{t("branding.identity")}</CardTitle>
 					<CardDescription>{t("branding.faviconNote")}</CardDescription>

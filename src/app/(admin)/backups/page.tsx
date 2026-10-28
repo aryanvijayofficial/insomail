@@ -194,7 +194,7 @@ export default function BackupsPage() {
       )}
 
       {configuration && !configuration.configured && (
-        <Card className="rounded-3xl border border-amber-200 bg-amber-50 p-6">
+        <Card className="rounded-2xl border border-amber-200 bg-amber-50 ">
           <CardHeader className="py-0">
             <div className="flex items-start gap-3">
               <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />
@@ -237,7 +237,7 @@ export default function BackupsPage() {
         </Card>
       )}
 
-      <Card className="rounded-3xl border-0 bg-white p-6">
+      <Card className="rounded-2xl border-neutral-200 bg-white ">
         <CardHeader className="py-0">
           <CardTitle>{t("backups.automatic")}</CardTitle>
           <CardDescription>
@@ -247,7 +247,7 @@ export default function BackupsPage() {
         <CardContent className="space-y-5 pt-5">
           {settings && (
             <>
-              <div className="flex items-center justify-between gap-4 border-t border-neutral-100 pt-5">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-neutral-100 pt-5">
                 <Label htmlFor="automatic-backup-switch">{t("backups.enableAutomatic")}</Label>
                 <Switch
                   id="automatic-backup-switch"
@@ -259,7 +259,7 @@ export default function BackupsPage() {
               {settings.enabled && (
                 <>
                   <div className="grid gap-4">
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
                       <Label htmlFor="schedule-type" className="flex-1">{t("backups.frequency")}</Label>
                       <Select
                         id="schedule-type"
@@ -289,7 +289,7 @@ export default function BackupsPage() {
                     </div>
 
                     {settings.scheduleType === "weekly" && (
-                      <div className="flex items-center justify-between gap-4">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
                         <Label htmlFor="weekday">{t("backups.dayOfWeek")}</Label>
                         <Select
                           id="weekday"
@@ -315,7 +315,7 @@ export default function BackupsPage() {
                     )}
 
                     {settings.scheduleType === "monthly" && (
-                      <div className="flex items-center justify-between gap-4">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
                         <Label htmlFor="month-day">{t("backups.dayOfMonth")}</Label>
                         <Input
                           id="month-day"
@@ -341,7 +341,7 @@ export default function BackupsPage() {
                   </div>
 
                   <div className="grid gap-4 border-t border-neutral-100 pt-5">
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
                       <Label htmlFor="retention-switch">{t("backups.deleteOld")}</Label>
                       <Switch
                         id="retention-switch"
@@ -356,7 +356,7 @@ export default function BackupsPage() {
                       />
                     </div>
 
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
                       <Label htmlFor="retention-days">
                         {t("backups.deleteOlderThan")}
                       </Label>
@@ -391,7 +391,7 @@ export default function BackupsPage() {
         </CardContent>
       </Card>
 
-      <section className="overflow-hidden rounded-3xl bg-white">
+      <section className="overflow-hidden rounded-2xl bg-white">
         <div className="flex items-center gap-3 border-b border-neutral-100 px-4 py-4">
           <DatabaseBackup className="h-5 w-5 text-neutral-500" />
           <h2 className="font-semibold text-neutral-900">{t("backups.history")}</h2>
