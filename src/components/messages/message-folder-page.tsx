@@ -489,9 +489,9 @@ export function MessageFolderPage({
 	return (
 		<div className="flex h-full min-h-0 flex-col">
 			{confirmationDialog}
-			<div className={`flex h-14 shrink-0 items-center justify-between border-b border-neutral-200 ${compact ? "px-4" : "px-4.5 md:px-6"}`}>
+			<div className={`flex min-h-14 shrink-0 flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-neutral-200 py-2 ${compact ? "px-4" : "px-4.5 md:px-6"}`}>
 				{selectedMessageId ? <h2 className="sr-only">{title}</h2> : <h1 className="sr-only">{title}</h1>}
-				<div className="flex items-center gap-3 w-full">
+				<div className="flex min-w-0 flex-[1_1_10rem] items-center gap-3">
 					<Tooltip label={t("list.selectAll")}>
 						<Checkbox
 							checked={allVisibleSelected}
@@ -531,12 +531,12 @@ export function MessageFolderPage({
 						/>
 					) : (
 						(compact || isMobile) && (
-							<p aria-hidden="true" className="truncate font-semibold text-neutral-900 pl-1">{title}</p>
+							<p aria-hidden="true" className="min-w-0 truncate pl-1 font-semibold text-neutral-900">{title}</p>
 						)
 					)}
 				</div>
 				{(selectedIds.length === 0 || compact) && (
-					<div className="flex items-center gap-2 text-neutral-500">
+					<div className="ml-auto flex max-w-full shrink-0 flex-wrap items-center justify-end gap-2 text-neutral-500">
 						<span className="text-xs text-neutral-500 whitespace-nowrap">
 							{t("list.range", { start: pageRange.start, end: pageRange.end, total: pageRange.total })}
 						</span>
