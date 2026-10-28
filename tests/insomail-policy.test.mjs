@@ -55,3 +55,8 @@ test('plan badge reflects selected plan without changing it and notices remain c
  const footer=readFileSync('src/components/sidebar-footer.tsx','utf8');assert.match(footer,/About &amp; License/);assert.doesNotMatch(footer,/api\/source/);
  const about=readFileSync('src/app/about/page.tsx','utf8');assert.match(about,/Copyright \(C\) 2026 Hieu Nguyen/);assert.match(about,/no warranty/);assert.match(about,/about\/license/); const license=readFileSync("src/app/about/license/page.tsx","utf8");assert.match(license,/AGPL_LICENSE/);
 });
+test('security UX keeps backend behavior and accessible password visibility controls',()=>{
+ const form=readFileSync('src/components/settings/change-password-form.tsx','utf8');
+ assert.match(form,/updatePassword\(currentPassword,newPassword\)/);assert.match(form,/type="button"/);assert.match(form,/aria-pressed/);assert.match(form,/aria-invalid/);assert.match(form,/auto:"current-password"/);assert.match(form,/disabled=\{loading\|\|!valid\}/);
+ const back=readFileSync('src/components/about-back-link.tsx','utf8');assert.match(back,/previous.origin === window.location.origin/);assert.doesNotMatch(back,/history.back/);
+});
