@@ -72,15 +72,15 @@ export function ScheduleSendSheet({ open, onOpenChange, value, onChange, onApply
 					aria-describedby={undefined}
 					className="slide-sheet fixed inset-x-0 bottom-0 z-[70] max-h-[85dvh] overflow-hidden rounded-t-3xl bg-white pb-[env(safe-area-inset-bottom)] shadow-2xl outline-none"
 				>
-					<div className="flex h-14 items-center gap-1 px-2">
+					<div className="flex min-h-14 items-center gap-1 px-2 py-2">
 						{page === "root" ? <span className="w-10" /> : (
-							<button type="button" onClick={() => setPage("root")} className="flex h-10 w-10 items-center justify-center rounded-lg text-neutral-400 active:bg-neutral-100">
+							<button type="button" onClick={() => setPage("root")} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-neutral-50 text-neutral-400 hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-blue-600 active:bg-neutral-100">
 								<ChevronLeft className="h-6 w-6" />
 								<span className="sr-only">{t("schedule.heading")}</span>
 							</button>
 						)}
-						<DialogPrimitive.Title className="flex-1 truncate text-center text-base font-semibold text-neutral-900">{title}</DialogPrimitive.Title>
-						<DialogPrimitive.Close className="flex h-10 w-10 items-center justify-center rounded-lg text-neutral-400 active:bg-neutral-100">
+						<DialogPrimitive.Title className="min-w-0 flex-1 break-words text-center text-base font-semibold leading-6 text-neutral-900">{title}</DialogPrimitive.Title>
+						<DialogPrimitive.Close className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-neutral-50 text-neutral-400 hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-blue-600 active:bg-neutral-100">
 							<X className="h-5 w-5" />
 							<span className="sr-only">{t("navigation.close")}</span>
 						</DialogPrimitive.Close>

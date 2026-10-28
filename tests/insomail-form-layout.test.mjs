@@ -28,3 +28,9 @@ test('booking editor replaces the list at narrow widths instead of clipping save
 test('booking native time inputs get full rows on phones so minutes and AM/PM stay visible',()=>{
  assert.match(read('src/app/(calendar)/booking/booking-editor.tsx'), /grid w-full grid-cols-\[minmax\(0,1fr\)_auto\] items-end gap-2 sm:flex/);
 });
+
+
+test('schedule sheet keeps timezone title readable and public booking branding wraps',()=>{
+ assert.match(read('src/components/compose/schedule-send-sheet.tsx'), /min-w-0 flex-1 break-words text-center/);
+ assert.match(read('src/app/book/[userId]/[eventId]/page.tsx'), /flex min-w-0 flex-wrap items-center gap-3/);
+});
