@@ -6,7 +6,7 @@
 	"compatibility_date": "2026-05-20",
 	"keep_vars": true,
 	"routes": [{"pattern":"insomail.com","custom_domain":true}],
-	"vars": {"APP_URL":"https://insomail.com", "CF_ACCOUNT_ID":"02362954db44bfe1c0cf3baa860f8baf", "CF_EMAIL_WORKER_NAME":"mailflare", "INSOMAIL_SOURCE_KEY":"source/insomail-20261029-maintenance.tar.gz"},
+	"vars": {"APP_URL":"https://insomail.com", "CF_ACCOUNT_ID":"02362954db44bfe1c0cf3baa860f8baf", "CF_EMAIL_WORKER_NAME":"mailflare", "INSOMAIL_SOURCE_KEY":"source/insomail-20261029-branding.tar.gz"},
 	"compatibility_flags": [
 		"nodejs_compat",
 		"global_fetch_strictly_public"

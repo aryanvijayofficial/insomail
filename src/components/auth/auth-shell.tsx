@@ -92,6 +92,7 @@ export function AuthShell({
             <LanguageSelector variant="text" />
           </div>
         </section>
+        <p className="px-7 pb-6 text-center text-xs text-neutral-500 lg:col-span-2"><a href="/about" className="underline">About &amp; License</a>{" · "}<a href="/api/source" className="underline">Source code</a></p>
       </main>
     </div>
   );

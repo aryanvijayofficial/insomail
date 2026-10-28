@@ -163,6 +163,6 @@ export default function PublicBookingEventPage() {
 						</>}
 				</div>}
 		</div>
-		<a href="/api/source" className="mx-auto mt-5 block w-fit text-xs text-neutral-500 underline">InsoMail source code (AGPL)</a>
-	</main>;
+		<a href="/api/source" className="mx-auto mt-5 block w-fit text-xs text-neutral-500 underline">Source code (AGPL)</a>
+	<a href="/about" className="mx-auto mt-2 block w-fit text-xs text-neutral-500 underline">About &amp; License</a></main>;
 }

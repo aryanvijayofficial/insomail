@@ -1,5 +1,6 @@
 "use client";
 
+import {useBranding} from "./branding-provider";
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
 import { DEFAULT_LOCALE, createTranslator, getDirection, loadMessages, resolveLocale, serializeLocaleCookie } from "@/lib/i18n/utils";
 import type { Locale, Messages } from "@/lib/i18n/types";
@@ -51,5 +52,13 @@ export function LanguageProvider({ initialLocale, initialMessages, children }: {
 }
 
 export function useLanguage() {
-	return useContext(LanguageContext);
+	const value=useContext(LanguageContext);
+ const branding=useBranding();
+ const t=useCallback<typeof value.t>((key,vars)=>{
+  const text=value.t(key,vars);
+  // Actual upstream mobile-app identity and license names stay accurate.
+  if(String(key).startsWith("emailClients.") || String(key).includes("devicesDescription") || String(key).startsWith("licenses.")) return text;
+  return text.replaceAll("Mailflare",branding.appName);
+ },[value.t,branding.appName]);
+ return {...value,t};
 }

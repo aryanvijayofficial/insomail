@@ -70,7 +70,7 @@ export function AdminUpdateCard() {
                 <div className="rounded-2xl border border-blue-100 bg-blue-50/50 p-4 text-sm leading-6 text-neutral-700">
                   <p className="font-medium">Manual updates are intentional</p>
                   <p className="mt-1">Mail, free plans and account management do not need GitHub updater credentials. Review upstream changes, merge them into InsoMail, test, refresh the source archive, then deploy.</p>
-                  <p className="mt-2">The original one-click updater replaces the tracked source with upstream Mailflare and can remove InsoMail customizations. It is disabled here. Database status is checked separately below.</p>
+                  <p className="mt-2">The original one-click updater replaces the tracked source with the upstream project and can remove local customizations. It is disabled here. Database status is checked separately below.</p>
                   <a href="https://github.com/aryanvijayofficial/insomail" className="mt-2 inline-block font-medium text-blue-700 underline" target="_blank" rel="noreferrer">InsoMail source repository</a>
                 </div>
 

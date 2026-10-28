@@ -1,3 +1,4 @@
+import {getBranding} from "@/lib/branding/service";
 import { cookies } from "next/headers";
 import { getEnv } from "@/lib/cloudflare";
 import { LOCALE_COOKIE, createTranslator, loadMessages, resolveLocale } from "./utils";
@@ -22,5 +23,7 @@ export async function loadServerMessages(locale: Locale): Promise<Partial<Messag
 // For server components and route handlers; client components use `useLanguage()`.
 export async function getServerTranslator() {
 	const locale = await getRequestLocale();
-	return createTranslator(locale, await loadServerMessages(locale));
+	const t=createTranslator(locale, await loadServerMessages(locale));
+ const branding=await getBranding(getEnv());
+ return ((key,vars)=>t(key,vars).replaceAll("Mailflare",branding.appName)) as typeof t;
 }

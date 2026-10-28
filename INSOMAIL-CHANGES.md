@@ -22,3 +22,7 @@ After committing a change, run `node scripts/build-insomail-source.mjs`. It pack
 ## Maintenance policy
 
 InsoMail intentionally uses reviewed manual updates. The upstream one-click workflow replaces the full tracked tree and can discard local changes, so it is replaced with a non-mutating notice and its app dispatch endpoint is disabled. GitHub updater credentials are optional and are not needed for mail or free plans. Keep database migration checks separate. Review and merge upstream changes, run tests, rebuild the source archive, and deploy the reviewed InsoMail revision.
+
+## Product identity and notices
+
+Active-plan badges show the selected per-user plan; Plans remains a neutral navigation label. Product copy uses saved instance branding. A prominent About & License link consolidates the preserved Mailflare copyright, modification notice, no-warranty and redistribution information and full AGPL text. Source download remains directly available on signed-in, login and public booking surfaces.

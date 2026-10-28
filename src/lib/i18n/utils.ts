@@ -35,12 +35,12 @@ function interpolate(template: string, vars?: TranslationVars): string {
 
 // InsoMail product copy overrides upstream paid-plan wording in every locale.
 const insomailCopy: Partial<Record<TranslationKey, string>> = {
- "admin.nav.licenses": "Free plans",
+ "admin.nav.licenses": "Plans",
  "admin.section.licenses": "Choose Professional or Team for free. No checkout or license key.",
  "admin.section.accounts": "Create and manage accounts. Admin-only, with no app user-count cap.",
  "adminKeys.perm.accountsDesc": "Create and update accounts within this administrator's permissions.",
  "branding.proOnly": "Custom branding is included in InsoMail and managed by the primary administrator.",
- "licenses.title": "Free plans",
+ "licenses.title": "Plans",
  "update.title": "Application maintenance",
  "update.description": "InsoMail uses reviewed manual deployments to preserve its free plans and custom changes.",
 };
