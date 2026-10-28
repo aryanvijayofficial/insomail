@@ -111,7 +111,7 @@ export default function BookingsPage() {
 		catch { toast.error(t("booking.copyFailed")); }
 	}
 
-	return <div className={clsx("flex h-full min-h-0 flex-col bg-[#f6f8fc] pl-3 max-md:pl-0 transition-[gap] duration-200 ease-in-out motion-reduce:transition-none lg:flex-row", minimal ? "gap-0" : "gap-3")}>
+	return <div className={clsx("flex h-full min-h-0 flex-col bg-[#f6f8fc] pl-3 max-md:pl-0 transition-[gap] duration-200 ease-in-out motion-reduce:transition-none md:flex-row", minimal ? "gap-0" : "gap-3")}>
 		<Toaster position="bottom-left" />
 		{loading && <RouteLoadingBarPortal />}
 		<UpcomingSidebar />

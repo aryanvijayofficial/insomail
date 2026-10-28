@@ -66,8 +66,8 @@ export function UpcomingSidebar({ events, onSelect, drawer = false, refreshKey }
 
 	if (drawer) return <div className="h-full min-h-0 bg-white">{list}</div>;
 
-	return <aside className={clsx("relative shrink-0 rounded-t-3xl bg-white transition-[width,max-height] duration-200 ease-in-out motion-reduce:transition-none lg:h-full lg:max-h-none", minimal ? "w-0 max-h-0" : "w-full max-h-[36vh] lg:w-[min(var(--sidebar-width),15rem,22vw)]")} aria-hidden={minimal}>
+	return <aside className={clsx("relative shrink-0 rounded-t-3xl bg-white transition-[width,max-height] duration-200 ease-in-out motion-reduce:transition-none md:h-full md:max-h-none", minimal ? "w-0 max-h-0" : "w-full max-h-[36vh] md:w-[min(var(--sidebar-width),15rem,22vw)]")} aria-hidden={minimal}>
 		{list}
-		{!minimal && <div className="hidden lg:block"><SidebarResizeBoundary /></div>}
+		{!minimal && <div className="hidden md:block"><SidebarResizeBoundary /></div>}
 	</aside>;
 }
