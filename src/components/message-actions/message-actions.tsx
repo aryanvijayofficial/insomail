@@ -1,7 +1,7 @@
 "use client";
 
 import { useConfirmDialog } from "@/components/ui/use-confirm-dialog";
-import { createElement, useState, useMemo, useCallback, useRef } from "react";
+import { createElement, useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Archive, Ban, BellOff, Clock, FileCode2, Forward, Mail, MailOpen, MoreVertical, Reply, ReplyAll, ShieldAlert, Trash2 } from "lucide-react";
 import { useLanguage } from "@/components/language-provider";
@@ -51,7 +51,17 @@ export function MessageActions({
 	const { t } = useLanguage();
 	const {confirm,confirmationDialog}=useConfirmDialog();
 	const router = useRouter();
-	const isMobile = useIsMobile();
+	const viewportMobile = useIsMobile();
+ const actionBarRef = useRef<HTMLDivElement>(null);
+ const [compactPane, setCompactPane] = useState(false);
+ useEffect(() => {
+  const pane = actionBarRef.current?.closest("section");
+  if (!pane) return;
+  const update = () => setCompactPane(pane.clientWidth < 620);
+  update(); const observer = new ResizeObserver(update); observer.observe(pane);
+  return () => observer.disconnect();
+ }, []);
+ const isMobile = viewportMobile || compactPane;
 	const { openDraftComposer } = useCompose();
 	const { backHref: listHref } = useMessageListVisibility();
 	const { shortcutsEnabled } = useShortcuts();
@@ -258,7 +268,7 @@ export function MessageActions({
 	const moveActions = getMoveMessageActions(status, direction);
 
 	return (
-		<div className="flex flex-wrap items-center gap-3 text-neutral-600 flex-1 min-w-0">
+		<div ref={actionBarRef} className="flex flex-wrap items-center gap-1 text-neutral-600 flex-1 min-w-0">
 			{confirmationDialog}
 			{error && <span role="alert" className="text-xs text-red-600">{error}</span>}
 

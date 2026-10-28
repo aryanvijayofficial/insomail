@@ -6,9 +6,9 @@ import { prepareReaderEmailHtml } from "@/lib/remote-images/reader";
 import { collapseQuotedEmailHtml } from "@/app/(dashboard)/inbox/[messageId]/quote-collapse-utils";
 
 const BASE_STYLE = `
-:host { display:block; min-width:0; isolation:isolate; contain:paint; }
+:host { display:block; min-width:0; isolation:isolate; contain:paint; overflow-wrap:anywhere; }
 :host { background:#fff; color:#202124; color-scheme:light; border-radius:8px; }
-table { color:inherit; }
+table { color:inherit; max-width:100%; }
 a { overflow-wrap:anywhere; }
 img, video { max-width:100%; height:auto; }
 .email-quote-toggle { margin-top:1.4em; }
