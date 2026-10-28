@@ -208,3 +208,33 @@ When adding a schema change, create a new uniquely named SQL file in `drizzle/mi
 ## Branding license
 
 Activate a purchased Pro or Team key from **Admin → Licenses**. Mailflare sends the key to Paymug and stores only a one-way hash and the activation state. Apply all D1 migrations before activating a license.
+
+## insoMail immutable assets across deployments
+
+Open browser tabs can still request JavaScript/CSS filenames from a prior release.
+The build preserves those files through an append-only asset history. Do not remove
+old history during routine deployment, or old tabs may fail until reloaded.
+
+Manual deployments from this workspace use `.asset-history/` and the prior
+`dist/client/_next/static/`. Both are ignored by Git. A clean checkout does not
+contain them. CI now refuses an empty history rather than silently shipping only
+new assets.
+
+For clean CI, restore a persistent asset-history directory before `npm run build`,
+set `INSOMAIL_ASSET_HISTORY_DIR` to it, and persist the updated directory only after
+a successful build. Use an always-restored durable artifact or object store, not
+an optional cache that can disappear. The history must survive across releases
+and branches that deploy to the same production app. Keep it outside build output.
+A missing restore must fail the deployment. The existing manual-update notice
+workflow does not deploy or provide this storage.
+
+For an existing app, seed that durable history from the currently deployed
+workspace's full `.asset-history/` before the first clean-CI release. Do not use
+bootstrap for an existing app. Only a genuinely new installation with no prior
+clients may set `INSOMAIL_ASSET_HISTORY_BOOTSTRAP=1` for its first build; persist
+that build's history and remove the flag for subsequent builds.
+
+This guard and directory support do not configure a remote store themselves.
+Verify a restored clean build includes a known prior asset before enabling CI
+production deployments. No production CI deployment should be enabled until that
+restore/persist path is in place and tested.

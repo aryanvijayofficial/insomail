@@ -191,3 +191,12 @@ test("styled signatures are deterministic and editor copies are inert but export
 	assert.match(prepareEmailHtml(preview, { forOutgoing: true }).html, /\.signature\{color:red;background:url\(https:\/\/remote.example\/bg\)/);
 	assert.equal(sanitizeEditorHtml(prepareEmailHtml(preview, { forOutgoing: true }).html), preview);
 });
+
+test('reader external links cannot navigate the application top frame', () => {
+ const result=prepareEmailHtml('<a href="https://example.org/" target="_top">Website</a><iframe src="https://example.org/"></iframe>',{reader:true});
+ const template=document.createElement('template');template.innerHTML=result.html;
+ const anchor=template.content.querySelector('a');
+ assert.equal(anchor?.getAttribute('target'),'_blank');
+ assert.equal(anchor?.getAttribute('rel'),'noopener noreferrer');
+ assert.equal(template.content.querySelector('iframe'),null);
+});

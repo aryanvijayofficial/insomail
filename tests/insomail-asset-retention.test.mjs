@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,existsSync,rmSync,copyFileSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {spawnSync} from 'node:child_process';
+function setup(t){const root=mkdtempSync(join(tmpdir(),'insomail-assets-'));t.after(()=>rmSync(root,{recursive:true,force:true}));mkdirSync(join(root,'bin'));copyFileSync(new URL('../scripts/build-with-retained-assets.mjs',import.meta.url),join(root,'build.mjs'));writeFileSync(join(root,'bin/npm'),'#!/bin/sh\nmkdir -p dist/client/_next/static/chunks\nprintf current > dist/client/_next/static/chunks/current.js\n',{mode:0o755});return {root,run:(extra={})=>spawnSync(process.execPath,['build.mjs'],{cwd:root,env:{...process.env,CI:'true',INSOMAIL_ASSET_HISTORY_DIR:'',INSOMAIL_ASSET_HISTORY_BOOTSTRAP:'',PATH:join(root,'bin')+':'+process.env.PATH,...extra},encoding:'utf8'})};}
+test('clean CI without restored history fails before build',t=>{const{root,run}=setup(t);const r=run();assert.equal(r.status,1);assert.match(r.stderr,/Missing prior immutable assets/);assert.equal(existsSync(join(root,'dist')),false);});
+test('restored persistent history survives a clean build and receives current assets',t=>{const{root,run}=setup(t);mkdirSync(join(root,'persistent/chunks'),{recursive:true});writeFileSync(join(root,'persistent/chunks/prior.js'),'prior');const r=run({INSOMAIL_ASSET_HISTORY_DIR:'persistent'});assert.equal(r.status,0,r.stderr);assert.equal(readFileSync(join(root,'dist/client/_next/static/chunks/prior.js'),'utf8'),'prior');assert.equal(readFileSync(join(root,'persistent/chunks/current.js'),'utf8'),'current');});
+test('only explicit new-install bootstrap permits empty clean CI',t=>{const{root,run}=setup(t);assert.equal(run({INSOMAIL_ASSET_HISTORY_BOOTSTRAP:'1'}).status,0);assert.ok(existsSync(join(root,'.asset-history/chunks/current.js')));});
+test('local manual build retains prior output without CI',t=>{const{root,run}=setup(t);mkdirSync(join(root,'dist/client/_next/static/chunks'),{recursive:true});writeFileSync(join(root,'dist/client/_next/static/chunks/prior.js'),'prior');assert.equal(run({CI:'false'}).status,0);assert.ok(existsSync(join(root,'dist/client/_next/static/chunks/prior.js')));});
+test('history paths overlapping build output are rejected',t=>{const{run}=setup(t);for(const path of ['dist/client/_next/static','dist/client/_next/static/history','.','dist'])assert.equal(run({INSOMAIL_ASSET_HISTORY_DIR:path}).status,1,path);});

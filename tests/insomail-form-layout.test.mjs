@@ -61,3 +61,5 @@ test('timezone picker keeps readable labels separate from canonical selection an
  assert.match(form,/value:"",label:t/);
  assert.match(read('src/components/ui/select.tsx'),/relative inline-flex min-w-0 w-full/);
 });
+
+test('reader paper has inner spacing and long links can wrap without removing formatted-mail scroll',()=>{const s=readFileSync('src/components/messages/email-html-renderer.tsx','utf8');assert.match(s,/paperPadding = 16/);assert.match(s,/overflow-wrap:anywhere/);assert.match(s,/box-sizing:border-box/);assert.match(s,/max-w-full overflow-x-auto/);assert.match(s,/style=\{\{ padding: paperPadding \}\}/);});

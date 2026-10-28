@@ -6,10 +6,10 @@ import { prepareReaderEmailHtml } from "@/lib/remote-images/reader";
 import { collapseQuotedEmailHtml } from "@/app/(dashboard)/inbox/[messageId]/quote-collapse-utils";
 
 const BASE_STYLE = `
-:host { display:block; min-width:0; isolation:isolate; contain:paint; }
+:host { display:block; min-width:0; box-sizing:border-box; isolation:isolate; contain:paint; overflow-wrap:anywhere; }
 :host { background:#fff; color:#202124; color-scheme:light; border-radius:8px; }
 table { color:inherit; }
-a { overflow-wrap:anywhere; }
+a { overflow-wrap:anywhere; word-break:break-word; }
 img, video { max-width:100%; height:auto; }
 .email-quote-toggle { margin-top:1.4em; }
 .email-quote-toggle > summary { cursor:pointer; list-style:none; width:26px; border-radius:20px; background:#ececec; text-align:center; }
@@ -18,7 +18,7 @@ img, video { max-width:100%; height:auto; }
 .email-quote-content { display:flow-root; }
 `;
 
-export function EmailHtmlRenderer({ html, className, preserveLeadingQuote = false, autoAllowRemote = false, onAllowRemote, paperPadding = 0 }: {
+export function EmailHtmlRenderer({ html, className, preserveLeadingQuote = false, autoAllowRemote = false, onAllowRemote, paperPadding = 16 }: {
 	html: string; className?: string; preserveLeadingQuote?: boolean;
 	/** Inset inside the light paper, independent of surrounding app chrome. */
 	paperPadding?: number;
