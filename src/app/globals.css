@@ -507,3 +507,18 @@ button {
 }
 
 /* Cards keep their own padding at every width; spacing belongs to shared components. */
+
+/* Shared dark menus: stronger neutral hover, blue keyboard focus, unchanged disabled states. */
+.dark [data-account-menu] :is(a,button):not(:disabled):hover,
+.dark [role="menuitem"]:not([data-disabled]):hover,
+.dark [role="menuitem"]:not([data-disabled])[data-highlighted],
+.dark nav a:not([aria-current="page"]):hover {
+  background-color: #50545b;
+}
+.dark [data-account-menu] :is(a,button):focus-visible,
+.dark [role="menuitem"]:not([data-disabled]):focus-visible,
+.dark nav a:focus-visible {
+  background-color: #3b5276;
+  outline: 2px solid #8ab4f8;
+  outline-offset: -2px;
+}
