@@ -224,7 +224,7 @@ export function RichTextEditor({
 				)}
 			</div>
 			{footerContent}
-			<div className="relative flex items-center gap-0.5 max-md:gap-2 border-t border-neutral-100 px-4 py-3 max-md:border-t-0">
+			<div className="relative flex shrink-0 items-center gap-0.5 max-md:flex-wrap max-md:gap-2 border-t border-neutral-100 px-4 py-3 max-md:border-t-0">
 				{toolbarStart}
 				<div className="contents max-md:hidden">{formatButtons}</div>
 				{toolbarEnd}

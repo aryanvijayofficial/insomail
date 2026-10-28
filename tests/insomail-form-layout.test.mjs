@@ -11,3 +11,9 @@ test('backup history uses labelled mobile cards instead of clipping a fixed-widt
  assert.match(source, /aria-label=\{t\("backups.download"\)\}/);
  assert.match(source, /min-w-0 pr-16/);
 });
+
+
+test('compose footer wraps on narrow phones and sender label has a real gap',()=>{
+ assert.match(read('src/components/compose/rich-text-editor.tsx'), /shrink-0 items-center gap-0.5 max-md:flex-wrap/);
+ assert.match(read('src/components/compose/compose-form.tsx'), /px-4 py-1 flex flex-row items-center gap-2/);
+});
