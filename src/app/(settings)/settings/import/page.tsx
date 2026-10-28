@@ -1,7 +1,7 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Folder, Server, Upload } from "lucide-react";
 import { useLanguage } from "@/components/language-provider";
 import type { TranslationKey } from "@/lib/i18n/types";
@@ -72,6 +72,9 @@ export default function SettingsImportPage() {
   const [selectedSections, setSelectedSections] =
     useState<ImportSourceSection[]>(defaultSections);
   const [sourceDropdownOpen, setSourceDropdownOpen] = useState(false);
+ const sourceDropdownRef=useRef<HTMLDivElement>(null);
+ const sourceTriggerRef=useRef<HTMLButtonElement>(null);
+ useEffect(()=>{if(!sourceDropdownOpen)return;const close=(event:PointerEvent)=>{if(!sourceDropdownRef.current?.contains(event.target as Node))setSourceDropdownOpen(false)};const escape=(event:KeyboardEvent)=>{if(event.key==="Escape"){setSourceDropdownOpen(false);sourceTriggerRef.current?.focus();}};document.addEventListener("pointerdown",close);document.addEventListener("keydown",escape);return()=>{document.removeEventListener("pointerdown",close);document.removeEventListener("keydown",escape)}},[sourceDropdownOpen]);
   const [files, setFiles] = useState<File[]>([]);
   const [fileStarted, setFileStarted] = useState(false);
   const [fileError, setFileError] = useState<string | null>(null);
@@ -233,18 +236,19 @@ export default function SettingsImportPage() {
             <div className="space-y-2">
               <Label>{t("importPage.chooseSections")}</Label>
 
-              <div className="relative">
+              <div className="relative" ref={sourceDropdownRef}>
                 <button
+ ref={sourceTriggerRef} aria-expanded={sourceDropdownOpen} aria-controls="import-sections" aria-label={t("importPage.chooseSections")}
                   type="button"
                   onClick={() => setSourceDropdownOpen((open) => !open)}
-                  className="flex w-full items-center justify-between rounded-md border border-neutral-200 bg-white px-3 py-2 text-left text-sm shadow-sm shadow-neutral-200/50"
+                  className="flex min-h-10 w-full items-center gap-2 rounded-xl border border-neutral-200 bg-white px-3 py-2 text-left text-sm focus-visible:outline-2 focus-visible:outline-blue-600"
                 >
-                  <label className="flex-1">{t("importPage.selected")}</label>
-                  <span className="truncate">{sourceSummary}</span>
-                  <span className="text-neutral-500 px-2">▾</span>
+                  <span className="shrink-0 text-neutral-500">{t("importPage.selected")}</span>
+                  <span className="min-w-0 flex-1 truncate" title={sourceSummary}>{sourceSummary}</span>
+                  <span aria-hidden="true" className="shrink-0 text-neutral-500">▾</span>
                 </button>
                 {sourceDropdownOpen && (
-                  <div className="absolute z-20 mt-2 w-full rounded-xl border border-neutral-200 bg-white p-2 shadow-lg">
+                  <div id="import-sections" role="group" aria-label={t("importPage.chooseSections")} className="absolute z-20 mt-2 max-h-72 overflow-y-auto w-full rounded-xl border border-neutral-200 bg-white p-2 shadow-lg">
                     {importSourceOptions.map((option) => (
                       <label
                         key={option.value}
