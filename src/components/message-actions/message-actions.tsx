@@ -272,28 +272,10 @@ export function MessageActions({
 			{confirmationDialog}
 			{error && <span role="alert" className="text-xs text-red-600">{error}</span>}
 
-			{isMobile && (
-				<>
-					<Button
-						variant="ghost"
-						size="roundedSM"
-						aria-label={trashLabel}
-						disabled={disabled}
-						onClick={onTrashClick}
-					>
-						<Trash2 size={iconSize} />
-					</Button>
-					<Button
-						variant="ghost"
-						size="roundedSM"
-						aria-label={t("common.reportSpam")}
-						disabled={disabled || status === "spam" || direction !== "inbound"}
-						onClick={() => runAction("spam")}
-					>
-						<ShieldAlert size={iconSize} />
-					</Button>
-				</>
-			)}
+   {isMobile && <>
+    <Button type="button" variant="ghost" size="roundedSM" aria-label={t("message.reply")} disabled={disabled} onClick={() => handleReply("reply")}><Reply size={iconSize}/></Button>
+    <Button type="button" variant="ghost" size="roundedSM" aria-label={t("common.archive")} disabled={disabled || status === "archived"} onClick={() => runAction("archive")}><Archive size={iconSize}/></Button>
+   </>}
 			{!isMobile && (
 				<>
 			<Tooltip label={shortcutsEnabled ? t("actions.archiveHint") : t("common.archive")}>
@@ -404,9 +386,11 @@ export function MessageActions({
 
 
 				{moreOpen && (
-					<div className="absolute right-0 top-8 z-20 w-54 rounded-xl border border-neutral-200 bg-white p-2 shadow-lg">
+					<div className={`absolute top-8 z-50 w-54 max-w-[calc(100vw-2rem)] max-h-[calc(100dvh-8rem)] overflow-y-auto rounded-xl border border-neutral-200 bg-white p-2 shadow-lg ${compactPane ? "left-0" : "right-0"}`}>
 						{isMobile && (
 							<>
+        <button type="button" className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-neutral-700 hover:bg-neutral-100" disabled={disabled} onClick={onTrashClick}><Trash2 size={16}/>{trashLabel}</button>
+        <button type="button" className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-neutral-700 hover:bg-neutral-100" disabled={disabled || status === "spam" || direction !== "inbound"} onClick={() => runAction("spam")}><ShieldAlert size={16}/>{t("common.reportSpam")}</button>
 								<button type="button" className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-neutral-700 hover:bg-neutral-100 disabled:text-neutral-400" disabled={status === "archived"} onClick={() => void runAction("archive")}>
 									<Archive className="h-4 w-4" />
 									{t("common.archive")}
