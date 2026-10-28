@@ -252,18 +252,19 @@ export default function MailboxSettingsPage() {
                 : t("mailbox.aliasesLoadFailed")}
             </p>
           )}
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Input
               value={aliasLocalPart}
               onChange={(event) => setAliasLocalPart(event.target.value)}
               placeholder={t("mailbox.aliasPlaceholder")}
-              className="min-w-0 flex-1"
+              className="min-w-[10rem] flex-[1_1_12rem]"
               disabled={addAlias.isPending}
             />
             <Select
               value={aliasDomainId}
               onChange={(event) => setAliasDomainId(event.target.value)}
-              className="h-10 min-w-0 flex-1 text-sm"
+              containerClassName="min-w-[10rem] flex-[1_1_12rem]"
+              className="text-sm"
               disabled={addAlias.isPending}
             >
               {(aliases.data?.availableDomains ?? []).map((domain) => (
@@ -345,7 +346,8 @@ export default function MailboxSettingsPage() {
               <Select
                 value={selectedUserId}
                 onChange={(event) => setSelectedUserId(event.target.value)}
-                className="h-10 min-w-0 flex-1 text-sm"
+                containerClassName="min-w-[10rem] flex-[1_1_12rem]"
+              className="text-sm"
               >
                 <option value="">{t("mailbox.chooseAccount")}</option>
                 {(sharedAccess.data?.availableUsers ?? [])

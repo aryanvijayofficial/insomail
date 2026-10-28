@@ -1,4 +1,4 @@
-// InsoMail modification, 2026-10-29. AGPL-3.0 source offer to every network user.
+// insoMail modification, 2026-10-29. AGPL-3.0 source offer to every network user.
 import { getEnv } from "@/lib/cloudflare";
 
 export async function GET(request: Request) {

@@ -115,7 +115,7 @@ export default function AccountsPage() {
 	return <div className="space-y-6">
 		<div className="flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-2xl md:text-3xl font-medium text-neutral-900">{t("accounts.title")}</h1><p className="mt-2 text-sm text-neutral-500">{t("accounts.description")}</p>{seats && seats.limit !== null && <p className={`mt-1 text-sm ${seatsFull ? "text-amber-700" : "text-neutral-500"}`}>{t("accounts.seatsUsed", { used: seats.used, limit: seats.limit })}{seatsFull ? ` ${t("accounts.seatsFull")}` : ""}</p>}</div>{!teamRequired && canManage && <Button disabled={seatsFull} className={mobilePrimaryActionClass} onClick={() => setCreateOpen(true)}><Plus className="h-4 w-4" />{t("accounts.new")}</Button>}</div>
 		{message && !createOpen && <p role="alert" className="text-sm text-red-600">{message}</p>}
-		<p className="text-sm text-neutral-500">InsoMail has no application account-count cap. Account creation is admin-only. Hosting, storage and sending quotas still apply across all users.</p>
+		<p className="text-sm text-neutral-500">insoMail has no application account-count cap. Account creation is admin-only. Hosting, storage and sending quotas still apply across all users.</p>
 		<div className="relative">{teamRequired && <p role="alert" className="rounded-2xl bg-white p-6 text-sm text-neutral-600">Account management is not available. Check your administrator permissions.</p>}
 			<AccountsTable accounts={accounts} currentUserId={currentUser?.id} isPrimaryAdmin={!!currentUser?.isPrimaryAdmin} loading={loading} selected={selected} onSelectedChange={setSelected} onDeleteSelected={() => setDeleteOpen(true)} onRestore={restoreAccount} restoringId={restoringId} />
 		</div>

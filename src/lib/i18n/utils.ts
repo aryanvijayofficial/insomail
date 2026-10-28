@@ -33,16 +33,16 @@ function interpolate(template: string, vars?: TranslationVars): string {
 	return template.replace(/\{(\w+)\}/g, (match, name: string) => (Object.hasOwn(vars, name) ? String(vars[name] ?? "") : match));
 }
 
-// InsoMail product copy overrides upstream paid-plan wording in every locale.
+// insoMail product copy overrides upstream paid-plan wording in every locale.
 const insomailCopy: Partial<Record<TranslationKey, string>> = {
  "admin.nav.licenses": "About & License",
  "admin.section.licenses": "One feature set for all accounts. Administrator permissions and mailbox grants still apply.",
  "admin.section.accounts": "Create and manage accounts. Admin-only, with no app user-count cap.",
  "adminKeys.perm.accountsDesc": "Create and update accounts within this administrator's permissions.",
- "branding.proOnly": "Custom branding is included in InsoMail and managed by the primary administrator.",
+ "branding.proOnly": "Custom branding is included in insoMail and managed by the primary administrator.",
  "licenses.title": "About & License",
  "update.title": "Application maintenance",
- "update.description": "InsoMail uses reviewed manual deployments to preserve its custom changes.",
+ "update.description": "insoMail uses reviewed manual deployments to preserve its custom changes.",
 };
 
 export function translate(messages: Partial<Messages>, key: TranslationKey, vars?: TranslationVars): string {

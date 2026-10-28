@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useId, useRef } from "react";
+import React, { useId, useRef, useState, useEffect } from "react";
 import { X, Keyboard } from "lucide-react";
 import { useLanguage } from "@/components/language-provider";
 import type { TranslationKey } from "@/lib/i18n/types";
@@ -46,18 +46,17 @@ function ShortcutsHelpDialogContent({
     return acc;
   }, {} as Record<string, ShortcutDefinition[]>);
 
+  const [apple, setApple] = useState(false);
+  useEffect(() => { setApple(/Mac|iPhone|iPad/.test(navigator.platform)); }, []);
   const formatKey = (shortcut: ShortcutDefinition) => {
-    const parts: string[] = [];
-    if (shortcut.modifiers) {
-      shortcut.modifiers.forEach((m) => {
-        if (m === "ctrl") parts.push(t("shortcutsHelp.ctrl"));
-        if (m === "meta") parts.push("⌘");
-        if (m === "alt") parts.push("Alt");
-        if (m === "shift") parts.push("Shift");
-      });
-    }
-    parts.push(shortcut.key.toUpperCase());
-    return parts.join(" + ");
+    const mods = shortcut.modifiers ?? [];
+    const keys = mods.includes("ctrl") && mods.includes("meta")
+      ? [apple ? "⌘" : t("shortcutsHelp.ctrl"), ...mods.filter(m => m !== "ctrl" && m !== "meta")]
+      : mods.map(m => m === "meta" ? "⌘" : m === "ctrl" ? t("shortcutsHelp.ctrl") : m === "alt" ? "Alt" : "Shift");
+    const sequence = shortcut.key.split(" ");
+    return <span className="flex shrink-0 items-center gap-1" aria-label={keys.length ? [...keys, shortcut.key].join(" + ") : sequence.join(" then ")}>
+      {[...keys, ...sequence].map((key, index) => <React.Fragment key={index}>{index > 0 && <span className="text-[10px] text-neutral-500">{keys.length ? "+" : "then"}</span>}<kbd className="min-w-6 rounded-md border border-neutral-200 bg-neutral-50 px-1.5 py-1 text-center text-xs font-mono text-neutral-700">{key === "escape" ? "Esc" : key.toUpperCase()}</kbd></React.Fragment>)}
+    </span>;
   };
 
   return (
@@ -77,10 +76,10 @@ function ShortcutsHelpDialogContent({
           event.stopPropagation();
           onClose();
         }}
-        className="relative w-full max-w-2xl bg-white border border-neutral-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col z-10 max-h-[85vh]"
+        className="relative w-full max-w-xl bg-white border border-neutral-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col z-10 max-h-[calc(100dvh-2rem)]"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100">
+        <div className="flex items-center justify-between shrink-0 px-5 py-4 border-b border-neutral-100">
           <div className="flex items-center gap-2.5">
             <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
               <Keyboard className="w-5 h-5" />
@@ -106,24 +105,22 @@ function ShortcutsHelpDialogContent({
         </div>
 
         {/* Categories */}
-        <div className="overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="overflow-y-auto min-h-0 p-4 sm:p-5 space-y-5">
           {Object.entries(grouped).map(([category, items]) => (
-            <div key={category} className="space-y-3">
+            <div key={category} className="space-y-1.5">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 border-b border-neutral-100 pb-1.5">
                 {t(`shortcut.category.${category}` as TranslationKey)}
               </h3>
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {items.map((item, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center justify-between text-sm"
+                    className="flex items-center justify-between gap-4 rounded-lg px-2 py-1 text-sm hover:bg-neutral-50"
                   >
                     <span className="text-neutral-700">
                       {item.label}
                     </span>
-                    <kbd className="px-2 py-0.5 text-xs font-mono font-medium text-neutral-600 bg-neutral-100 border border-neutral-200 rounded-md shadow-2xs">
-                      {formatKey(item)}
-                    </kbd>
+                    {formatKey(item)}
                   </div>
                 ))}
               </div>
@@ -132,7 +129,7 @@ function ShortcutsHelpDialogContent({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 bg-neutral-50 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-500">
+        <div className="shrink-0 px-5 py-3 bg-neutral-50 border-t border-neutral-100 flex flex-wrap gap-2 items-center justify-between text-xs text-neutral-500">
           <span>{withKey(t("shortcutsHelp.pressToToggle", { key: "{key}" }), "?")}</span>
           <span>{withKey(t("shortcutsHelp.pressToClose", { key: "{key}" }), "ESC")}</span>
         </div>
