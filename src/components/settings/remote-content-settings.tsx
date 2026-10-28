@@ -49,7 +49,7 @@ export function RemoteContentSettings() {
 		<div>
 			<div role="radiogroup" aria-label={t("settingsPage.inbox.remoteContent")} className="space-y-3">
 				{OPTIONS.map((option) => (
-					<label key={option.mode} className="flex cursor-pointer items-center gap-3 rounded-xl bg-neutral-50 p-4">
+					<label key={option.mode} className="flex cursor-pointer items-center gap-3 py-2">
 						<input
 							type="radio"
 							name="remote-content-mode"

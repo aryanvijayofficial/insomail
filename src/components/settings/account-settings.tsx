@@ -1,5 +1,6 @@
 "use client";
 
+import { SettingsSection } from "./settings-section";
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/components/language-provider";
 import { LanguageSelector } from "@/components/language-selector";
@@ -44,48 +45,9 @@ export function AccountSettings() {
 		);
 	}
 
-	return (
-		<div className="space-y-8 py-4">
-			<h1 className="sr-only">{t("settings.nav.account")}</h1>
-			{/* <div>
-				<h1 className="text-2xl md:text-3xl font-medium text-neutral-900">Account</h1>
-				<p className="mt-1 text-sm text-neutral-500">Manage your account details and sign-in password.</p>
-			</div> */}
-
-			<section className="space-y-4">
-				<div>
-					<h2 className="text-xl font-semibold text-neutral-900">{t("settings.account.detailsTitle")}</h2>
-					<p className="mt-1 text-sm text-neutral-500">{t("settings.account.detailsDescription")}</p>
-				</div>
-				<div className="space-y-4">
-					<ProfileForm
-						accountName={user.name}
-						initialResetEmail={user.resetEmail ?? ""}
-					/>
-
-					<div className="space-y-4 rounded-2xl border border-neutral-200 bg-white p-5 sm:p-6">
-						<div>
-							<h3 className="text-lg font-semibold text-neutral-900">{t("settings.account.signatureTitle")}</h3>
-							<p className="mt-1 text-sm text-neutral-500">{t("settings.account.signatureDescription")}</p>
-						</div>
-					<MailboxSignatureForm />
-					</div>
-				</div>
-			</section>
-
-			<section className="space-y-4">
-				<div>
-					<h2 className="text-xl font-semibold text-neutral-900">{t("settings.account.generalTitle")}</h2>
-					<p className="mt-1 text-sm text-neutral-500">{t("settings.account.generalDescription")}</p>
-				</div>
-				<div className="space-y-4">
-					<div className="rounded-2xl border border-neutral-200 bg-white p-5 sm:p-6">
-						<h3 className="mb-3 text-lg font-semibold text-neutral-900">{t("language.label")}</h3>
-						<div className="w-full [&_label]:sr-only"><LanguageSelector /></div>
-					</div>
-					<TimeZoneForm userId={user.id} initialTimeZone={user.timeZone} />
-				</div>
-			</section>
-		</div>
-	);
+ return <div className="space-y-5 py-4"><h1 className="sr-only">{t("settings.nav.account")}</h1>
+ <SettingsSection title={t("settings.account.detailsTitle")} description={t("settings.account.detailsDescription")}><ProfileForm accountName={user.name} initialResetEmail={user.resetEmail??""}/></SettingsSection>
+ <SettingsSection title={t("settings.account.signatureTitle")} description={t("settings.account.signatureDescription")}><MailboxSignatureForm/></SettingsSection>
+ <SettingsSection title={t("settings.account.generalTitle")} description={t("settings.account.generalDescription")}><div className="space-y-5"><div className="space-y-2"><LanguageSelector/></div><TimeZoneForm userId={user.id} initialTimeZone={user.timeZone}/></div></SettingsSection>
+ </div>;
 }

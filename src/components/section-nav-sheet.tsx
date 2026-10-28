@@ -58,7 +58,7 @@ export function SectionNavSheet({ label, title, children, className }: SectionNa
 				className={clsx(
 					"fixed inset-x-0 bottom-0 z-[110] max-h-[85dvh] overflow-y-auto overscroll-contain rounded-t-3xl bg-white pb-[env(safe-area-inset-bottom)] shadow-2xl transition-transform duration-300 ease-out motion-reduce:transition-none",
 					"md:static md:z-auto md:max-h-none md:translate-y-0 md:overflow-visible md:rounded-none md:bg-transparent md:pb-0 md:shadow-none",
-					open ? "translate-y-0" : "translate-y-full",
+					open ? "translate-y-0" : "hidden md:block md:translate-y-0",
 					className,
 				)}
 			>
