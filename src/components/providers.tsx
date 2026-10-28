@@ -1,5 +1,6 @@
 "use client";
 
+import { ConfirmationHost } from "@/components/ui/confirmation-host";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { clearMailboxClientState } from "@/components/mailbox-provider-utils";
@@ -52,7 +53,7 @@ export function Providers({ children, initialBranding }: { children: React.React
 	return (
 		<QueryClientProvider client={client}>
 			<BrandingProvider initialBranding={initialBranding}>
-				<PwaServiceWorker />
+				<PwaServiceWorker /><ConfirmationHost />
 				{children}
 				<ThemeSync />
 				<div role="status" aria-live="polite">

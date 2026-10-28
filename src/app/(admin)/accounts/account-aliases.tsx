@@ -29,13 +29,13 @@ export function AccountAliases({ domains, domainId, username, useAllDomains, onU
 				</div>
 				{aliases.map((alias, index) => (
 					<div key={alias.id} className="flex items-center gap-2">
-						<div className="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
+						<div className="grid min-w-0 flex-1 grid-cols-[auto_minmax(0,1fr)] sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
 							<Input
 								aria-label={t("aliases.usernameLabel", { n: index + 1 })}
 								value={alias.localPart}
 								onChange={(event) => onAliasesChange(aliases.map((item) => item.id === alias.id ? { ...item, localPart: event.target.value } : item))}
 								placeholder={t("accounts.username")}
-								className="min-w-0"
+								className="min-w-0 max-sm:col-span-2"
 								pattern="[a-zA-Z0-9._%+\-]+"
 								maxLength={64}
 								required

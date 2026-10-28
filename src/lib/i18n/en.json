@@ -2176,5 +2176,7 @@
 	"spamFilter.replaceKey": "Replace key",
 	"spamFilter.addKey": "Add key",
 	"spamFilter.removeKeyTitle": "Remove {name} key?",
-	"spamFilter.removeKeyConfirm": "This stops this service check unless a server environment key is configured. You can add a key again later."
+	"spamFilter.removeKeyConfirm": "This stops this service check unless a server environment key is configured. You can add a key again later.",
+	"common.confirmAction": "Confirm action",
+	"common.confirm": "Confirm"
 }

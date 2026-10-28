@@ -22,7 +22,7 @@ export default function AiUsagePage() {
 
 	const totals = data?.totals;
 	return <div className="space-y-6">
-		<div className="flex items-start justify-between gap-4"><div><h1 className="text-2xl md:text-3xl font-medium text-neutral-900">{t("aiUsage.title")}</h1><p className="mt-2 text-sm text-neutral-500">{t("aiUsage.description")}</p></div><Link href="/agent" className="shrink-0 text-sm font-medium text-blue-700 hover:underline">{t("aiUsage.back")}</Link></div>
+		<div className="flex flex-wrap items-start justify-between gap-4"><div><h1 className="text-2xl md:text-3xl font-medium text-neutral-900">{t("aiUsage.title")}</h1><p className="mt-2 text-sm text-neutral-500">{t("aiUsage.description")}</p></div><Link href="/agent" className="shrink-0 text-sm font-medium text-blue-700 hover:underline">{t("aiUsage.back")}</Link></div>
 		{error && <p role="alert" className="text-sm text-red-700">{error}</p>}
 		<div className="grid gap-4 sm:grid-cols-3">
 			<section className="rounded-2xl bg-white p-5"><p className="text-sm text-neutral-500">{t("aiUsage.totalTokens")}</p><p className="mt-2 text-2xl font-semibold text-neutral-900">{totals ? formatTokenCount(totals.totalTokens) : "—"}</p></section>

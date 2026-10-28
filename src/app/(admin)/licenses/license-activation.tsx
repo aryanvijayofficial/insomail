@@ -1,5 +1,7 @@
 "use client";
 
+import { requestConfirmation } from "@/components/ui/confirmation-host";
+
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { CheckCircle2 } from "lucide-react";
@@ -46,7 +48,7 @@ export function LicenseActivation({ children }: { children?: ReactNode }) {
 			setStatus(t("licenses.enterKey"));
 			return;
 		}
-		if (nextAction === "deactivate" && !window.confirm(t("licenses.deactivateConfirm"))) return;
+		if (nextAction === "deactivate" && !await requestConfirmation(t("licenses.deactivateConfirm"))) return;
 
 		setAction(nextAction);
 		setStatus(null);

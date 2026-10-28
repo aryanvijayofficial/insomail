@@ -1,5 +1,7 @@
 "use client";
 
+import { requestConfirmation } from "@/components/ui/confirmation-host";
+
 import { Select } from "@/components/ui/select";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -220,7 +222,7 @@ export default function CalendarPage() {
 
   async function deleteEvent(id: string) {
     const recurring = editing && editing.repeat !== "none";
-    if (!window.confirm(recurring ? t("calendar.deleteFuture") : t("calendar.deleteEvent"))) return;
+    if (!await requestConfirmation(recurring ? t("calendar.deleteFuture") : t("calendar.deleteEvent"))) return;
     setPendingAction(id);
     try {
       const effectiveFrom = recurring ? new Date().toISOString() : undefined;

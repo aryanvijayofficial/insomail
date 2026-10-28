@@ -1,5 +1,7 @@
 "use client";
 
+import { requestConfirmation } from "@/components/ui/confirmation-host";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { mobilePrimaryActionClass } from "@/components/page-header-utils";
@@ -95,7 +97,7 @@ export default function BookingsPage() {
 	}
 
 	async function remove(event: BookingEvent) {
-		if (!window.confirm(t("booking.deleteConfirm", { name: event.name }))) return;
+		if (!await requestConfirmation(t("booking.deleteConfirm", { name: event.name }))) return;
 		try {
 			const response = await authFetch(`/api/booking/${event.id}`, { method: "DELETE" });
 			if (!response.ok) throw new Error();

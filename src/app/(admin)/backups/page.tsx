@@ -1,5 +1,7 @@
 "use client";
 
+import { requestConfirmation } from "@/components/ui/confirmation-host";
+
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
@@ -116,7 +118,7 @@ export default function BackupsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-medium text-neutral-900">
             {t("backups.title")}
@@ -131,10 +133,10 @@ export default function BackupsPage() {
             type="file"
             accept="application/json,.json"
             className="hidden"
-            onChange={(event) => {
+            onChange={async (event) => {
               const file = event.target.files?.[0];
               event.target.value = "";
-              if (!file || !window.confirm(t("backups.restoreConfirm"))) return;
+              if (!file || !await requestConfirmation(t("backups.restoreConfirm"))) return;
               restore.mutate(file);
             }}
           />

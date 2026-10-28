@@ -1,5 +1,7 @@
 "use client";
 
+import { requestConfirmation } from "@/components/ui/confirmation-host";
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AtSign, Save, Trash2, UserPlus } from "lucide-react";
 import { useParams, usePathname, useRouter } from "next/navigation";
@@ -119,7 +121,7 @@ export default function MailboxSettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
           <h1 className="truncate text-2xl md:text-3xl font-medium text-neutral-900">
             {t("mailbox.title")}
@@ -397,9 +399,9 @@ export default function MailboxSettingsPage() {
             type="button"
             variant="destructive"
             disabled={!mailbox.data || removeMailbox.isPending}
-            onClick={() => {
+            onClick={async () => {
               if (
-                !window.confirm(
+                !await requestConfirmation(
                   t("mailbox.deleteConfirm", { address }),
                 )
               )

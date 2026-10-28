@@ -30,7 +30,7 @@ export function DialogContent({
 				{...props}
 			>
 				{children}
-				<DialogPrimitive.Close className={cn("absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-lg p-1.5 text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700 focus-visible:outline-2 focus-visible:outline-blue-600", closeClassName)}>
+				<DialogPrimitive.Close className={cn("absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-50 p-1.5 text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700 focus-visible:outline-2 focus-visible:outline-blue-600", closeClassName)}>
 					<X className="h-5 w-5" />
 					<span className="sr-only">{closeLabel ?? t("navigation.close")}</span>
 				</DialogPrimitive.Close>

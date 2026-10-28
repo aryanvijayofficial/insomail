@@ -94,7 +94,7 @@ export default function AdminAgentPage() {
 	}
 
 	return <div className="space-y-6">
-		<div className="flex items-start justify-between gap-4"><div><h1 className="text-2xl md:text-3xl font-medium text-neutral-900">{t("agentAdmin.title")}</h1><p className="mt-2 text-sm text-neutral-500">{t("agentAdmin.description")}</p></div><Link href="/ai-usage" className="shrink-0 rounded-xl border border-neutral-200 bg-white px-4 py-2 text-sm font-medium text-neutral-800 hover:bg-neutral-50">{t("agentAdmin.viewUsage")}</Link></div>
+		<div className="flex flex-wrap items-start justify-between gap-4"><div><h1 className="text-2xl md:text-3xl font-medium text-neutral-900">{t("agentAdmin.title")}</h1><p className="mt-2 text-sm text-neutral-500">{t("agentAdmin.description")}</p></div><Link href="/ai-usage" className="shrink-0 rounded-xl border border-neutral-200 bg-white px-4 py-2 text-sm font-medium text-neutral-800 hover:bg-neutral-50">{t("agentAdmin.viewUsage")}</Link></div>
 		<Card className="rounded-2xl border-neutral-200 bg-white ">
 			<CardContent className="flex flex-wrap items-center justify-between gap-3 p-0">
 				<div><p className="font-medium text-neutral-900">{t("agentAdmin.enable")}</p><p className="mt-1 text-sm text-neutral-500">{t("agentAdmin.enableHint")}</p></div>

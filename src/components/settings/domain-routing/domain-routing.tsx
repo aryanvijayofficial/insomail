@@ -127,7 +127,7 @@ export function DomainRouting({ domain }: DomainRoutingProps = {}) {
 					</div>
 					<p className="mt-1 text-sm text-neutral-500">{t("routing.rulesFor", { host: hostname || t("routing.selectInbox") })}</p>
 				</div>
-				<div className="flex items-end gap-2">
+				<div className="flex flex-wrap items-end gap-2">
 					<Button onClick={openCreate} disabled={!domainId}>
 						<Plus className="h-4 w-4" /> {t("routing.addRoute")}
 					</Button>

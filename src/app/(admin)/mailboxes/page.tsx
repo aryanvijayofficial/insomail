@@ -189,13 +189,13 @@ export default function MailboxesPage() {
 							</div>
 							<div className="space-y-2">
 								<Label htmlFor="mailbox-username">{t("mailboxes.emailAddress")}</Label>
-								<div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
+								<div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
 									<Input
 										id="mailbox-username"
 										value={localPart}
 										onChange={(event) => setLocalPart(event.target.value)}
 										placeholder={t("mailboxes.localPlaceholder")}
-										className="min-w-0"
+										className="min-w-0 max-sm:col-span-2"
 									/>
 									<span className="flex items-center text-sm text-neutral-500">@</span>
 									<Select

@@ -1,5 +1,7 @@
 "use client";
 
+import { requestConfirmation } from "@/components/ui/confirmation-host";
+
 import { mobilePrimaryActionClass } from "@/components/page-header-utils";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -215,8 +217,8 @@ export default function WebhooksPage() {
 									<Button
 										variant="ghost"
 										size="sm"
-										onClick={() => {
-											if (window.confirm(t("webhooks.rotateConfirm"))) rotate.mutate(hook.id);
+										onClick={async () => {
+											if (await requestConfirmation(t("webhooks.rotateConfirm"))) rotate.mutate(hook.id);
 										}}
 										disabled={rotate.isPending}
 									>

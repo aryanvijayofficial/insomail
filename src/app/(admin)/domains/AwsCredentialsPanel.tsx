@@ -1,5 +1,7 @@
 "use client";
 
+import { requestConfirmation } from "@/components/ui/confirmation-host";
+
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/components/language-provider";
 import { Button } from "@/components/ui/button";
@@ -95,7 +97,7 @@ export default function AwsCredentialsPanel({ need, onChanged }: Props) {
 		onChanged?.(true, data.report);
 	});
 	const remove = () => run("remove", async () => {
-		if (!window.confirm(t("aws.removeConfirm"))) return;
+		if (!await requestConfirmation(t("aws.removeConfirm"))) return;
 		const data = await requestJson<{ status: AwsConfigStatus }>("/api/admin/aws", "DELETE", {});
 		setStatus(data.status);
 		setReport(null);
