@@ -23,3 +23,8 @@ test('booking editor replaces the list at narrow widths instead of clipping save
  assert.match(read('src/app/(calendar)/booking/page.tsx'), /form && "max-xl:hidden"/);
  assert.match(read('src/app/(calendar)/booking/booking-editor.tsx'), /w-full xl:w-\[392px\]/);
 });
+
+
+test('booking native time inputs get full rows on phones so minutes and AM/PM stay visible',()=>{
+ assert.match(read('src/app/(calendar)/booking/booking-editor.tsx'), /grid w-full grid-cols-\[minmax\(0,1fr\)_auto\] items-end gap-2 sm:flex/);
+});
