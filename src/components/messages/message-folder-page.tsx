@@ -2,7 +2,7 @@
 
 import { useConfirmDialog } from "@/components/ui/use-confirm-dialog";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { MouseEvent } from "react";
 import { Archive, ChevronLeft, ChevronRight, ListFilter, Mail, MailOpen, RefreshCw, Trash2 } from "lucide-react";
 import { useLanguage } from "@/components/language-provider";
@@ -19,6 +19,7 @@ import { useMessages } from "@/hooks/use-messages";
 import type { BulkMessageAction } from "@/app/api/messages/bulk/types";
 import type { Message } from "@/hooks/types";
 import { setMessageDragData } from "@/lib/messages/drag-utils";
+import { BulkActionFeedback } from "./bulk-action-feedback";
 import { BulkMessageToolbar } from "./bulk-message-toolbar";
 import { SwipeableRow } from "./swipeable-row";
 import { MessageListRowActions } from "./message-list-row-actions";
@@ -315,6 +316,8 @@ export function MessageFolderPage({
 		Array<{ id: string; read: boolean }>
 	>([]);
 	const [pendingBulkAction, setPendingBulkAction] = useState(false);
+	const bulkActionLock = useRef(false);
+	const [bulkStatus, setBulkStatus] = useState<string | null>(null);
 	const [emptyingFolder, setEmptyingFolder] = useState(false);
 	const [actionError, setActionError] = useState<string | null>(null);
 	const [unreadOnly, setUnreadOnly] = useState(false);
@@ -440,11 +443,17 @@ export function MessageFolderPage({
 	}, [actionError]);
 
 	async function runSelectedActionReportingErrors(action: BulkMessageAction, folderId?: string) {
+		if (bulkActionLock.current) return;
+		bulkActionLock.current = true;
 		setActionError(null);
+		setBulkStatus(null);
 		try {
 			await runSelectedAction(action, folderId);
 		} catch (error) {
+			setBulkStatus(null);
 			setActionError(error instanceof PartialDeleteError ? t("actions.error.deleteSkipped") : t("actions.error.update"));
+		} finally {
+			bulkActionLock.current = false;
 		}
 	}
 
@@ -455,6 +464,7 @@ export function MessageFolderPage({
 			if (!await confirm({title:t("common.deleteForever"),description:getPermanentDeleteConfirmText(ids.length,t),confirmLabel:t("common.deleteForever")})) return;
 		}
 
+		setBulkStatus(action === "delete" ? t("mailbox.deleting") : t("common.processing"));
 		setPendingBulkAction(true);
 		const previousMessages = messages;
 		const readValue = action === "read" ? true : action === "unread" ? false : null;
@@ -474,6 +484,7 @@ export function MessageFolderPage({
 		}
 		try {
 			await runBulkMessageAction(expandSelectedIds(selectedIds), action, true, folderId);
+			setBulkStatus(t("common.done"));
 			setSelectedMessages([]);
 		} catch (error) {
 			if (readValue !== null) {
@@ -489,13 +500,14 @@ export function MessageFolderPage({
 	return (
 		<div className="flex h-full min-h-0 flex-col">
 			{confirmationDialog}
+			<BulkActionFeedback message={actionError ?? bulkStatus} pending={pendingBulkAction} error={Boolean(actionError)} dismissLabel={t("navigation.close")} onDismiss={() => { setBulkStatus(null); setActionError(null); }} />
 			<div className={`flex min-h-14 shrink-0 flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-neutral-200 py-2 ${compact ? "px-4" : "px-4.5 md:px-6"}`}>
 				{selectedMessageId ? <h2 className="sr-only">{title}</h2> : <h1 className="sr-only">{title}</h1>}
 				<div className="flex min-w-0 flex-[1_1_10rem] items-center gap-3">
 					<Tooltip label={t("list.selectAll")}>
 						<Checkbox
 							checked={allVisibleSelected}
-							disabled={messages.length === 0}
+							disabled={messages.length === 0 || pendingBulkAction}
 							onChange={(event) => toggleAllVisible(event.target.checked)}
 							className="h-4 w-4 rounded border-neutral-300"
 							aria-label={t("list.selectAll")}
@@ -600,11 +612,6 @@ export function MessageFolderPage({
 				)}
 			</div>
 
-			{actionError && (
-				<p role="alert" className="shrink-0 border-b border-red-100 bg-red-50 px-6 py-2 text-sm font-medium text-red-700">
-					{actionError}
-				</p>
-			)}
 
 			<div className="min-h-0 flex-1 overflow-y-auto overscroll-contain scrollbar-gutter-stable">
 				{config.folder === "inbox" && !config.folderId && offset === 0 && !mailboxesLoading && <DueFollowUps mailboxId={selectedMailbox?.id} />}
@@ -618,7 +625,7 @@ export function MessageFolderPage({
 							active={message.id === selectedMessageId}
 							compact={compact || isMobile}
 							currentAccountName={currentAccountName}
-							onSelectedChange={updateSelectedMessage}
+							onSelectedChange={(...args) => { if (!bulkActionLock.current) updateSelectedMessage(...args); }}
 							onMessageAction={(messageId, action) => {
 								setActionError(null);
 								return runBulkMessageAction(expandSelectedIds([messageId]), action, action !== "read" && action !== "unread").catch((error) => {
