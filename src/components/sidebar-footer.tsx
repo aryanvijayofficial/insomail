@@ -48,6 +48,7 @@ export function PoweredBy({ className = "px-1" }: { className?: string }) {
         >
           Mailflare v{packageJson.version}
         </a>
+        {" · "}<a href="/api/source" className="underline text-neutral-500">Source code</a>
       </p>
 	);
 }
