@@ -74,13 +74,13 @@ export function ScheduleSendSheet({ open, onOpenChange, value, onChange, onApply
 				>
 					<div className="flex h-14 items-center gap-1 px-2">
 						{page === "root" ? <span className="w-10" /> : (
-							<button type="button" onClick={() => setPage("root")} className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-700 active:bg-neutral-100">
+							<button type="button" onClick={() => setPage("root")} className="flex h-10 w-10 items-center justify-center rounded-lg text-neutral-400 active:bg-neutral-100">
 								<ChevronLeft className="h-6 w-6" />
 								<span className="sr-only">{t("schedule.heading")}</span>
 							</button>
 						)}
 						<DialogPrimitive.Title className="flex-1 truncate text-center text-base font-semibold text-neutral-900">{title}</DialogPrimitive.Title>
-						<DialogPrimitive.Close className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-700 active:bg-neutral-100">
+						<DialogPrimitive.Close className="flex h-10 w-10 items-center justify-center rounded-lg text-neutral-400 active:bg-neutral-100">
 							<X className="h-5 w-5" />
 							<span className="sr-only">{t("navigation.close")}</span>
 						</DialogPrimitive.Close>

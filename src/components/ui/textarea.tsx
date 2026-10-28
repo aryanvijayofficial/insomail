@@ -6,7 +6,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, React.ComponentPro
 	({ className, ...props }, ref) => (
 		<textarea
 			className={cn(
-				fieldClass, "min-h-24 h-auto resize-y",
+				fieldClass, "block min-h-24 h-auto resize-y",
 				className,
 			)}
 			ref={ref}

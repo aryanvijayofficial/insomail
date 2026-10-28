@@ -606,7 +606,7 @@ export function ComposeForm({
 					<button
 						type="button"
 						onClick={() => void removeStoredAttachment(attachment.id)}
-						className="rounded-full p-1 text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700"
+						className="rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700"
 					>
 						<X className="h-3.5 w-3.5" />
 						<span className="sr-only">{t("compose.removeAttachment")}</span>
@@ -630,7 +630,7 @@ export function ComposeForm({
 								current.filter((item) => item.id !== attachment.id),
 							)
 						}
-						className="rounded-full p-1 text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700"
+						className="rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700"
 					>
 						<X className="h-3.5 w-3.5" />
 						<span className="sr-only">{t("compose.removeAttachment")}</span>
@@ -696,7 +696,7 @@ export function ComposeForm({
 							<button type="button" onClick={() => { if (minimized) setMinimized(false); setModalMode((current) => !current); }} aria-label={modalMode ? t("compose.restoreFloating") : t("compose.openModal")} title={modalMode ? t("compose.restoreFloating") : t("compose.openModal")} className="max-md:hidden rounded p-1 dark:hover:bg-neutral-200 hover:bg-neutral-700 hover:text-white">
 								{modalMode ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
 							</button>
-							<button type="button" onClick={dismiss} aria-label={t("compose.close")} className="rounded p-1 max-md:-m-2 max-md:p-3 hover:bg-neutral-700 dark:hover:bg-neutral-200 hover:text-white">
+							<button type="button" onClick={dismiss} aria-label={t("compose.close")} className="rounded-lg p-1.5 max-md:-m-2 max-md:p-3 hover:bg-neutral-700 dark:hover:bg-neutral-200 hover:text-white">
 								<X className="h-4 w-4" />
 							</button>
 						</div>

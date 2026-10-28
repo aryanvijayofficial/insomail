@@ -60,7 +60,7 @@ export default function GeneralSettingsPage() {
 		<Card className="rounded-2xl border-neutral-200 bg-white ">
 			<CardHeader className="py-0"><CardTitle>{t("general.attachments")}</CardTitle></CardHeader>
 			<CardContent className="pt-6"><form onSubmit={save} className="space-y-4">
-				<div className="space-y-2"><Label htmlFor="attachment-limit">{t("general.maxAttachments")}</Label><Input id="attachment-limit" type="number" min="1" max="25" step="1" value={maxMb} onChange={(event) => setMaxMb(Number(event.target.value))} disabled={!loaded || saving} className="max-w-40" required /><p className="text-sm text-neutral-500">{t("general.appliesTo")}</p></div>
+				<div className="flex flex-col items-start gap-2"><Label htmlFor="attachment-limit">{t("general.maxAttachments")}</Label><Input id="attachment-limit" type="number" min="1" max="25" step="1" value={maxMb} onChange={(event) => setMaxMb(Number(event.target.value))} disabled={!loaded || saving} className="max-w-40" required /><p className="text-sm text-neutral-500">{t("general.appliesTo")}</p></div>
 				<div className="space-y-2 rounded-xl bg-neutral-50 p-4 text-sm text-neutral-700"><p>{t("general.cloudflareLimit")}</p><p>{t("general.largeFiles")}</p></div>
 				{status && <p role="status" className="text-sm text-neutral-700">{status}</p>}
 				<Button type="submit" disabled={!loaded || saving || !Number.isInteger(maxMb) || maxMb < 1 || maxMb > 25}>{saving ? t("common.saving") : t("general.save")}</Button>
@@ -70,7 +70,7 @@ export default function GeneralSettingsPage() {
 			<CardHeader className="py-0"><CardTitle>{t("general.drive")}</CardTitle></CardHeader>
 			<CardContent className="pt-6"><form onSubmit={saveDrive} className="space-y-4">
 				<div className="flex items-center gap-3"><Switch id="drive-unlimited" checked={unlimited} onCheckedChange={setUnlimited} disabled={!loaded || driveSaving} /><Label htmlFor="drive-unlimited">{t("general.driveUnlimited")}</Label></div>
-				{!unlimited && <div className="space-y-2"><Label htmlFor="drive-limit">{t("general.driveLimit")}</Label><Input id="drive-limit" type="number" min="0.01" max="1000000" step="any" value={limitGb} onChange={(event) => setLimitGb(Number(event.target.value))} disabled={!loaded || driveSaving} className="max-w-40" required /></div>}
+				{!unlimited && <div className="flex flex-col items-start gap-2"><Label htmlFor="drive-limit">{t("general.driveLimit")}</Label><Input id="drive-limit" type="number" min="0.01" max="1000000" step="any" value={limitGb} onChange={(event) => setLimitGb(Number(event.target.value))} disabled={!loaded || driveSaving} className="max-w-40" required /></div>}
 				<p className="text-sm text-neutral-500">{t("general.driveHint")}</p>
 				{driveStatus && <p role="status" className="text-sm text-neutral-700">{driveStatus}</p>}
 				<Button type="submit" disabled={!loaded || driveSaving || (!unlimited && !(limitGb > 0))}>{driveSaving ? t("common.saving") : t("general.save")}</Button>

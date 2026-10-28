@@ -1,5 +1,6 @@
 "use client";
 
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useState } from "react";
 import { useLanguage } from "@/components/language-provider";
 import { authFetch } from "@/lib/auth/client";
@@ -23,10 +24,10 @@ export function SendReview({ approvalId, snapshot, onClose, onSent }: SendReview
 		} catch (cause) { setError(cause instanceof Error ? cause.message : t("agent.review.couldNotSend")); }
 		finally { setBusy(false); }
 	}
-	return <div className="fixed inset-0 z-[70] flex items-center justify-center bg-neutral-950/60 p-4" role="dialog" aria-modal="true" aria-label={t("agent.review.dialog")}>
-		<div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-5 shadow-2xl">
-			<h2 className="text-lg font-semibold">{snapshot.scheduledAt ? t("agent.review.reviewSchedule") : t("agent.review.reviewSend")}</h2>
-			<p className="mt-1 text-sm text-neutral-500">{snapshot.scheduledAt ? t("agent.review.confirmScheduled") : t("agent.review.confirmDelivered")}</p>
+	return <Dialog open onOpenChange={open=>{if(!open&&!busy)onClose?.()}}><DialogContent className="w-[min(672px,calc(100vw-32px))]" closeClassName={busy||!onClose?"hidden":undefined}>
+<DialogHeader>
+			<DialogTitle>{snapshot.scheduledAt ? t("agent.review.reviewSchedule") : t("agent.review.reviewSend")}</DialogTitle>
+			<DialogDescription>{snapshot.scheduledAt ? t("agent.review.confirmScheduled") : t("agent.review.confirmDelivered")}</DialogDescription></DialogHeader>
 			<dl className="mt-4 grid grid-cols-[5rem_1fr] gap-2 text-sm break-words">
 				<dt className="text-neutral-500">{t("agent.review.from")}</dt><dd>{snapshot.from}</dd>
 				<dt className="text-neutral-500">{t("agent.review.to")}</dt><dd>{snapshot.to}</dd>
@@ -42,6 +43,5 @@ export function SendReview({ approvalId, snapshot, onClose, onSent }: SendReview
 				{onClose && <button type="button" className="rounded-lg border px-4 py-2" onClick={onClose} disabled={busy}>{t("common.cancel")}</button>}
 				<button type="button" className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white disabled:opacity-50" onClick={() => void confirm()} disabled={busy}>{busy ? snapshot.scheduledAt ? t("agent.review.scheduling") : t("agent.review.sending") : snapshot.scheduledAt ? t("agent.review.confirmSchedule") : t("agent.review.confirmSend")}</button>
 			</div>
-		</div>
-	</div>;
+</DialogContent></Dialog>;
 }

@@ -72,8 +72,8 @@ export function DriveShareDialog({ item, onClose, onChanged }: { item: DriveItem
 		<Dialog open={!!item} onOpenChange={(open) => { if (!open) onClose(); }}>
 			<DialogContent className="max-h-[calc(100vh-4rem)] overflow-y-auto">
 				<DialogHeader><DialogTitle className="pr-6 truncate">{t("drive.shareTitle", { name: item?.name ?? "" })}</DialogTitle></DialogHeader>
-				<form onSubmit={addPerson} className="flex gap-2">
-					<Input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder={t("drive.shareEmail")} aria-label={t("drive.shareEmail")} />
+				<form onSubmit={addPerson} className="flex flex-wrap gap-2">
+					<Input className="min-w-0 flex-[1_1_100%] sm:flex-[1_1_10rem]" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder={t("drive.shareEmail")} aria-label={t("drive.shareEmail")} />
 					<Select value={role} onChange={(event) => setRole(event.target.value as DriveShareRole)} containerClassName="w-auto shrink-0" aria-label={t("drive.peopleWithAccess")}>
 						<option value="view">{t("drive.canView")}</option>
 						<option value="edit">{t("drive.canEdit")}</option>

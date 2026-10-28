@@ -29,13 +29,13 @@ export function AccountAliases({ domains, domainId, username, useAllDomains, onU
 				</div>
 				{aliases.map((alias, index) => (
 					<div key={alias.id} className="flex items-center gap-2">
-						<div className="flex min-w-0 flex-1 items-center gap-1 rounded-md border border-neutral-200 bg-white">
+						<div className="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
 							<Input
 								aria-label={t("aliases.usernameLabel", { n: index + 1 })}
 								value={alias.localPart}
 								onChange={(event) => onAliasesChange(aliases.map((item) => item.id === alias.id ? { ...item, localPart: event.target.value } : item))}
 								placeholder={t("accounts.username")}
-								className="min-w-0 flex-1 rounded-none border-0 shadow-none"
+								className="min-w-0"
 								pattern="[a-zA-Z0-9._%+\-]+"
 								maxLength={64}
 								required
@@ -45,8 +45,8 @@ export function AccountAliases({ domains, domainId, username, useAllDomains, onU
 								aria-label={t("aliases.domainLabel", { n: index + 1 })}
 								value={alias.domainId}
 								onChange={(event) => onAliasesChange(aliases.map((item) => item.id === alias.id ? { ...item, domainId: event.target.value } : item))}
-								containerClassName="min-w-0 flex-1 self-stretch rounded-none border-0 px-0"
-								className="min-w-0 bg-transparent px-2 text-sm"
+								containerClassName="min-w-0"
+								className="min-w-0 text-sm"
 								required
 							>
 								{availableDomains.map((domain) => <option key={domain.id} value={domain.id}>{domain.hostname}</option>)}

@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, CheckCircle2, KeyRound } from "lucide-react";
 import { useLanguage } from "@/components/language-provider";
+import { useConfirmDialog } from "@/components/ui/use-confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -109,7 +110,9 @@ function KeyRow({ field, envName, title, hint, signupUrl, source, disabled, onSa
 	onSaved: (settings: SpamFilterSettingsResponse) => void;
 }) {
 	const { t } = useLanguage();
-	const [value, setValue] = useState("");
+	const [editing,setEditing]=useState(false);
+ const {confirm,confirmationDialog}=useConfirmDialog();
+ const [value, setValue] = useState("");
 	const [saving, setSaving] = useState(false);
 	const [status, setStatus] = useState<{ text: string; error: boolean } | null>(null);
 	const inputId = `spam-key-${field}`;
@@ -120,6 +123,7 @@ function KeyRow({ field, envName, title, hint, signupUrl, source, disabled, onSa
 		try {
 			onSaved(await saveSpamFilterSettings({ [field]: key }));
 			setValue("");
+ setEditing(false);
 			setStatus({ text: key ? t("spamFilter.keySavedStatus") : t("spamFilter.keyRemovedStatus"), error: false });
 		} catch (error) {
 			setStatus({ text: error instanceof Error ? error.message : t("spamFilter.saveFailed"), error: true });
@@ -127,18 +131,19 @@ function KeyRow({ field, envName, title, hint, signupUrl, source, disabled, onSa
 	}
 
 	const sourceText = source === "settings" ? t("spamFilter.keySaved") : source === "env" ? t("spamFilter.keyFromEnv", { name: envName }) : t("spamFilter.keyMissing");
-	return <form className="space-y-2" onSubmit={(event) => { event.preventDefault(); if (value.trim()) void save(value.trim()); }}>
-		<div className="flex flex-wrap items-baseline justify-between gap-2">
-			<Label htmlFor={inputId} className="font-medium">{title}</Label>
-			<a href={signupUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-blue-700 hover:underline">{t("spamFilter.getKey")}<ExternalLink className="h-3.5 w-3.5" aria-hidden="true" /></a>
-		</div>
-		<p className="text-sm text-neutral-500">{hint}</p>
-		<p className={source ? "text-sm text-green-700" : "text-sm text-neutral-500"}>{sourceText}</p>
-		<div className="flex flex-wrap gap-2">
-			<Input id={inputId} type="password" autoComplete="off" spellCheck={false} value={value} onChange={(event) => setValue(event.target.value)} disabled={disabled || saving} placeholder={source ? t("spamFilter.keyReplacePlaceholder") : t("spamFilter.keyPlaceholder")} className="max-w-md flex-1" />
-			<Button type="submit" disabled={disabled || saving || !value.trim()}>{saving ? t("common.saving") : t("spamFilter.saveKey")}</Button>
-			{source === "settings" && <Button type="button" variant="outline" disabled={disabled || saving} onClick={() => void save(null)}>{t("spamFilter.removeKey")}</Button>}
-		</div>
-		{status && <p role={status.error ? "alert" : "status"} className={status.error ? "text-sm text-red-700" : "text-sm text-neutral-700"}>{status.text}</p>}
-	</form>;
+ return <section className="min-w-0 rounded-xl border border-neutral-200 bg-neutral-50 p-4 sm:p-5">{confirmationDialog}
+  <div className="flex flex-wrap items-start justify-between gap-3">
+   <h4 className="flex items-center gap-2 text-base font-medium text-neutral-900"><KeyRound className="h-4 w-4" aria-hidden="true" />{title}</h4>
+   <a href={signupUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-blue-700 hover:underline">{t("spamFilter.getKey")}<ExternalLink className="h-3.5 w-3.5" aria-hidden="true" /></a>
+  </div>
+  <p className="mt-3 text-sm leading-6 text-neutral-500">{hint}</p>
+  <p className={`mt-3 flex items-start gap-2 text-sm ${source ? "text-green-700" : "text-neutral-500"}`}>{source&&<CheckCircle2 aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0" />}{sourceText}</p>
+  {(!source||editing)?<form className="mt-4 space-y-3" onSubmit={event=>{event.preventDefault();if(value.trim())void save(value.trim());}}>
+   <Label htmlFor={inputId}>{source?t("spamFilter.replaceKey"):t("spamFilter.addKey")}</Label>
+   <Input id={inputId} type="password" autoComplete="new-password" spellCheck={false} value={value} onChange={event=>setValue(event.target.value)} disabled={disabled||saving} placeholder={source?t("spamFilter.keyReplacePlaceholder"):t("spamFilter.keyPlaceholder")} />
+   <div className="flex flex-wrap gap-2"><Button type="submit" disabled={disabled||saving||!value.trim()}>{saving?t("common.saving"):t("spamFilter.saveKey")}</Button>{source&&<Button type="button" variant="outline" disabled={saving} onClick={()=>{setEditing(false);setValue("");}}>{t("common.cancel")}</Button>}</div>
+  </form>:<div className="mt-4"><Button type="button" variant="outline" disabled={disabled||saving} onClick={()=>setEditing(true)}>{t("spamFilter.replaceKey")}</Button></div>}
+  {source==="settings"&&<div className="mt-5 flex justify-end border-t border-neutral-200 pt-3"><Button type="button" variant="ghost" className="text-red-700 hover:bg-red-50" disabled={disabled||saving} onClick={async()=>{if(await confirm({title:t("spamFilter.removeKeyTitle",{name:title}),description:t("spamFilter.removeKeyConfirm"),confirmLabel:t("spamFilter.removeKey")}))void save(null);}}>{t("spamFilter.removeKey")}</Button></div>}
+  {status&&<p className={`mt-3 text-sm ${status.error?"text-red-700":"text-neutral-700"}`} role={status.error?"alert":"status"}>{status.text}</p>}
+ </section>;
 }

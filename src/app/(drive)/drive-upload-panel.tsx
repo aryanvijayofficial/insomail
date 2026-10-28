@@ -16,7 +16,7 @@ export function DriveUploadPanel({ uploads, onClose }: { uploads: DriveUploadEnt
 		<section aria-label={t("drive.uploads")} className="fixed bottom-4 right-4 z-[90] w-[min(360px,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-xl">
 			<header className="flex items-center justify-between gap-3 bg-neutral-50 px-4 py-2.5 text-sm font-medium text-neutral-800">
 				<span aria-live="polite">{active ? t("drive.uploadingCount", { count: active }) : t("drive.uploaded", { count: done })}</span>
-				<button type="button" onClick={onClose} disabled={active > 0} aria-label={t("navigation.close")} className="flex h-8 w-8 items-center justify-center rounded-full text-neutral-600 hover:bg-neutral-200 disabled:invisible"><X size={16} /></button>
+				<button type="button" onClick={onClose} disabled={active > 0} aria-label={t("navigation.close")} className="flex h-8 w-8 items-center justify-center rounded-lg text-neutral-400 hover:bg-neutral-200 disabled:invisible"><X size={16} /></button>
 			</header>
 			<ul className="max-h-64 divide-y divide-neutral-100 overflow-y-auto">
 				{uploads.map((entry) => (

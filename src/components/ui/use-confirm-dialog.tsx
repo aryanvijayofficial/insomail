@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/components/language-provider";
 import { Button } from "./button";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "./dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./dialog";
 
 type Confirmation = { title: string; description: string; confirmLabel: string; action?: () => Promise<void> };
 /** Shared themed confirmation. Cancel is focused first; no effect occurs before explicit confirmation. */
@@ -31,8 +31,8 @@ export function useConfirmDialog() {
  }
  const confirmationDialog=<Dialog open={!!request} onOpenChange={open=>{if(!open&&!busy)settle(false)}}>
   <DialogContent onOpenAutoFocus={event=>{event.preventDefault();cancelRef.current?.focus()}} onCloseAutoFocus={event=>{event.preventDefault();trigger.current?.focus()}} onEscapeKeyDown={event=>{if(busy)event.preventDefault()}} onPointerDownOutside={event=>{if(busy)event.preventDefault()}} closeClassName={busy?"hidden":undefined} className="border border-neutral-200" aria-busy={busy}>
-   <DialogTitle className="pr-7">{request?.title}</DialogTitle>
-   <DialogDescription className="mt-3 leading-6">{request?.description}</DialogDescription>
+   <DialogHeader><DialogTitle>{request?.title}</DialogTitle>
+   <DialogDescription className="mt-3 leading-6">{request?.description}</DialogDescription></DialogHeader>
    {error&&<p role="alert" className="mt-3 text-sm text-red-600">{error}</p>}
    <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
     <Button ref={cancelRef} type="button" variant="outline" disabled={busy} onClick={()=>settle(false)}>{t("common.cancel")}</Button>

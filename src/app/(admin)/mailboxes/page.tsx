@@ -189,18 +189,19 @@ export default function MailboxesPage() {
 							</div>
 							<div className="space-y-2">
 								<Label htmlFor="mailbox-username">{t("mailboxes.emailAddress")}</Label>
-								<div className="flex h-10 overflow-hidden rounded-md border border-neutral-200 bg-white shadow-sm shadow-neutral-200/50 focus-within:border-blue-600">
+								<div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
 									<Input
 										id="mailbox-username"
 										value={localPart}
 										onChange={(event) => setLocalPart(event.target.value)}
 										placeholder={t("mailboxes.localPlaceholder")}
-										className="min-w-0 flex-1 rounded-none border-0 shadow-none focus-visible:border-0"
+										className="min-w-0"
 									/>
 									<span className="flex items-center text-sm text-neutral-500">@</span>
 									<Select
 										aria-label={t("accounts.domain")}
-										className="min-w-0 max-w-[55%] bg-transparent px-3 text-sm text-neutral-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+										containerClassName="min-w-0"
+ className="min-w-0 text-sm text-neutral-700"
 										value={domainId}
 										onChange={(event) => setDomainId(event.target.value)}
 									>

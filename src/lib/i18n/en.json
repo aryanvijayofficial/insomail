@@ -2172,5 +2172,9 @@
 	"drive.save": "Save",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"spamFilter.replaceKey": "Replace key",
+	"spamFilter.addKey": "Add key",
+	"spamFilter.removeKeyTitle": "Remove {name} key?",
+	"spamFilter.removeKeyConfirm": "This stops this service check unless a server environment key is configured. You can add a key again later."
 }
