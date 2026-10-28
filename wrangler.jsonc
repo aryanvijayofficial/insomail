@@ -1,9 +1,12 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "mailflare",
+	"account_id": "02362954db44bfe1c0cf3baa860f8baf",
 	"main": "./worker.ts",
 	"compatibility_date": "2026-05-20",
 	"keep_vars": true,
+	"routes": [{"pattern":"insomail.com","custom_domain":true}],
+	"vars": {"APP_URL":"https://insomail.com", "CF_ACCOUNT_ID":"02362954db44bfe1c0cf3baa860f8baf", "CF_EMAIL_WORKER_NAME":"mailflare"},
 	"compatibility_flags": [
 		"nodejs_compat",
 		"global_fetch_strictly_public"
@@ -76,6 +79,7 @@
 		{
 			"binding": "DB",
 			"database_name": "mailflare",
+			"database_id": "a3ccd830-dce7-411f-8c46-90dfd1b2a88b",
 			"migrations_dir": "drizzle/migrations",
 		},
 	],
