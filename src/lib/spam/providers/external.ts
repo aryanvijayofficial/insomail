@@ -55,7 +55,12 @@ export class ExternalSpamIntelligenceProvider implements SpamIntelligenceProvide
 
 		if (this.config.spamhausDqsKey) {
 			if (input.senderIp) tasks.push(this.checkZen(input.senderIp));
-			for (const domain of [sender, ...links].filter(Boolean)) tasks.push(this.checkDbl(domain, domain === sender));
+			// DBL accepts full hostnames. Do not collapse a listed subdomain to
+			// an unrelated clean parent; RDAP/URLhaus keep their existing scope.
+			const dblSender = VALID_HOST.test(input.senderDomain) ? input.senderDomain.toLowerCase() : "";
+			const dblLinks = [...new Set(input.urlDomains.filter((domain) => VALID_HOST.test(domain)).map((domain) => domain.toLowerCase()))]
+				.filter((domain) => domain !== dblSender).slice(0, MAX_LINK_DOMAINS);
+			for (const domain of [dblSender, ...dblLinks].filter(Boolean)) tasks.push(this.checkDbl(domain, domain === dblSender));
 		}
 		if (this.config.abuseChAuthKey) {
 			for (const domain of [sender, ...links].filter(Boolean)) tasks.push(this.checkUrlhaus(domain));

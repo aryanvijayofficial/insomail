@@ -182,3 +182,21 @@ test("without keys only the domain age is checked, and failures add no signal", 
 	assert.deepEqual(await disabled.check({ senderDomain: "other.example", urlDomains: ["a.example"], fingerprint: "f" }), []);
 	assert.equal(calls.length, 1);
 });
+
+test("Cloudflare peer IPv4 is accepted only from the first trusted receiving clause",()=>{
+ const cf='from sbl-dqs.blt.spamhaus.net (199.168.89.88) by cloudflare-email.net (cloudflare) id test for <me@example.org>; Wed, 28 Oct 2026 19:51:28 +0000';
+ assert.equal(spam.extractSenderIp({received:cf}),'199.168.89.88');
+ assert.equal(spam.extractSenderIp({received:cf.replace('199.168.89.88','10.0.0.1')}),null);
+ assert.equal(spam.extractSenderIp({received:cf.replace('cloudflare-email.net','attacker.example')}),null);
+ assert.equal(spam.extractSenderIp({received:'from clean.example (10.0.0.1) by cloudflare-email.net; Wed, 28 Oct 2026 19:51:28 +0000, '+cf}),null);
+ assert.equal(spam.extractSenderIp({received:'from host.example (comment 199.168.89.88) by cloudflare-email.net'}),null);
+});
+
+test("DBL retains exact sender/link hostnames while RDAP retains registrable domains",async()=>{
+ const asked=[];globalThis.fetch=async(url)=>{const u=new URL(url);const name=u.searchParams.get('name');if(name){asked.push(name);return Response.json({Status:0,Answer:[{data:'127.0.1.2',type:1}]})}return Response.json({events:[]})};
+ const provider=new spam.ExternalSpamIntelligenceProvider({spamhausDqsKey:'fixture-key',domainAge:false});
+ const signals=await provider.check({senderDomain:'listed.sender-specific.example.org',urlDomains:['listed.link-specific.example.net'],fingerprint:'fixture'});
+ assert.ok(asked.includes('listed.sender-specific.example.org.fixture-key.dbl.dq.spamhaus.net'));
+ assert.ok(asked.includes('listed.link-specific.example.net.fixture-key.dbl.dq.spamhaus.net'));
+ assert.ok(signals.some(s=>s.id==='spamhaus_domain_spam'));
+});

@@ -51,6 +51,11 @@ export function extractSenderIp(headers?: Record<string, string>): string | null
 	const received = findHeader(headers, "received");
 	if (!received) return null;
 	const first = received.split(/;\s*(?:mon|tue|wed|thu|fri|sat|sun),/i)[0];
+	// Cloudflare's receiving hop records the peer as a parenthesized bare IPv4.
+	// Anchor to its first `from ... by cloudflare-email.net` clause, never a
+	// lower sender-supplied Received hop or an arbitrary parenthesized address.
+	const cloudflarePeer = first.match(/^\s*from\s+[^\s()]+\s+\((\d{1,3}(?:\.\d{1,3}){3})\)\s+by\s+cloudflare-email\.net(?:\s|$)/i);
+	if (cloudflarePeer && isPublicIpv4(cloudflarePeer[1])) return cloudflarePeer[1];
 	for (const match of first.matchAll(/\[(?:IPv6:)?(\d{1,3}(?:\.\d{1,3}){3})\]/gi)) {
 		if (isPublicIpv4(match[1])) return match[1];
 	}
