@@ -34,6 +34,22 @@ export default {
 	async fetch(request: Request, rawEnv: CloudflareEnv, ctx: ExecutionContext) {
 		const env = withDatabase(withStorage(rawEnv));
 		const url = new URL(request.url);
+		// InsoMail source download bypasses framework stream wrapping for large archives.
+		if (url.pathname === "/api/source" && request.method === "GET") {
+			const user = await getUserFromSession(env, getSessionTokenFromRequest(request));
+			if (!user || user.disabled) return new Response("Unauthorized", { status: 401 });
+			const key = (env as CloudflareEnv & { INSOMAIL_SOURCE_KEY?: string }).INSOMAIL_SOURCE_KEY;
+			if (!key) return new Response("Source archive not configured", { status: 503 });
+			const archive = await env.BUCKET.get(key);
+			if (!archive) return new Response("Source archive unavailable", { status: 503 });
+			return new Response(archive.body, { headers: {
+				"Content-Type": "application/gzip",
+				"Content-Length": String(archive.size),
+				"Content-Disposition": 'attachment; filename="insomail-source.tar.gz"',
+				"Cache-Control": "private, no-store",
+				"X-Content-Type-Options": "nosniff",
+			} });
+		}
 		if (url.pathname === "/api/realtime") {
 			if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") {
 				return new Response("Expected WebSocket upgrade", { status: 426 });

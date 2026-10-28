@@ -21,3 +21,13 @@ test('public registration stays closed after initial admin',()=>{
  assert.match(source,/if \(await hasAdminAccount\(env\)\)/);
  assert.match(source,/Registration is closed after the first account is created/);
 });
+
+test('Worker source streaming authenticates and declares complete archive length',()=>{
+ const source=readFileSync('worker.ts','utf8');
+ const route=source.slice(source.indexOf('// InsoMail source download'),source.indexOf('if (url.pathname === "/api/realtime")'));
+ assert.match(route,/getUserFromSession/);
+ assert.match(route,/!user \|\| user.disabled/);
+ assert.ok(route.indexOf('getUserFromSession') < route.indexOf('env.BUCKET.get'));
+ assert.match(route,/"Content-Length": String\(archive.size\)/);
+ assert.doesNotMatch(route,/searchParams|request\.json/);
+});

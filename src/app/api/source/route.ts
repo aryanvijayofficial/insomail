@@ -12,6 +12,7 @@ export async function GET(request: Request) {
   if (!archive) return new Response("Source archive unavailable", { status: 503 });
   return new Response(archive.body, { headers: {
     "Content-Type": "application/gzip",
+    "Content-Length": String(archive.size),
     "Content-Disposition": 'attachment; filename="insomail-source.tar.gz"',
     "Cache-Control": "private, no-store",
     "X-Content-Type-Options": "nosniff",

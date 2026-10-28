@@ -5,7 +5,7 @@ This modified version remains under GNU AGPL version 3. The LICENSE and upstream
 
 - InsoMail's local account policy permits admin-created accounts without an application seat cap. It does not assert an active Pro or Team license or contact a license service to claim one.
 - Existing authorization, private inbox ownership, closed public registration and password handling remain. Shared inboxes, branding and forwarding keep their original feature policies.
-- Every signed-in user can download this version's corresponding source using the Source code link in the sidebar. The archive excludes secrets, database contents, uploaded mail and build artifacts.
+- Every signed-in user can download this version's corresponding source using the Source code link in the sidebar. Large archive downloads stream directly from the Worker with an explicit byte length, after validating the session. The archive excludes secrets, database contents, uploaded mail and build artifacts.
 - Application account count does not remove infrastructure, storage or sending quotas or billing.
 
 ## Build and deploy
