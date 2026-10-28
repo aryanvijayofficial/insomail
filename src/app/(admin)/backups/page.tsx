@@ -266,7 +266,7 @@ export default function BackupsPage() {
                       <Select
                         id="schedule-type"
                         value={settings.scheduleType}
-                        containerClassName="w-1/2 max-w-52 shrink-0 text-sm"
+                        containerClassName="w-full shrink-0 sm:w-1/2 sm:max-w-52 text-sm"
                         disabled={autoSaveSettings.isPending}
                         onChange={(event) => {
                           const scheduleType = event.target
@@ -296,7 +296,7 @@ export default function BackupsPage() {
                         <Select
                           id="weekday"
                           value={settings.scheduleValue ?? 1}
-                          containerClassName="w-1/2 max-w-52 shrink-0"
+                          containerClassName="w-full shrink-0 sm:w-1/2 sm:max-w-52"
                           disabled={autoSaveSettings.isPending}
                           onChange={(event) =>
                             autoSaveSettings.mutate({
@@ -321,7 +321,7 @@ export default function BackupsPage() {
                         <Label htmlFor="month-day">{t("backups.dayOfMonth")}</Label>
                         <Input
                           id="month-day"
-                          className="w-1/2 max-w-52 shrink-0"
+                          className="w-full shrink-0 sm:w-1/2 sm:max-w-52"
                           type="number"
                           min={1}
                           max={28}
@@ -362,10 +362,10 @@ export default function BackupsPage() {
                       <Label htmlFor="retention-days">
                         {t("backups.deleteOlderThan")}
                       </Label>
-                      <div className="flex w-1/2 max-w-52 shrink-0 items-center gap-2 relative">
+                      <div className="flex w-full shrink-0 sm:w-1/2 sm:max-w-52 items-center gap-2 relative">
                         <Input
                           id="retention-days"
-                          className="min-w-0"
+                          className="min-w-0 pr-16"
                           type="number"
                           min={1}
                           max={3650}
@@ -398,7 +398,7 @@ export default function BackupsPage() {
           <DatabaseBackup className="h-5 w-5 text-neutral-500" />
           <h2 className="font-semibold text-neutral-900">{t("backups.history")}</h2>
         </div>
-        <div className="grid grid-cols-[1fr_110px_110px_170px_120px] gap-4 border-b border-neutral-100 bg-neutral-50 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">
+        <div className="hidden grid-cols-[minmax(0,1fr)_110px_110px_170px_120px] gap-4 border-b border-neutral-100 bg-neutral-50 px-4 py-2 text-xs xl:grid font-semibold uppercase tracking-wide text-neutral-500">
           <span>{t("backups.col.file")}</span>
           <span>{t("backups.col.status")}</span>
           <span>{t("backups.col.size")}</span>
@@ -412,10 +412,10 @@ export default function BackupsPage() {
         {(backups.data?.backups ?? []).map((backup: BackupItem) => (
           <div
             key={backup.id}
-            className="grid grid-cols-[1fr_110px_110px_170px_120px] items-center gap-4 border-b border-neutral-100 px-4 py-3 last:border-b-0"
+            className="grid grid-cols-2 items-start gap-4 border-b xl:grid-cols-[minmax(0,1fr)_110px_110px_170px_120px] xl:items-center border-neutral-100 px-4 py-3 last:border-b-0"
           >
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-neutral-900">
+            <div className="col-span-2 min-w-0 xl:col-span-1">
+              <p className="break-all text-sm font-medium text-neutral-900">
                 {backup.filename ?? backup.id}
               </p>
               <p className="truncate text-xs text-neutral-500">
@@ -423,20 +423,23 @@ export default function BackupsPage() {
                 {backup.error ? `: ${backup.error}` : ""}
               </p>
             </div>
-            <Badge variant="outline" className={getStatusClass(backup.status)}>
+            <div><span className="mb-1 block text-xs text-neutral-500 xl:hidden">{t("backups.col.status")}</span><Badge variant="outline" className={getStatusClass(backup.status)}>
               {t(`backups.status.${backup.status}` as TranslationKey)}
-            </Badge>
+            </Badge></div>
             <span className="text-sm text-neutral-600">
+              <span className="mb-1 block text-xs text-neutral-500 xl:hidden">{t("backups.col.size")}</span>
               {formatBackupSize(backup.size)}
             </span>
             <span className="text-sm text-neutral-600">
+              <span className="mb-1 block text-xs text-neutral-500 xl:hidden">{t("backups.col.created")}</span>
               {formatBackupDate(backup.createdAt)}
             </span>
-            <div className="flex gap-1">
+            <div className="flex flex-wrap gap-1">
               <Button
                 size="sm"
                 variant="ghost"
                 title={t("backups.download")}
+                aria-label={t("backups.download")}
                 disabled={backup.status !== "completed" || download.isPending}
                 onClick={() => download.mutate(backup)}
               >
@@ -446,6 +449,7 @@ export default function BackupsPage() {
                 size="sm"
                 variant="ghost"
                 title={t("backups.delete")}
+                aria-label={t("backups.delete")}
                 disabled={
                   deleteBackup.isPending ||
                   backup.status === "queued" ||

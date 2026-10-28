@@ -3,3 +3,11 @@ test('compound email fields reserve real columns and stack below small breakpoin
 test('shared dialog matches help dialog header and square visible close target',()=>{const s=read('src/components/ui/dialog.tsx');assert.match(s,/h-8 w-8.*rounded-lg bg-neutral-50/);assert.match(s,/border-b border-neutral-100/);assert.match(s,/text-base font-semibold/);assert.match(s,/focus-visible:outline-2/)});
 test('blocklist replacement is opt-in and removal remains separately confirmed',()=>{const s=read('src/app/(admin)/spam-filter/page.tsx');assert.match(s,/\(!source\|\|editing\)/);assert.match(s,/source==="settings"/);assert.match(s,/await confirm\(/);assert.match(s,/setEditing\(false\);setValue\(""\)/)});
 test('browser-native confirmations are consistently replaced by cancel-first dialog',()=>{function scan(dir){for(const f of readdirSync(dir,{withFileTypes:true})){const p=dir+'/'+f.name;if(f.isDirectory())scan(p);else if(p.endsWith('.tsx'))assert.doesNotMatch(read(p),/window\.confirm\(/,p)}}scan('src');const s=read('src/components/ui/confirmation-host.tsx');assert.match(s,/useConfirmDialog/);assert.match(read('src/components/providers.tsx'),/<ConfirmationHost/)});
+
+test('backup history uses labelled mobile cards instead of clipping a fixed-width table', () => {
+ const source = readFileSync('src/app/(admin)/backups/page.tsx', 'utf8');
+ assert.match(source, /grid grid-cols-2 items-start/);
+ assert.match(source, /xl:grid-cols-\[minmax\(0,1fr\)_110px_110px_170px_120px\]/);
+ assert.match(source, /aria-label=\{t\("backups.download"\)\}/);
+ assert.match(source, /min-w-0 pr-16/);
+});
