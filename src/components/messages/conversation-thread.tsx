@@ -153,7 +153,7 @@ export function ConversationMessageCard({
 
 
 	return (
-		<article className={cn("bg-white transition-colors px-3 sm:px-6", !expanded && "hover:bg-neutral-50", !isAnyPanelVisible && "sm:pl-12")}>
+		<article className={cn("bg-white transition-colors px-3 sm:px-6", !expanded && "hover:bg-neutral-50", !isAnyPanelVisible && "@xl:pl-12")}>
 			<div className="w-full">
 				<div className="flex w-full flex-wrap items-start gap-x-3 py-3 sm:pl-4">
 					<button
@@ -216,7 +216,7 @@ export function ConversationMessageCard({
 					)}
 				</div>
 				{expanded && body && (
-					<div className="pb-4 pt-2 sm:pl-16">
+					<div className="pb-4 pt-2 @xl:pl-16">
 						{outbound && <MessageOpenStatus messageId={message.id} />}
 						{outbound && message.status !== "draft" && <MessageFollowUpStatus messageId={message.id} />}
 						{body.html ? (

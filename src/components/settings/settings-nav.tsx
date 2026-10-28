@@ -21,7 +21,7 @@ export function SettingsNav() {
 	const currentLabel = t(currentItem?.labelKey ?? "settings.nav.settings");
 
 	return (
-		<SectionNavSheet title={t("settings.nav.menu")} label={currentLabel} className="w-full px-4 py-4 md:min-h-full md:w-48 lg:w-56 md:border-l md:border-blue-100/70 md:py-10">
+		<SectionNavSheet title={t("settings.nav.menu")} label={currentLabel} className="w-full px-4 py-4 lg:min-h-full lg:w-56 lg:border-l lg:border-blue-100/70 lg:py-10">
 			<div className="sticky top-6 space-y-7">
 				{sections.map((section) => (
 					<div key={section.labelKey} className="space-y-3">

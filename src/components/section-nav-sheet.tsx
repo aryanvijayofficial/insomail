@@ -3,8 +3,9 @@
 import clsx from "clsx";
 import { ChevronUp } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
-import { useIsMobile } from "./sidebar-mobile-utils";
+import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
+const narrowQuery = "(max-width: 1023px)";
+const subscribeNarrow = (cb: () => void) => { const m = window.matchMedia(narrowQuery); m.addEventListener("change", cb); return () => m.removeEventListener("change", cb); };
 
 type SectionNavSheetProps = {
 	label: string;
@@ -15,7 +16,7 @@ type SectionNavSheetProps = {
 
 // Inline column from md up; on phones a bottom sheet opened from a floating pill showing the current section.
 export function SectionNavSheet({ label, title, children, className }: SectionNavSheetProps) {
-	const mobile = useIsMobile();
+	const mobile = useSyncExternalStore(subscribeNarrow, () => window.matchMedia(narrowQuery).matches, () => false);
 	const pathname = usePathname();
 	const [open, setOpen] = useState(false);
 	const hidden = mobile && !open;
@@ -40,7 +41,7 @@ export function SectionNavSheet({ label, title, children, className }: SectionNa
 				onClick={() => setOpen(true)}
 				aria-haspopup="dialog"
 				aria-expanded={open}
-				className="fixed bottom-4 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-full bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white shadow-lg md:hidden"
+				className="relative z-40 my-2 flex self-center items-center gap-2 rounded-full bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white shadow-lg lg:hidden"
 			>
 				<span className="max-w-[60vw] truncate">{label}</span>
 				<ChevronUp size={16} aria-hidden="true" />
@@ -48,7 +49,7 @@ export function SectionNavSheet({ label, title, children, className }: SectionNa
 			<div
 				onClick={() => setOpen(false)}
 				aria-hidden="true"
-				className={clsx("fixed inset-0 z-[100] bg-black/40 transition-opacity duration-200 ease-out motion-reduce:transition-none md:hidden", open ? "opacity-100" : "pointer-events-none opacity-0")}
+				className={clsx("fixed inset-0 z-[100] bg-black/40 transition-opacity duration-200 ease-out motion-reduce:transition-none lg:hidden", open ? "opacity-100" : "pointer-events-none opacity-0")}
 			/>
 			<aside
 				role={mobile ? "dialog" : undefined}
@@ -57,12 +58,12 @@ export function SectionNavSheet({ label, title, children, className }: SectionNa
 				inert={hidden}
 				className={clsx(
 					"fixed inset-x-0 bottom-0 z-[110] max-h-[85dvh] overflow-y-auto overscroll-contain rounded-t-3xl bg-white pb-[env(safe-area-inset-bottom)] shadow-2xl transition-transform duration-300 ease-out motion-reduce:transition-none",
-					"md:static md:z-auto md:max-h-none md:translate-y-0 md:overflow-visible md:rounded-none md:bg-transparent md:pb-0 md:shadow-none",
-					open ? "translate-y-0" : "hidden md:block md:translate-y-0",
+					"lg:static lg:z-auto lg:max-h-none lg:translate-y-0 lg:overflow-visible lg:rounded-none lg:bg-transparent lg:pb-0 lg:shadow-none",
+					open ? "translate-y-0" : "hidden lg:block lg:translate-y-0",
 					className,
 				)}
 			>
-				<div className="flex justify-center pt-3 md:hidden" onClick={() => setOpen(false)}>
+				<div className="flex justify-center pt-3 lg:hidden" onClick={() => setOpen(false)}>
 					<span className="h-1.5 w-10 rounded-full bg-neutral-300" />
 				</div>
 				{children}

@@ -19,7 +19,7 @@ export function AccountSettingsNav() {
 	const currentLabel = t(currentItem?.labelKey ?? "accountSettings.title");
 
 	return (
-		<SectionNavSheet title={t("accountSettings.menu")} label={currentLabel} className="w-full shrink-0 px-4 py-4 md:w-48 md:px-0 md:py-0">
+		<SectionNavSheet title={t("accountSettings.menu")} label={currentLabel} className="w-full shrink-0 px-4 py-4 lg:w-48 lg:px-0 lg:py-0">
 			<div className="sticky top-6 space-y-3">
 				<h2 className="px-4 text-xs font-semibold uppercase tracking-wide text-neutral-500">
 					{t("accountSettings.title")}

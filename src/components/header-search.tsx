@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import type { HeaderSearchProps } from "./header-search-types";
 
 // The header search shared by every layout. On phones it is an icon beside the menu button
@@ -33,7 +32,7 @@ export function HeaderSearch({ value, onChange, label, placeholder, onSubmit, tr
 				className={clsx("h-12 min-w-0 flex-1 items-center gap-2.5 rounded-full bg-[#eaf1fb] px-4 text-neutral-600 focus-within:ring-2 focus-within:ring-blue-500/30 transition-all md:flex", expanded ? "flex max-md:fixed max-md:inset-x-2 max-md:top-2 max-md:z-[60] max-md:shadow-md" : "max-md:hidden")}
 			>
 				<Search className="h-5 w-5 shrink-0" />
-				<Input
+				<input
 					ref={inputRef}
 					{...inputProps}
 					onBlur={() => setExpanded(false)}
@@ -41,7 +40,7 @@ export function HeaderSearch({ value, onChange, label, placeholder, onSubmit, tr
 					onChange={(event) => onChange(event.target.value)}
 					aria-label={label}
 					placeholder={placeholder ?? label}
-					className="h-full min-w-0 flex-1 bg-transparent text-[15px] text-neutral-800 outline-none! shadow-none! border-none! placeholder:text-neutral-500"
+					className="h-full min-w-0 flex-1 rounded-none bg-transparent text-[15px] text-neutral-800 outline-none focus-visible:outline-none shadow-none border-0 placeholder:text-neutral-500"
 				/>
 				{trailing}
 			</form>
