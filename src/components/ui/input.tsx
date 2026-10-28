@@ -9,7 +9,8 @@ export const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"in
             readOnly={readOnly}
             title={readOnly ? "Read only" : props.title}
 			className={cn(
-				"block", fieldClass,
+				className?.split(/\s+/).includes("sr-only") ? undefined : "block",
+                className?.split(/\s+/).includes("sr-only") ? undefined : fieldClass,
                 readOnly && "cursor-default border-dashed text-neutral-600",
 				className,
 			)}

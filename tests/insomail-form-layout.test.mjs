@@ -34,3 +34,8 @@ test('schedule sheet keeps timezone title readable and public booking branding w
  assert.match(read('src/components/compose/schedule-send-sheet.tsx'), /min-w-0 flex-1 break-words text-center/);
  assert.match(read('src/app/book/[userId]/[eventId]/page.tsx'), /flex min-w-0 flex-wrap items-center gap-3/);
 });
+
+
+test('visually hidden native inputs do not inherit full-width field dimensions',()=>{
+ assert.match(read('src/components/ui/input.tsx'), /includes\("sr-only"\) \? undefined : fieldClass/);
+});
