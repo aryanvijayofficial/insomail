@@ -39,3 +39,11 @@ test('schedule sheet keeps timezone title readable and public booking branding w
 test('visually hidden native inputs do not inherit full-width field dimensions',()=>{
  assert.match(read('src/components/ui/input.tsx'), /includes\("sr-only"\) \? undefined : fieldClass/);
 });
+
+
+test('calendar editor sits above page headers and reserves time input width',()=>{
+ const source=read('src/app/(calendar)/calendar/page.tsx');
+ assert.match(source,/dialog-overlay fixed inset-0 z-\[130\]/);
+ assert.doesNotMatch(source,/eventFieldClass\} pl-14/);
+ assert.match(source,/adding && createPortal/);
+});

@@ -538,8 +538,8 @@ export default function CalendarPage() {
         </div>
       </section>
 
-      {adding && (
-        <div className={clsx("dialog-overlay fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/35 p-4", closingEventEditor && "pointer-events-none")} data-state={closingEventEditor ? "closed" : "open"}>
+      {adding && createPortal(
+        <div className={clsx("dialog-overlay fixed inset-0 z-[130] flex items-center justify-center bg-neutral-950/35 p-4", closingEventEditor && "pointer-events-none")} data-state={closingEventEditor ? "closed" : "open"}>
           <DialogFrame label={editing ? t("calendar.editEvent") : t("calendar.createEvent")} onClose={() => { if (pendingAction !== "save") setClosingEventEditor(true); }} className="dialog-content max-h-[calc(100dvh-2rem)] w-full max-w-xl overflow-y-auto rounded-2xl border border-neutral-200 bg-white p-5 shadow-2xl" data-state={closingEventEditor ? "closed" : "open"}
             onAnimationEnd={(event) => {
               if (!closingEventEditor || event.target !== event.currentTarget) return;
@@ -550,7 +550,7 @@ export default function CalendarPage() {
             <div className="-mx-5 -mt-5 flex items-start gap-3 border-b border-neutral-100 px-5 py-4">
               <input value={title} onChange={(event) => setTitle(event.target.value)} placeholder={t("calendar.addTitle")} aria-label={t("calendar.eventName")}
                 className="min-w-0 flex-1 rounded-md border border-transparent bg-transparent px-2 py-1 text-2xl font-medium text-neutral-900 outline-none placeholder:text-neutral-500 hover:bg-white/60 focus:border-blue-600 focus:bg-white" />
-              <button type="button" aria-label={t("calendar.closeEditor")} disabled={pendingAction === "save"} onClick={() => setClosingEventEditor(true)} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 disabled:opacity-50"><X className="h-5 w-5" /></button>
+              <button type="button" aria-label={t("calendar.closeEditor")} disabled={pendingAction === "save"} onClick={() => setClosingEventEditor(true)} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-neutral-50 p-1.5 text-neutral-400 focus-visible:outline-2 focus-visible:outline-blue-600 hover:bg-neutral-100 hover:text-neutral-700 disabled:opacity-50"><X className="h-5 w-5" /></button>
             </div>
             <div className="mt-4 space-y-2">
               <div className="grid grid-cols-[24px_minmax(0,1fr)] items-start gap-3">
@@ -559,14 +559,14 @@ export default function CalendarPage() {
                   if (!event.currentTarget.contains(event.relatedTarget)) setDurationOptionsOpen(false);
                 }}>
                   <div className="grid gap-1 sm:grid-cols-[minmax(0,1fr)_1px_minmax(0,1fr)] sm:gap-2">
-                    <label className="relative block min-w-0 text-sm">
-                      <span className="pointer-events-none absolute left-2 top-1/2 z-10 -translate-y-1/2 font-medium text-neutral-500">{t("calendar.from")}</span>
-                      <Input type="datetime-local" value={startsAt} onFocus={() => setDurationOptionsOpen(true)} onChange={(event) => setStartsAt(event.target.value)} aria-label={t("calendar.fromLabel")} className={`${eventFieldClass} pl-14`} />
+                    <label className="block min-w-0 text-sm">
+                      <span className="mb-1 block px-2 text-xs font-medium text-neutral-500">{t("calendar.from")}</span>
+                      <Input type="datetime-local" value={startsAt} onFocus={() => setDurationOptionsOpen(true)} onChange={(event) => setStartsAt(event.target.value)} aria-label={t("calendar.fromLabel")} className={`${eventFieldClass} w-full px-2`} />
                     </label>
                     <div aria-hidden="true" className="h-px w-full self-center bg-neutral-200 sm:h-6 sm:w-px" />
-                    <label className="relative block min-w-0 text-sm">
-                      <span className="pointer-events-none absolute left-2 top-1/2 z-10 -translate-y-1/2 font-medium text-neutral-500">{t("calendar.to")}</span>
-                      <Input type="datetime-local" value={endsAt} onFocus={() => setDurationOptionsOpen(true)} onChange={(event) => setEndsAt(event.target.value)} aria-label={t("calendar.toLabel")} className={`${eventFieldClass} pl-14`} />
+                    <label className="block min-w-0 text-sm">
+                      <span className="mb-1 block px-2 text-xs font-medium text-neutral-500">{t("calendar.to")}</span>
+                      <Input type="datetime-local" value={endsAt} onFocus={() => setDurationOptionsOpen(true)} onChange={(event) => setEndsAt(event.target.value)} aria-label={t("calendar.toLabel")} className={`${eventFieldClass} w-full px-2`} />
                     </label>
                   </div>
                   {durationOptionsOpen && <div className="flex flex-wrap gap-1 pt-1" aria-label={t("calendar.setDuration")}>
@@ -649,7 +649,7 @@ export default function CalendarPage() {
               </div>
             </div>
           </DialogFrame>
-        </div>
+        </div>, document.body
       )}
     </div>
   );
