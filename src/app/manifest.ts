@@ -12,7 +12,7 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
 		background_color: "#ffffff",
 		theme_color: "#ffffff",
 		icons: [
-			{ src: "/api/branding/icon", sizes: "any", purpose: "any" },
+			{ src: "/api/branding/icon?v=insomail-current", sizes: "any", purpose: "any" },
 		],
 	};
 }

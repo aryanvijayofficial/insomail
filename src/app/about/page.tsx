@@ -8,7 +8,7 @@ export default async function AboutPage() {
  return <div className="min-h-dvh bg-[#f6f8fc] text-neutral-900">
   <header className="border-b border-neutral-200/70 bg-white/80">
    <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-5 py-5 sm:px-8">
-    <Link href="/" className="flex min-w-0 items-center gap-3 font-semibold"><img src={branding.hasCustomIcon ? "/api/branding/icon" : "/icon-96.png"} alt="" className="h-9 w-9 object-contain"/><span className="truncate">{branding.appName}</span></Link>
+    <Link href="/" className="flex min-w-0 items-center gap-3 font-semibold"><img src={branding.hasCustomIcon ? "/api/branding/icon?v=insomail-current" : "/icon-96.png"} alt="" className="h-9 w-9 object-contain"/><span className="truncate">{branding.appName}</span></Link>
     <AboutBackLink fallback="/"/>
    </div>
   </header>

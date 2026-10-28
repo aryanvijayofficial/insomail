@@ -12,7 +12,7 @@ async function getDefaultIcon(env: CloudflareEnv): Promise<Response> {
 	const asset = await env.ASSETS.fetch("https://mailflare.local/icon-96.png");
 	const headers = new Headers(asset.headers);
 	// The asset binding defaults to revalidation; this endpoint uses a versioned URL on changes.
-	if (asset.ok) headers.set("Cache-Control", "public, max-age=3600");
+	if (asset.ok) headers.set("Cache-Control", "no-store, max-age=0");
 	return new Response(asset.body, {
 		status: asset.status,
 		statusText: asset.statusText,
@@ -36,7 +36,7 @@ export async function GET() {
 					headers: {
 						"Content-Type": object.httpMetadata?.contentType ?? "image/png",
 						// Changing the icon bumps the `v` query in this tab; other tabs pick it up within the hour.
-						"Cache-Control": "public, max-age=3600",
+						"Cache-Control": "no-store, max-age=0",
 						"X-Content-Type-Options": "nosniff",
 					},
 				});
