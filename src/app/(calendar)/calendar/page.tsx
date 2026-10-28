@@ -469,7 +469,7 @@ export default function CalendarPage() {
                 <option value="day">{t("calendar.day")}</option>
               </Select>
             </div>
-            <Button disabled={pendingAction !== null} onClick={() => openNewEvent()} className={clsx("ml-1 max-md:ml-0 h-10 rounded-full bg-blue-600 px-4 text-white hover:bg-blue-500", mobilePrimaryActionClass)}><Plus className="h-5 w-5" />{t("calendar.newEvent")}</Button>
+            <Button disabled={pendingAction !== null} onClick={() => openNewEvent()} className={clsx("ml-1 max-md:ml-0 h-10 rounded-full bg-blue-600 px-4 text-white hover:bg-blue-500", mobilePrimaryActionClass, adding && "invisible pointer-events-none")}><Plus className="h-5 w-5" />{t("calendar.newEvent")}</Button>
           </div>
         </div>,
         headerTarget,
@@ -477,7 +477,7 @@ export default function CalendarPage() {
       <UpcomingSidebar events={events} onSelect={editEvent} />
 
       <section aria-busy={loading} className="min-h-0 min-w-0 flex-1 rounded-t-3xl bg-white flex flex-col overflow-hidden">
-        <div className="min-h-0 min-w-0 flex-1 overflow-auto overscroll-contain">
+        <div className={clsx("min-h-0 min-w-0 flex-1 overscroll-contain", adding ? "overflow-hidden pointer-events-none" : "overflow-auto")} inert={adding}>
           <div className={clsx("w-full", view === "week" ? "min-w-190" : "min-w-90")}>
             <div className="sticky top-0 z-30 grid h-14 border-b border-neutral-200 bg-white" style={{ gridTemplateColumns: `64px repeat(${days.length}, minmax(0, 1fr))` }}>
               <div />
@@ -547,7 +547,7 @@ export default function CalendarPage() {
               setEditing(null);
               setClosingEventEditor(false);
             }}>
-            <div className="-mx-5 -mt-5 flex items-start gap-3 border-b border-neutral-100 px-5 py-4">
+            <div className="sticky -top-5 z-10 -mx-5 -mt-5 flex items-start gap-3 border-b border-neutral-100 bg-white px-5 py-4">
               <input value={title} onChange={(event) => setTitle(event.target.value)} placeholder={t("calendar.addTitle")} aria-label={t("calendar.eventName")}
                 className="min-w-0 flex-1 rounded-md border border-transparent bg-transparent px-2 py-1 text-2xl font-medium text-neutral-900 outline-none placeholder:text-neutral-500 hover:bg-white/60 focus:border-blue-600 focus:bg-white" />
               <button type="button" aria-label={t("calendar.closeEditor")} disabled={pendingAction === "save"} onClick={() => setClosingEventEditor(true)} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-neutral-50 p-1.5 text-neutral-400 focus-visible:outline-2 focus-visible:outline-blue-600 hover:bg-neutral-100 hover:text-neutral-700 disabled:opacity-50"><X className="h-5 w-5" /></button>
