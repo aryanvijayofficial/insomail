@@ -35,5 +35,5 @@ export function SidebarFooter() {
 
 /** Legal and source navigation shared by the mail and Drive sidebars. */
 export function PoweredBy({ className = "px-1" }: { className?: string }) {
- return <p className={`${className} text-[11px] text-neutral-500`}><a href="/settings/plan" className="underline">Plans</a>{" · "}<a href="/about" className="underline">About &amp; License</a>{" · "}<a href="/api/source" className="underline">Source code</a></p>;
+ return <p className={`${className} text-[11px] text-neutral-500`}><a href="/settings/plan" className="underline">Plans</a>{" · "}<a href="/about" className="underline">About &amp; License</a></p>;
 }

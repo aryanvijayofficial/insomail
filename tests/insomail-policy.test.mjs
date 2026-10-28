@@ -52,6 +52,6 @@ test('free-plan overview copy cannot regress to paid requirements in another loc
 test('plan badge reflects selected plan without changing it and notices remain convenient',()=>{
  const badge=readFileSync('src/components/license-indicator.tsx','utf8');
  assert.match(badge,/api\/settings\/plan/); assert.match(badge,/insomail:plan-changed/);assert.doesNotMatch(badge,/Free plans|method:/);
- const footer=readFileSync('src/components/sidebar-footer.tsx','utf8');assert.match(footer,/About &amp; License/);assert.match(footer,/api\/source/);
+ const footer=readFileSync('src/components/sidebar-footer.tsx','utf8');assert.match(footer,/About &amp; License/);assert.doesNotMatch(footer,/api\/source/);
  const about=readFileSync('src/app/about/page.tsx','utf8');assert.match(about,/Copyright \(C\) 2026 Hieu Nguyen/);assert.match(about,/no warranty/);assert.match(about,/about\/license/); const license=readFileSync("src/app/about/license/page.tsx","utf8");assert.match(license,/AGPL_LICENSE/);
 });
