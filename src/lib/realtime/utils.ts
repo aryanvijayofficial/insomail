@@ -4,6 +4,7 @@ import { domains, mailboxAccess, mailboxes } from "@/db/schema";
 import { isTeamMailboxSharingEnabled } from "@/lib/mailboxes/access-utils";
 import type { NewMessageNotification, AgentDraftNotification } from "./types";
 import { sendPushNotifications } from "@/lib/push/server";
+import { sendFcmPush } from "@/lib/push/fcm";
 import { sendNativePush } from "@/lib/push/native";
 
 export function getSessionTokenFromRequest(request: Request): string | undefined {
@@ -66,7 +67,7 @@ export async function notifyUsersOfNewMessage(
 				body: JSON.stringify(payload),
 			});
 		}),
-		...(payload.type === "agent_draft" ? [] : [sendPushNotifications(env, userIds, payload), sendNativePush(env, userIds, payload)]),
+		...(payload.type === "agent_draft" ? [] : [sendPushNotifications(env, userIds, payload), sendNativePush(env, userIds, payload), sendFcmPush(env, userIds, payload)]),
 	]);
 	for (const result of results) {
 		if (result.status === "rejected") console.error("New-message notification failed", result.reason);

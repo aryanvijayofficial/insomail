@@ -43,6 +43,7 @@ export const INTERNAL_TABLES = [
 	"jmap_change_floor",
 	// Push registrations are re-sent by each app on launch.
 	"push_devices",
+	"fcm_devices",
 	// Web-push subscriptions are saved again by each client whenever it resolves
 	// its push state, and they reference sessions whose rows a restore replaces.
 	"push_subscriptions",

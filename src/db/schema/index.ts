@@ -758,6 +758,18 @@ export const pushDevices = sqliteTable(
 	],
 );
 
+/** Android push registration, bound to a revocable REST session. */
+export const fcmDevices = sqliteTable("fcm_devices", {
+ id: text("id").primaryKey(),
+ userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+ sessionId: text("session_id").notNull().references(() => sessions.id, { onDelete: "cascade" }),
+ installationId: text("installation_id").notNull(),
+ token: text("token").notNull(),
+ tokenHash: text("token_hash").notNull(),
+ createdAt: timestamp("created_at").notNull(),
+ updatedAt: timestamp("updated_at").notNull(),
+}, t => [uniqueIndex("fcm_devices_token_idx").on(t.tokenHash), uniqueIndex("fcm_devices_user_installation_idx").on(t.userId, t.installationId), index("fcm_devices_session_idx").on(t.sessionId)]);
+
 export const pushSubscriptions = sqliteTable(
 	"push_subscriptions",
 	{
@@ -1146,6 +1158,7 @@ export const schema = {
 	webhooks,
 	webhookDeliveries,
 	sessions,
+	fcmDevices,
 	pushSubscriptions,
 	driveItems,
 	driveUploadParts,

@@ -1,4 +1,6 @@
 interface CloudflareEnv {
+ /** Restricted FCM sender JSON, stored as an encrypted deployment secret. */
+ FCM_SERVICE_ACCOUNT_JSON?: string;
 	DB: D1Database;
 	/** Connection string for an external database (PostgreSQL, MySQL, libSQL, ...); unset keeps D1. See docs/databases.md. */
 	DATABASE_URL?: string;

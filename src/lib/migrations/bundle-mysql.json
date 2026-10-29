@@ -254,6 +254,15 @@
       "statements": [
         "ALTER TABLE users ADD COLUMN insomail_plan varchar(32) NOT NULL DEFAULT 'professional';"
       ]
+    },
+    {
+      "name": "0080_add_fcm_devices.sql",
+      "statements": [
+        "CREATE TABLE fcm_devices (\n id varchar(191) PRIMARY KEY NOT NULL,\n user_id varchar(191) NOT NULL,\n session_id varchar(191) NOT NULL,\n installation_id varchar(191) NOT NULL,\n token longtext NOT NULL,\n token_hash varchar(191) NOT NULL,\n created_at bigint NOT NULL,\n updated_at bigint NOT NULL,\n FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,\n FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE\n);",
+        "CREATE UNIQUE INDEX fcm_devices_token_idx ON fcm_devices(token_hash);",
+        "CREATE UNIQUE INDEX fcm_devices_user_installation_idx ON fcm_devices(user_id,installation_id);",
+        "CREATE INDEX fcm_devices_session_idx ON fcm_devices(session_id);"
+      ]
     }
   ]
 }

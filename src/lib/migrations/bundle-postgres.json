@@ -275,6 +275,15 @@
       "statements": [
         "ALTER TABLE users ADD COLUMN insomail_plan text NOT NULL DEFAULT 'professional';"
       ]
+    },
+    {
+      "name": "0080_add_fcm_devices.sql",
+      "statements": [
+        "CREATE TABLE fcm_devices (\n id text PRIMARY KEY NOT NULL,\n user_id text NOT NULL REFERENCES users(id) ON DELETE CASCADE,\n session_id text NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,\n installation_id text NOT NULL,\n token text NOT NULL,\n token_hash text NOT NULL,\n created_at bigint NOT NULL,\n updated_at bigint NOT NULL\n);",
+        "CREATE UNIQUE INDEX fcm_devices_token_idx ON fcm_devices(token_hash);",
+        "CREATE UNIQUE INDEX fcm_devices_user_installation_idx ON fcm_devices(user_id,installation_id);",
+        "CREATE INDEX fcm_devices_session_idx ON fcm_devices(session_id);"
+      ]
     }
   ]
 }
