@@ -6,6 +6,7 @@ import { agentDraftMetadata, messages } from "@/db/schema";
 import { requireUser } from "@/lib/auth/cookies";
 import { buildSnippet } from "@/lib/email/parse";
 import type { DraftPayload, DraftRouteParams } from "./types";
+import { resolveDraftBodies } from "../draft-body";
 import { selectDraftWithBody } from "./utils";
 import { readJsonBody } from "@/lib/http/request";
 import { RequestBodyTooLargeError } from "@/lib/http/errors";
@@ -61,8 +62,7 @@ export async function PATCH(request: Request, { params }: DraftRouteParams) {
 		return NextResponse.json({ error: sender.error }, { status: 403 });
 	}
 
-	const text = input.text ?? "";
-	const html = input.html ?? "";
+	const { text, htmlBody } = resolveDraftBodies(draft, input);
 	await db
 		.update(messages)
 		.set({
@@ -72,9 +72,9 @@ export async function PATCH(request: Request, { params }: DraftRouteParams) {
 			ccAddr: input.cc || null,
 			bccAddr: input.bcc || null,
 			subject: input.subject ?? null,
-			snippet: buildSnippet(text || null, html || null),
+			snippet: buildSnippet(text || null, htmlBody),
 			textBody: text || null,
-			htmlBody: html || null,
+			htmlBody,
 		})
 		.where(eq(messages.id, id));
 	await db.update(agentDraftMetadata).set({ revision: sql`${agentDraftMetadata.revision} + 1`, humanEditedAt: new Date(), ...(scheduledAt !== undefined ? { scheduledAt } : {}) }).where(eq(agentDraftMetadata.draftId, id));
