@@ -1,8 +1,8 @@
-import { and, count, eq, inArray } from "drizzle-orm";
+import { and, count, eq, inArray, notInArray, sum, sql } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { messages } from "@/db/schema";
+import { messageLabels, messages } from "@/db/schema";
 import { getCurrentUser } from "@/lib/auth/cookies";
 import { getEnv } from "@/lib/cloudflare";
 import { scheduledMessageCondition } from "@/lib/email/scheduled";
@@ -59,12 +59,29 @@ export async function GET(request: Request) {
 			messages.snoozedUntil,
 		);
 
+	// Exact per-label counts (no parent rollup), trash and spam excluded.
+	const labelRows = await db
+		.select({
+			labelId: messageLabels.labelId,
+			total: count(),
+			unread: sum(sql`case when ${messages.direction} = 'inbound' and ${messages.read} = false then 1 else 0 end`),
+		})
+		.from(messageLabels)
+		.innerJoin(messages, eq(messages.id, messageLabels.messageId))
+		.where(and(...conditions, notInArray(messages.status, ["trash", "spam"])))
+		.groupBy(messageLabels.labelId);
+	const customLabels: Record<string, { total: number; unread: number }> = {};
+	for (const row of labelRows) {
+		customLabels[row.labelId] = { total: row.total, unread: Number(row.unread ?? 0) };
+	}
+
 	const [scheduledRow] = await db
 		.select({ total: count() })
 		.from(messages)
 		.where(and(...conditions, scheduledMessageCondition(db)));
 	const counts = buildMessageCounts(rows);
 	counts.folders.scheduled.total = scheduledRow?.total ?? 0;
+	counts.customLabels = customLabels;
 
 	return NextResponse.json({ counts });
 }

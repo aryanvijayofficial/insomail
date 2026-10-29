@@ -13,6 +13,7 @@ export type MessageFolderConfig = {
 	emptyTextKey?: TranslationKey;
 	hrefPrefix: string;
 	folderId?: string;
+	labelId?: string;
 	icon: LucideIcon;
 	headerIcons?: LucideIcon[];
 	badgeVariant?: "default" | "secondary" | "outline";
@@ -29,7 +30,10 @@ export type MessageListRowProps = {
 	onSelectedChange: (messageId: string, selected: boolean) => void;
 	onMessageAction: (messageId: string, action: RowMessageAction) => Promise<void>;
 	dragMessageIds: string[];
+	labelsById?: Map<string, LabelChipLabel>;
 };
+
+export type LabelChipLabel = { id: string; name: string; color: string };
 
 export type RowMessageAction = "archive" | "trash" | "read" | "unread";
 
@@ -63,6 +67,7 @@ export type BulkMessageToolbarProps = {
 	hasUnreadSelection: boolean;
 	hideSelectedCount?: boolean;
 	onAction: (action: BulkMessageAction, folderId?: string) => void;
+	onApplyLabel?: (labelId: string) => void;
 	onClearSelection: () => void;
 	pending: boolean;
 	/** Folder being listed; archived, spam and trash offer a way back instead of the same move. */

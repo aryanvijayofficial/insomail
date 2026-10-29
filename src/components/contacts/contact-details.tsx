@@ -16,7 +16,9 @@ import { ContactAvatarForm } from "./contact-avatar-form";
 import { Label } from "@/components/ui/label";
 import type { ContactDetailsRecord, ContactDetailsTriggerProps } from "./contact-details-types";
 import {
+	addContactToSaved,
 	fetchContactDetails,
+	removeContactFromSaved,
 	updateContactName,
 } from "./contact-details-utils";
 
@@ -86,6 +88,25 @@ export function ContactDetailsTrigger({
 		}
 	}
 
+	const saved = contact?.source === "manual" || contact?.source === "outbound";
+
+	async function toggleSaved() {
+		if (!mailboxId || !contact) return;
+		setSaving(true);
+		setError(null);
+		try {
+			const updated = saved
+				? await removeContactFromSaved(mailboxId, address)
+				: await addContactToSaved(mailboxId, address);
+			setContact(updated);
+			window.dispatchEvent(new Event("mailflare:contacts-changed"));
+		} catch (toggleError) {
+			setError(toggleError instanceof Error ? toggleError.message : t("contact.updateFailed"));
+		} finally {
+			setSaving(false);
+		}
+	}
+
 	if (!mailboxId) return <span className={className}>{shownName}</span>;
 
 	return (
@@ -146,13 +167,25 @@ export function ContactDetailsTrigger({
 							)}
 						</div>
 						{error && <p role="alert" className="text-sm text-red-600">{error}</p>}
-						<Button
-							type="button"
-							onClick={saveContact}
-							disabled={loading || saving || !displayName.trim()}
-						>
-							{saving ? t("contact.saving") : t("contact.save")}
-						</Button>
+						<div className="flex items-center gap-2">
+							<Button
+								type="button"
+								onClick={saveContact}
+								disabled={loading || saving || !displayName.trim()}
+							>
+								{saving ? t("contact.saving") : t("contact.save")}
+							</Button>
+							{contact && (
+								<Button
+									type="button"
+									variant={saved ? "ghost" : "outline"}
+									onClick={toggleSaved}
+									disabled={loading || saving}
+								>
+									{saved ? t("contact.removeSaved") : t("contact.addToContacts")}
+								</Button>
+							)}
+						</div>
 					</div>
 				</DialogContent>
 			</Dialog>

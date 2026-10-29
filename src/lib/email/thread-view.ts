@@ -1,7 +1,7 @@
 import { suppressOwnPixels } from "@/lib/tracking/self-open";
 import { and, asc, eq, inArray, isNull, notInArray } from "drizzle-orm";
 import { getDb } from "@/db";
-import { messageAttachments, messages } from "@/db/schema";
+import { messageAttachments, messageLabels, messages } from "@/db/schema";
 import { getContactAvatarMap, getContactDisplayNameMap } from "@/lib/contacts/service";
 import { getFirstEmailAddressEntry, normalizeEmailAddress } from "@/lib/email/address";
 import { getMailboxAccessLevel } from "@/lib/mailboxes/access";
@@ -68,6 +68,20 @@ export async function getMessageThreadForUser(env: CloudflareEnv, user: SessionU
 		attachmentsByMessage.set(attachment.messageId, list);
 	}
 
+	const labelRows = ids.length
+		? await db
+				.select({ messageId: messageLabels.messageId, labelId: messageLabels.labelId })
+				.from(messageLabels)
+				.where(inArray(messageLabels.messageId, ids))
+		: [];
+	const labelIdsByMessageId = new Map<string, string[]>();
+	for (const row of labelRows) {
+		const list = labelIdsByMessageId.get(row.messageId) ?? [];
+		list.push(row.labelId);
+		labelIdsByMessageId.set(row.messageId, list);
+	}
+	const threadLabelIds = [...new Set(labelRows.map((row) => row.labelId))];
+
 	const contactMap = await getContactDisplayNameMap(
 		env,
 		message.userId,
@@ -81,12 +95,14 @@ export async function getMessageThreadForUser(env: CloudflareEnv, user: SessionU
 
 	return {
 		threadId: message.threadId,
+		threadLabelIds,
 		messages: (await suppressOwnPixels(env, user.id, rows)).map((row) => ({
 			...withoutRawKey(row),
 			fromContactName: contactMap.get(normalizeEmailAddress(row.fromAddr)) ?? null,
 			fromContactHasAvatar: contactAvatarMap.get(normalizeEmailAddress(row.fromAddr)) ?? false,
 			toContactName: contactMap.get(normalizeEmailAddress(getFirstEmailAddressEntry(row.toAddr))) ?? null,
 			attachments: attachmentsByMessage.get(row.id) ?? [],
+			labelIds: labelIdsByMessageId.get(row.id) ?? [],
 		})),
 	};
 }

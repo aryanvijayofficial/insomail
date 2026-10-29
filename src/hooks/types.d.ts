@@ -47,6 +47,8 @@ export type Message = {
 	threadUnread?: number;
 	/** In conversation view: every message this row stands for within the current folder. */
 	threadMessageIds?: string[];
+	/** Labels on this message; on grouped rows, the union across the thread. */
+	labelIds?: string[];
 	createdAt: string;
 };
 
@@ -104,6 +106,7 @@ export type MailboxCount = {
 export type MessageCounts = {
 	folders: Record<MessageFolder, FolderCount>;
 	customFolders: Record<string, FolderCount>;
+	customLabels?: Record<string, FolderCount>;
 	mailboxes: MailboxCount[];
 };
 

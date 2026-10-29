@@ -4,7 +4,7 @@ import type { SQL } from "drizzle-orm";
 import { getEnv } from "@/lib/cloudflare";
 import { getCurrentUser } from "@/lib/auth/cookies";
 import { getDb } from "@/db";
-import { messages, outboundJobs } from "@/db/schema";
+import { labels, messageLabels, messages, outboundJobs } from "@/db/schema";
 import { getContactDisplayNameMap } from "@/lib/contacts/service";
 import { getFirstEmailAddressEntry, normalizeEmailAddress } from "@/lib/email/address";
 import { getMailboxAccessLevel, hasMailboxPermission, listAccessibleMailboxes } from "@/lib/mailboxes/access";
@@ -28,6 +28,7 @@ export async function GET(request: Request) {
 	const direction = url.searchParams.get("direction");
 	const mailboxId = url.searchParams.get("mailboxId");
 	const folderId = url.searchParams.get("folderId");
+	const labelId = url.searchParams.get("labelId");
 	const status = url.searchParams.get("status");
 	const query = url.searchParams.get("q")?.trim();
 	const title = url.searchParams.get("title")?.trim();
@@ -66,6 +67,20 @@ export async function GET(request: Request) {
 	}
 	if (folderId) {
 		conditions.push(eq(messages.folderId, folderId));
+	}
+	if (labelId) {
+		const [label] = await db.select().from(labels).where(eq(labels.id, labelId)).limit(1);
+		const labelAccess = label ? await getMailboxAccessLevel(db, user, label.mailboxId) : null;
+		if (!label || !labelAccess?.canRead) {
+			return NextResponse.json({ error: "Label not found" }, { status: 404 });
+		}
+		conditions.push(
+			sql`${messages.id} IN (SELECT ${messageLabels.messageId} FROM ${messageLabels} WHERE ${messageLabels.labelId} = ${labelId})`,
+		);
+		// Label views show archived mail but hide trash and spam, like folder views.
+		if (!status) {
+			conditions.push(notInArray(messages.status, ["trash", "spam"]));
+		}
 	}
 	if (status) {
 		conditions.push(eq(messages.status, status));
@@ -214,6 +229,24 @@ export async function GET(request: Request) {
 	// `Message.textBody`/`htmlBody` are optional on the wire type and the
 	// reading pane loads them from /api/messages/[id]/thread, so they are
 	// neither selected nor sent here.
+	// Label memberships for the visible page; conversation rows carry the union
+	// of their member messages' labels.
+	const labelScopeIds = new Set<string>(rows.map((row) => row.id));
+	for (const ids of threadMessageIds.values()) for (const id of ids) labelScopeIds.add(id);
+	const labelRows = labelScopeIds.size
+		? await loadInBatches(Array.from(labelScopeIds), async (batch) =>
+				db
+					.select({ messageId: messageLabels.messageId, labelId: messageLabels.labelId })
+					.from(messageLabels)
+					.where(inArray(messageLabels.messageId, batch)),
+			)
+		: [];
+	const labelIdsByMessageId = new Map<string, string[]>();
+	for (const row of labelRows) {
+		const list = labelIdsByMessageId.get(row.messageId) ?? [];
+		list.push(row.labelId);
+		labelIdsByMessageId.set(row.messageId, list);
+	}
 	const enrichedRows = rows.map(({ rawR2Key: _rawR2Key, ...message }) => {
 		const threadStats = message.threadId ? threadCounts.get(message.threadId) : undefined;
 		const folderUnread = scopedThreadCounts.get(message.threadId ?? message.id)?.unread;
@@ -222,6 +255,9 @@ export async function GET(request: Request) {
 		return {
 			...message,
 			snippet: message.snippet,
+			labelIds: groupByThread
+				? [...new Set((threadMessageIds.get(message.threadId ?? message.id) ?? [message.id]).flatMap((id) => labelIdsByMessageId.get(id) ?? []))]
+				: labelIdsByMessageId.get(message.id) ?? [],
 			...(scheduledAtByMessageId.has(message.id) ? { scheduledAt: scheduledAtByMessageId.get(message.id) } : {}),
 			...(openCounts.has(message.id) ? { openCount: openCounts.get(message.id) } : {}),
 			fromContactName:

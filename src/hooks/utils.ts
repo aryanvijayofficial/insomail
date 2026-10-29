@@ -24,6 +24,7 @@ export function getMessageQueryParams(
 	mailboxId?: string | null,
 	filters?: MessageFilterOptions,
 	folderId?: string | null,
+	labelId?: string | null,
 ) {
 	const params = new URLSearchParams();
 	params.set("timeZone", getUserTimeZone());
@@ -55,6 +56,7 @@ export function getMessageQueryParams(
 	}
 
 	if (folderId) params.set("folderId", folderId);
+	if (labelId) params.set("labelId", labelId);
 	if (mailboxId) params.set("mailboxId", mailboxId);
 	const searchFilters = filters?.query ? parseMessageSearchQuery(filters.query) : null;
 	const parsedFilters = searchFilters

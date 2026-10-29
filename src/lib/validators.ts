@@ -221,6 +221,20 @@ export const folderSchema = z.object({
 	color: z.enum(FOLDER_COLOR_VALUES).default(DEFAULT_FOLDER_COLOR),
 });
 
+export const labelSchema = z.object({
+	mailboxId: z.string().min(1),
+	name: z.string().trim().min(1).max(80),
+	color: z.enum(FOLDER_COLOR_VALUES).default(DEFAULT_FOLDER_COLOR),
+	parentId: z.string().min(1).nullish(),
+});
+
+export const updateLabelSchema = z.object({
+	mailboxId: z.string().min(1),
+	name: z.string().trim().min(1).max(80).optional(),
+	color: z.enum(FOLDER_COLOR_VALUES).optional(),
+	parentId: z.string().min(1).nullable().optional(),
+});
+
 export const updateProfileSchema = z.object({
 	name: z.string().trim().min(1).max(100),
 	resetEmail: z.preprocess(

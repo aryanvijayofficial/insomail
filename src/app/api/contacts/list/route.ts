@@ -1,4 +1,4 @@
-import { and, asc, count, eq, gt } from "drizzle-orm";
+import { and, asc, count, eq, gt, inArray } from "drizzle-orm";
 import { getDb } from "@/db";
 import { contacts, mailboxes, users } from "@/db/schema";
 import { getCurrentUser } from "@/lib/auth/cookies";
@@ -28,7 +28,10 @@ export async function GET(request: Request) {
  const display = ({ id: _id, avatarKey, ...contact }: Row) => account && identityAddresses.has(contact.email)
   ? { ...contact, displayName: account.name, source: "manual", hasAvatar: !!account.avatarKey }
   : { ...contact, hasAvatar: !!avatarKey };
- const own = eq(contacts.userId, user.id);
+ const savedOnly = query.get("saved") === "1";
+ const own = savedOnly
+  ? and(eq(contacts.userId, user.id), inArray(contacts.source, ["manual", "outbound"]))
+  : eq(contacts.userId, user.id);
  if (search) {
   // Filter the same synthesized display values returned to the client. Keyset chunks
   // keep queries bounded without dropping matches, truncating totals, or huge IN lists.

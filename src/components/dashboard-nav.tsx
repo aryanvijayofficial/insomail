@@ -15,10 +15,13 @@ import {
   Inbox,
   MailPlus,
   Plus,
+  Pencil,
   Send,
   ShieldAlert,
   Star,
+  Tag,
   Trash2,
+  Users,
 } from "lucide-react";
 import { useSelectedMailbox } from "@/components/mailbox-provider";
 import { Button } from "@/components/ui/button";
@@ -35,6 +38,9 @@ import { Label } from "@/components/ui/label";
 import { useMessageCounts } from "@/hooks/use-message-counts";
 import { AUTH_SESSION_CHANGED_EVENT, authFetch } from "@/lib/auth/client";
 import { getMailboxFolders, invalidateFolderCache } from "@/lib/folders/client";
+import { dispatchLabelsChanged, updateMessageLabels } from "@/lib/labels/client";
+import type { LabelSummary } from "@/lib/labels/client-types";
+import { useMailboxLabels } from "@/components/messages/use-mailbox-labels";
 import {
   DEFAULT_FOLDER_COLOR,
   FOLDER_COLOR_OPTIONS,
@@ -111,6 +117,15 @@ export function DashboardNav({ className }: { className?: string }) {
     useState<FolderColor>(DEFAULT_FOLDER_COLOR);
   const [addingFolder, setAddingFolder] = useState(false);
   const [folderDialogOpen, setFolderDialogOpen] = useState(false);
+  const { labels } = useMailboxLabels(selectedMailbox?.id);
+  const [labelsSectionOpen, toggleLabelsSection] = useSectionOpen("mailflare:nav:labels-section-open");
+  const [labelDialogOpen, setLabelDialogOpen] = useState(false);
+  const [editingLabel, setEditingLabel] = useState<LabelSummary | null>(null);
+  const [labelName, setLabelName] = useState("");
+  const [labelColor, setLabelColor] = useState<FolderColor>(DEFAULT_FOLDER_COLOR);
+  const [labelParentId, setLabelParentId] = useState<string>("");
+  const [savingLabel, setSavingLabel] = useState(false);
+  const [deletingLabel, setDeletingLabel] = useState(false);
   const linksWithCounts: NavLink[] = links.filter((link) => link.href !== "/scheduled" || counts.folders.scheduled.total > 0).map(({ labelKey, ...rest }): NavLink => {
     const link = { ...rest, label: t(labelKey) };
     if (link.href === "/inbox") {
@@ -234,6 +249,95 @@ export function DashboardNav({ className }: { className?: string }) {
     } finally {
       setAddingFolder(false);
     }
+  }
+
+  function openCreateLabel() {
+    setEditingLabel(null);
+    setLabelName("");
+    setLabelColor(DEFAULT_FOLDER_COLOR);
+    setLabelParentId("");
+    setLabelDialogOpen(true);
+  }
+
+  function openEditLabel(label: LabelSummary) {
+    setEditingLabel(label);
+    setLabelName(label.name);
+    setLabelColor(label.color as FolderColor);
+    setLabelParentId(label.parentId ?? "");
+    setLabelDialogOpen(true);
+  }
+
+  // A label cannot nest under itself or its own descendants.
+  function availableLabelParents(): LabelSummary[] {
+    if (!editingLabel) return labels;
+    const blocked = new Set<string>([editingLabel.id]);
+    let grew = true;
+    while (grew) {
+      grew = false;
+      for (const label of labels) {
+        if (label.parentId && blocked.has(label.parentId) && !blocked.has(label.id)) {
+          blocked.add(label.id);
+          grew = true;
+        }
+      }
+    }
+    return labels.filter((label) => !blocked.has(label.id));
+  }
+
+  async function saveLabel(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!selectedMailbox?.id || !labelName.trim()) return;
+    setSavingLabel(true);
+    try {
+      const response = await authFetch(editingLabel ? `/api/labels/${editingLabel.id}` : "/api/labels", {
+        method: editingLabel ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mailboxId: selectedMailbox.id,
+          name: labelName.trim(),
+          color: labelColor,
+          parentId: labelParentId || null,
+        }),
+      });
+      if (!response.ok) return;
+      dispatchLabelsChanged();
+      setLabelDialogOpen(false);
+    } finally {
+      setSavingLabel(false);
+    }
+  }
+
+  async function deleteLabel() {
+    if (!selectedMailbox?.id || !editingLabel) return;
+    setDeletingLabel(true);
+    try {
+      const response = await authFetch(`/api/labels/${editingLabel.id}?mailboxId=${encodeURIComponent(selectedMailbox.id)}`, { method: "DELETE" });
+      if (!response.ok) return;
+      dispatchLabelsChanged();
+      window.dispatchEvent(new Event("mailflare:messages-changed"));
+      setLabelDialogOpen(false);
+    } finally {
+      setDeletingLabel(false);
+    }
+  }
+
+  // Flat depth-first list: parents followed by children, alphabetized per level.
+  const labelTree: { label: LabelSummary; depth: number }[] = [];
+  {
+    const byParent = new Map<string | null, LabelSummary[]>();
+    for (const label of labels) {
+      const list = byParent.get(label.parentId) ?? [];
+      list.push(label);
+      byParent.set(label.parentId, list);
+    }
+    for (const list of byParent.values()) list.sort((a, b) => a.name.localeCompare(b.name));
+    const walk = (parentId: string | null, depth: number) => {
+      for (const label of byParent.get(parentId) ?? []) {
+        labelTree.push({ label, depth });
+        walk(label.id, depth + 1);
+      }
+    };
+    walk(null, 0);
   }
 
   return (
@@ -361,6 +465,123 @@ export function DashboardNav({ className }: { className?: string }) {
         }]}
       />}
       {foldersSectionOpen && foldersOverflow && <NavToggle expanded={foldersOpen} onClick={toggleFolders} />}
+      {!minimal && (
+        <NavSectionHeader label={t("navigation.labels")} open={labelsSectionOpen} onToggle={toggleLabelsSection}>
+          {selectedMailbox && (
+            <button
+              type="button"
+              onClick={openCreateLabel}
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-neutral-500 hover:bg-blue-50 hover:text-blue-700"
+              aria-label={t("navigation.createLabel")}
+            >
+              <Plus className="h-4 w-4" />
+            </button>
+          )}
+        </NavSectionHeader>
+      )}
+      {!minimal && labelsSectionOpen && labels.length === 0 && (
+        <div className="px-4 py-1.5 text-xs text-neutral-500">
+          {t("navigation.noLabels")}
+        </div>
+      )}
+      {!minimal && labelsSectionOpen && labelTree.map(({ label, depth }) => (
+        <div key={label.id} className="group/label relative" style={{ paddingLeft: depth * 14 }}>
+          <NavItem
+            wrap
+            link={{
+              href: `/labels/${label.id}`,
+              label: label.name,
+              icon: Tag,
+              preloadMessages: true,
+              iconColor: label.color,
+              count: counts.customLabels?.[label.id]?.unread,
+              onMessageDrop: (messageIds: string[]) =>
+                void updateMessageLabels({ messageIds, addLabelIds: [label.id] }),
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => openEditLabel(label)}
+            className="absolute right-3 top-1/2 hidden h-6 w-6 -translate-y-1/2 items-center justify-center rounded-md text-neutral-400 hover:bg-blue-50 hover:text-blue-700 group-hover/label:flex"
+            aria-label={t("navigation.editLabel")}
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      ))}
+      {!minimal && <NavItem link={{ href: "/contacts", label: t("navigation.contacts"), icon: Users }} />}
+      <Dialog open={labelDialogOpen} onOpenChange={setLabelDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingLabel ? t("navigation.editLabel") : t("navigation.createLabel")}</DialogTitle>
+            <DialogDescription>{t("navigation.labelDescription")}</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={saveLabel} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="labelName">{t("navigation.labelName")}</Label>
+              <Input
+                id="labelName"
+                value={labelName}
+                onChange={(event) => setLabelName(event.target.value)}
+                placeholder={t("navigation.labelExample")}
+                autoFocus
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="labelParent">{t("navigation.nestUnder")}</Label>
+              <select
+                id="labelParent"
+                value={labelParentId}
+                onChange={(event) => setLabelParentId(event.target.value)}
+                className="w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm"
+              >
+                <option value="">{t("navigation.noParent")}</option>
+                {availableLabelParents().map((label) => (
+                  <option key={label.id} value={label.id}>{label.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label>{t("navigation.color")}</Label>
+              <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={t("navigation.folderColor")}>
+                {FOLDER_COLOR_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    role="radio"
+                    aria-checked={labelColor === option.value}
+                    aria-label={t(folderColorKeys[option.value])}
+                    title={t(folderColorKeys[option.value])}
+                    onClick={() => setLabelColor(option.value)}
+                    className={`h-8 w-8 rounded-full border-2 transition-transform hover:scale-110 ${
+                      labelColor === option.value
+                        ? "border-neutral-900 ring-2 ring-neutral-300 ring-offset-2"
+                        : "border-transparent"
+                    }`}
+                    style={{ backgroundColor: option.value }}
+                  />
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              {editingLabel ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                  disabled={deletingLabel || savingLabel}
+                  onClick={() => void deleteLabel()}
+                >
+                  {deletingLabel ? t("navigation.deleting") : t("common.delete")}
+                </Button>
+              ) : <span />}
+              <Button type="submit" disabled={savingLabel || deletingLabel || !labelName.trim()}>
+                {savingLabel ? t("navigation.saving") : editingLabel ? t("common.save") : t("navigation.createLabel")}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </SidebarScaffold>
   );
 }

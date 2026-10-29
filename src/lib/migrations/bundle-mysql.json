@@ -263,6 +263,18 @@
         "CREATE UNIQUE INDEX fcm_devices_user_installation_idx ON fcm_devices(user_id,installation_id);",
         "CREATE INDEX fcm_devices_session_idx ON fcm_devices(session_id);"
       ]
+    },
+    {
+      "name": "0081_add_labels.sql",
+      "statements": [
+        "CREATE TABLE `labels` (\n\t`id` varchar(191) PRIMARY KEY NOT NULL,\n\t`user_id` varchar(191) NOT NULL,\n\t`mailbox_id` varchar(191) NOT NULL,\n\t`name` varchar(191) NOT NULL,\n\t`color` varchar(191) DEFAULT '#2563eb' NOT NULL,\n\t`parent_id` varchar(191),\n\t`created_at` bigint NOT NULL DEFAULT (unix_timestamp()),\n\tCONSTRAINT `labels_user_id_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE cascade,\n\tCONSTRAINT `labels_mailbox_id_mailboxes_id_fk` FOREIGN KEY (`mailbox_id`) REFERENCES `mailboxes`(`id`) ON DELETE cascade,\n\tCONSTRAINT `labels_parent_id_labels_id_fk` FOREIGN KEY (`parent_id`) REFERENCES `labels`(`id`) ON DELETE cascade\n);",
+        "CREATE UNIQUE INDEX `labels_mailbox_parent_name_idx` ON `labels` (`mailbox_id`, `parent_id`, `name`);",
+        "CREATE INDEX `labels_mailbox_idx` ON `labels` (`mailbox_id`);",
+        "CREATE INDEX `labels_user_idx` ON `labels` (`user_id`);",
+        "CREATE TABLE `message_labels` (\n\t`message_id` varchar(191) NOT NULL,\n\t`label_id` varchar(191) NOT NULL,\n\t`created_at` bigint NOT NULL DEFAULT (unix_timestamp()),\n\tCONSTRAINT `message_labels_message_id_messages_id_fk` FOREIGN KEY (`message_id`) REFERENCES `messages`(`id`) ON DELETE cascade,\n\tCONSTRAINT `message_labels_label_id_labels_id_fk` FOREIGN KEY (`label_id`) REFERENCES `labels`(`id`) ON DELETE cascade\n);",
+        "CREATE UNIQUE INDEX `message_labels_pair_idx` ON `message_labels` (`message_id`, `label_id`);",
+        "CREATE INDEX `message_labels_label_idx` ON `message_labels` (`label_id`, `message_id`);"
+      ]
     }
   ]
 }

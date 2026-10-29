@@ -16,6 +16,9 @@ import { formatScheduledSendTime } from "./scheduled-send-utils";
 import { useIsMobile } from "@/components/sidebar-mobile-utils";
 import { useMessageCounts } from "@/hooks/use-message-counts";
 import { useMessages } from "@/hooks/use-messages";
+import { updateMessageLabels } from "@/lib/labels/client";
+import { LabelChips } from "./label-chips";
+import { useMailboxLabels } from "./use-mailbox-labels";
 import type { BulkMessageAction } from "@/app/api/messages/bulk/types";
 import type { Message } from "@/hooks/types";
 import { setMessageDragData } from "@/lib/messages/drag-utils";
@@ -65,6 +68,7 @@ function MessageListRow({
 	onSelectedChange,
 	onMessageAction,
 	dragMessageIds,
+	labelsById,
 }: MessageListRowProps) {
 	const { t } = useLanguage();
 	const Icon = config.icon;
@@ -82,7 +86,7 @@ function MessageListRow({
 	const href = `${config.hrefPrefix}/${message.id}`;
 	const navigation = useMessageNavigation(href, rowMessage);
 
-	const affectsInboxCount = config.folder === "inbox" && !config.folderId;
+	const affectsInboxCount = config.folder === "inbox" && !config.folderId && !config.labelId;
 
 	async function runRowAction(action: RowMessageAction) {
 		const previousRead = read;
@@ -175,6 +179,7 @@ function MessageListRow({
 					<span className="mt-0.5 block truncate text-xs leading-5 text-neutral-500">
 						{preview}
 					</span>
+					<LabelChips labelIds={message.labelIds} labelsById={labelsById} className="mt-0.5" />
 				</Link>
 			</div>
 		);
@@ -244,6 +249,7 @@ function MessageListRow({
 						{rowMessage.subject ?? t("list.noSubject")}
 					</span>
 					<span className="text-neutral-500"> - {getMessagePreview(rowMessage, config.folder, t)}</span>
+					<LabelChips labelIds={message.labelIds} labelsById={labelsById} className="ml-2" />
 				</Link>
 			</span>
 			<time
@@ -329,14 +335,17 @@ export function MessageFolderPage({
 		offset,
 		read: unreadOnly ? "unread" : "all",
 		group: grouped ? "thread" : undefined,
-	}, !mailboxesLoading, config.folderId);
+	}, !mailboxesLoading, config.folderId, config.labelId);
 	const { counts } = useMessageCounts(selectedMailbox?.id, !mailboxesLoading);
+	const { labelsById } = useMailboxLabels(selectedMailbox?.id);
 	usePageLoading(mailboxesLoading || isLoading);
 	const headerIcons = config.headerIcons ?? [];
 	const hasActiveFilters = !!query.trim();
-	const folderCount = config.folderId
-		? counts.customFolders[config.folderId]
-		: counts.folders[config.folder];
+	const folderCount = config.labelId
+		? counts.customLabels?.[config.labelId]
+		: config.folderId
+			? counts.customFolders[config.folderId]
+			: counts.folders[config.folder];
 	const titleTotal = folderCount?.total ?? total;
 	const titleUnread = folderCount?.unread ?? 0;
 	const mailboxAddress = getMailboxAddress(selectedMailbox);
@@ -360,7 +369,7 @@ export function MessageFolderPage({
 	useEffect(() => {
 		setOffset(0);
 		setSelectedMessages([]);
-	}, [query, selectedMailbox?.id, config.folder, config.folderId, unreadOnly, grouped]);
+	}, [query, selectedMailbox?.id, config.folder, config.folderId, config.labelId, unreadOnly, grouped]);
 
 	useEffect(() => {
 		setSelectedMessages([]);
@@ -377,12 +386,12 @@ export function MessageFolderPage({
 		if (mailboxesLoading) return;
 		document.title = formatEmailPageTitle({
 			location: title,
-			inbox: config.folder === "inbox" && !config.folderId,
+			inbox: config.folder === "inbox" && !config.folderId && !config.labelId,
 			total: titleTotal,
 			unread: titleUnread,
 			emailAddress: mailboxAddress,
 		});
-	}, [title, config.folder, config.folderId, mailboxAddress, mailboxesLoading, titleTotal, titleUnread]);
+	}, [title, config.folder, config.folderId, config.labelId, mailboxAddress, mailboxesLoading, titleTotal, titleUnread]);
 
 	useEffect(() => {
 		if (isLoading) return;
@@ -441,6 +450,19 @@ export function MessageFolderPage({
 		const timer = setTimeout(() => setActionError(null), 6000);
 		return () => clearTimeout(timer);
 	}, [actionError]);
+
+	async function applyLabelToSelection(labelId: string) {
+		setActionError(null);
+		setPendingBulkAction(true);
+		try {
+			await updateMessageLabels({ messageIds: expandSelectedIds(selectedIds), addLabelIds: [labelId] });
+			setSelectedMessages([]);
+		} catch {
+			setActionError(t("list.actionFailed"));
+		} finally {
+			setPendingBulkAction(false);
+		}
+	}
 
 	async function runSelectedActionReportingErrors(action: BulkMessageAction, folderId?: string) {
 		if (bulkActionLock.current) return;
@@ -537,6 +559,7 @@ export function MessageFolderPage({
 							selectedCount={selectedIds.length}
 							hasUnreadSelection={hasUnreadSelection}
 							onAction={runSelectedActionReportingErrors}
+							onApplyLabel={(labelId) => void applyLabelToSelection(labelId)}
 							onClearSelection={() => setSelectedMessages([])}
 							pending={pendingBulkAction}
 							folder={config.folderId ? undefined : config.folder}
@@ -618,6 +641,7 @@ export function MessageFolderPage({
 				<div role="list" aria-label={title} className="divide-y divide-neutral-100">
 					{messages.map((message) => (
 						<MessageListRow
+							labelsById={labelsById}
 							key={message.id}
 							message={message}
 							config={config}

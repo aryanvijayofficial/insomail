@@ -1,11 +1,12 @@
 "use client";
 
-import { Archive, ArchiveRestore, ChevronDown, Folder, FolderInput, Inbox, Mail, MailOpen, MoreVertical, ShieldAlert, ShieldCheck, Trash2, Undo2, X } from "lucide-react";
+import { Archive, ArchiveRestore, ChevronDown, Folder, FolderInput, Inbox, Mail, MailOpen, MoreVertical, ShieldAlert, ShieldCheck, Tag, Trash2, Undo2, X } from "lucide-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useLanguage } from "@/components/language-provider";
 import { Button } from "@/components/ui/button";
 import { useSelectedMailbox } from "@/components/mailbox-provider";
 import { useMailboxFolders } from "./use-mailbox-folders";
+import { useMailboxLabels } from "./use-mailbox-labels";
 import { Tooltip } from "@/components/ui/tooltip";
 import { supportsPermanentDelete } from "@/lib/messages/permanent-delete-utils";
 import type { BulkMessageAction } from "@/app/api/messages/bulk/types";
@@ -20,6 +21,7 @@ export function BulkMessageToolbar({
 	hasUnreadSelection,
 	hideSelectedCount = false,
 	onAction,
+	onApplyLabel,
 	onClearSelection,
 	pending,
 	folder,
@@ -45,6 +47,7 @@ export function BulkMessageToolbar({
 	].filter((option) => !option.hidden);
 	const { selectedMailbox } = useSelectedMailbox();
 	const folders = useMailboxFolders(selectedMailbox?.id);
+	const { labels } = useMailboxLabels(selectedMailbox?.id);
 	return (
 		<div className="flex min-w-0 items-center gap-2 text-neutral-600 w-full">
 			{!hideSelectedCount && (
@@ -117,6 +120,30 @@ export function BulkMessageToolbar({
 					</DropdownMenu.Content>
 				</DropdownMenu.Portal>
 			</DropdownMenu.Root>
+			{onApplyLabel && labels.length > 0 && (
+				<DropdownMenu.Root>
+					<Tooltip label={t("labels.apply")} className="max-md:hidden">
+						<DropdownMenu.Trigger asChild>
+							<Button variant="ghost" size="sm" className="max-md:hidden gap-1.5 bg-white text-xs font-medium text-neutral-700" disabled={pending}>
+								<Tag className="h-4 w-4" />
+								{t("labels.apply")}
+								<ChevronDown className="h-3.5 w-3.5 text-neutral-500" />
+							</Button>
+						</DropdownMenu.Trigger>
+					</Tooltip>
+					<DropdownMenu.Portal>
+						<DropdownMenu.Content align="end" sideOffset={4} className={menuContentClass}>
+							<DropdownMenu.Label className={menuLabelClass}>{t("navigation.labels")}</DropdownMenu.Label>
+							{labels.map((item) => (
+								<DropdownMenu.Item key={item.id} className={menuItemClass} onSelect={() => onApplyLabel(item.id)}>
+									<Tag className="h-4 w-4 shrink-0" style={{ color: item.color }} />
+									<span className="truncate">{item.name}</span>
+								</DropdownMenu.Item>
+							))}
+						</DropdownMenu.Content>
+					</DropdownMenu.Portal>
+				</DropdownMenu.Root>
+			)}
 			<Tooltip label={t("common.clearSelection")} className="max-md:hidden">
 				<Button variant="ghost" size="sm" onClick={onClearSelection} disabled={pending} aria-label={t("common.clearSelection")}>
 					<X className="h-4 w-4" />

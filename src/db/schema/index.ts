@@ -223,6 +223,51 @@ export const folders = sqliteTable(
 	],
 );
 
+export const labels = sqliteTable(
+	"labels",
+	{
+		id: text("id").primaryKey(),
+		userId: text("user_id")
+			.notNull()
+			.references(() => users.id, { onDelete: "cascade" }),
+		mailboxId: text("mailbox_id")
+			.notNull()
+			.references(() => mailboxes.id, { onDelete: "cascade" }),
+		name: text("name").notNull(),
+		color: text("color").notNull().default("#2563eb"),
+		parentId: text("parent_id").references((): AnySQLiteColumn => labels.id, { onDelete: "cascade" }),
+		createdAt: timestamp("created_at")
+			.notNull()
+			.$defaultFn(() => new Date()),
+	},
+	(t) => [
+		// Sibling-name uniqueness (case-insensitive) is enforced by the routes and,
+		// on SQLite, by the partial unique indexes of migration 0081; plain indexes
+		// here keep the schema portable across dialect kits.
+		index("labels_mailbox_idx").on(t.mailboxId),
+		index("labels_user_idx").on(t.userId),
+	],
+);
+
+export const messageLabels = sqliteTable(
+	"message_labels",
+	{
+		messageId: text("message_id")
+			.notNull()
+			.references(() => messages.id, { onDelete: "cascade" }),
+		labelId: text("label_id")
+			.notNull()
+			.references(() => labels.id, { onDelete: "cascade" }),
+		createdAt: timestamp("created_at")
+			.notNull()
+			.$defaultFn(() => new Date()),
+	},
+	(t) => [
+		uniqueIndex("message_labels_pair_idx").on(t.messageId, t.labelId),
+		index("message_labels_label_idx").on(t.labelId, t.messageId),
+	],
+);
+
 export const jmapMailboxRevisions = sqliteTable("jmap_mailbox_revisions", {
 	mailboxId: text("mailbox_id").primaryKey(),
 	revision: integer("revision").notNull().default(0),

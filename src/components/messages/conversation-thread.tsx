@@ -14,6 +14,8 @@ import { useLanguage } from "@/components/language-provider";
 import { cn } from "@/lib/utils";
 import type { ConversationMessageCardProps, ConversationThreadProps } from "./conversation-thread-types";
 import { ThreadMessageActions } from "./thread-message-actions";
+import { LabelChips } from "./label-chips";
+import { useMailboxLabels } from "./use-mailbox-labels";
 import { MessageOpenStatus } from "./message-open-status";
 import { MessageFollowUpStatus } from "@/components/follow-ups/message-follow-up-status";
 import {
@@ -138,6 +140,7 @@ export function ConversationMessageCard({
 	const { visible: messageListVisible } = useMessageListVisibility();
 	const isAssistantOpen = useAssistantOpen();
 	const isAnyPanelVisible = messageListVisible || isAssistantOpen;
+	const { labelsById } = useMailboxLabels(mailboxId);
 
 	useEffect(() => setLocallyRead(message.read), [message.read]);
 
@@ -187,6 +190,7 @@ export function ConversationMessageCard({
 							{!expanded && (
 								<span className={clsx(!locallyRead ? "font-semibold" : "text-neutral-500", "block truncate text-[13px]")}>{message.snippet || t("thread.noPreview")}</span>
 							)}
+							<LabelChips labelIds={message.labelIds} labelsById={labelsById} className="mt-0.5" />
 						</span>
 					</button>
 					<span className={clsx(!locallyRead ? "font-semibold" : "", "shrink-0 items-center gap-2 text-xs mr-2 mt-2", "hidden sm:flex")}>

@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
 import { X } from "lucide-react";
 import { useLanguage } from "@/components/language-provider";
+import { useSelectedMailbox } from "@/components/mailbox-provider";
+import { authFetch } from "@/lib/auth/client";
 import { Label } from "@/components/ui/label";
 import { getEmailAddress } from "@/lib/email/address";
 import { cn } from "@/lib/utils";
@@ -27,16 +29,80 @@ export function RecipientInput({
 	trailing,
 }: RecipientInputProps) {
 	const { t } = useLanguage();
+	const { selectedMailbox } = useSelectedMailbox();
 	const [draft, setDraft] = useState("");
 	const inputRef = useRef<HTMLInputElement | null>(null);
+	const [suggestions, setSuggestions] = useState<{ email: string; displayName: string | null }[]>([]);
+	const [suggestionsOpen, setSuggestionsOpen] = useState(false);
+	const [activeSuggestion, setActiveSuggestion] = useState(0);
+	const suggestionRequest = useRef(0);
+
+	// Saved-contact typeahead: debounce, ignore stale responses, hide what is already chipped.
+	useEffect(() => {
+		const needle = draft.trim();
+		if (!selectedMailbox?.id || !needle) {
+			setSuggestions([]);
+			setSuggestionsOpen(false);
+			return;
+		}
+		const requestId = ++suggestionRequest.current;
+		const timer = window.setTimeout(async () => {
+			try {
+				const params = new URLSearchParams({ mailboxId: selectedMailbox.id!, q: needle });
+				const response = await authFetch(`/api/contacts/suggest?${params.toString()}`, { cache: "no-store" });
+				if (!response.ok) return;
+				const data = (await response.json()) as { contacts?: { email: string; displayName: string | null }[] };
+				if (suggestionRequest.current !== requestId) return;
+				const chipped = new Set(value.map((entry) => getEmailAddress(entry).toLowerCase()));
+				const next = (data.contacts ?? []).filter((contact) => !chipped.has(contact.email.toLowerCase()));
+				setSuggestions(next);
+				setActiveSuggestion(0);
+				setSuggestionsOpen(next.length > 0);
+			} catch {
+				// Suggestions are best-effort; typing must never break.
+			}
+		}, 200);
+		return () => window.clearTimeout(timer);
+	}, [draft, selectedMailbox?.id, value]);
+
+	function pickSuggestion(contact: { email: string; displayName: string | null }) {
+		const entry = contact.displayName ? `${contact.displayName} <${contact.email}>` : contact.email;
+		onChange([...value, entry]);
+		setDraft("");
+		setSuggestions([]);
+		setSuggestionsOpen(false);
+		inputRef.current?.focus();
+	}
 
 	function commit(raw = draft) {
 		const entries = parseRecipientEntries(raw, value);
 		if (entries.length > 0) onChange([...value, ...entries]);
 		setDraft("");
+		setSuggestionsOpen(false);
 	}
 
 	function onKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+		if (suggestionsOpen && suggestions.length > 0) {
+			if (event.key === "ArrowDown") {
+				event.preventDefault();
+				setActiveSuggestion((index) => (index + 1) % suggestions.length);
+				return;
+			}
+			if (event.key === "ArrowUp") {
+				event.preventDefault();
+				setActiveSuggestion((index) => (index - 1 + suggestions.length) % suggestions.length);
+				return;
+			}
+			if (event.key === "Escape") {
+				setSuggestionsOpen(false);
+				return;
+			}
+			if (event.key === "Enter" || event.key === "Tab") {
+				event.preventDefault();
+				pickSuggestion(suggestions[activeSuggestion]);
+				return;
+			}
+		}
 		if (event.key === "," || event.key === ";" || event.key === "Enter" || (event.key === "Tab" && draft.trim())) {
 			if (event.key !== "Tab") event.preventDefault();
 			commit();
@@ -52,7 +118,7 @@ export function RecipientInput({
 
 	return (
 		<div
-			className="flex min-h-9 items-center gap-3 border-b border-neutral-100 px-4 py-1"
+			className="relative flex min-h-9 items-center gap-3 border-b border-neutral-100 px-4 py-1"
 			onClick={() => inputRef.current?.focus()}
 		>
 			<Label htmlFor={id} className="w-10 shrink-0 text-sm text-neutral-500">
@@ -102,7 +168,7 @@ export function RecipientInput({
 						setDraft(event.target.value);
 					}}
 					onKeyDown={onKeyDown}
-					onBlur={() => commit()}
+					onBlur={() => window.setTimeout(() => commit(), 150)}
 					type="text"
 					autoComplete="off"
 					autoFocus={autoFocus}
@@ -114,6 +180,31 @@ export function RecipientInput({
 					className="h-7 min-w-32 flex-1 border-0 bg-transparent p-0 text-sm outline-none placeholder:text-neutral-400 disabled:cursor-not-allowed"
 				/>
 			</div>
+			{suggestionsOpen && suggestions.length > 0 && (
+				<ul
+					role="listbox"
+					aria-label={t("navigation.contacts")}
+					className="absolute left-0 top-full z-40 mt-1 max-h-60 w-72 overflow-y-auto rounded-xl border border-neutral-200 bg-white p-1 shadow-lg"
+				>
+					{suggestions.map((contact, index) => (
+						<li key={contact.email}>
+							<button
+								type="button"
+								role="option"
+								aria-selected={index === activeSuggestion}
+								className={`flex w-full flex-col rounded-lg px-3 py-1.5 text-left ${index === activeSuggestion ? "bg-blue-50" : "hover:bg-neutral-50"}`}
+								onMouseDown={(event) => {
+									event.preventDefault();
+									pickSuggestion(contact);
+								}}
+							>
+								<span className="truncate text-sm text-neutral-900">{contact.displayName ?? contact.email}</span>
+								{contact.displayName && <span className="truncate text-xs text-neutral-500">{contact.email}</span>}
+							</button>
+						</li>
+					))}
+				</ul>
+			)}
 			{trailing && (
 				// Toggles live inside the clickable row; keep their clicks from refocusing this field.
 				<div
