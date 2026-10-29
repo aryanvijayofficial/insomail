@@ -703,8 +703,8 @@ export function ComposeForm({
 					)}
 				</div>
 				<div className={cn("flex min-h-0 flex-1 flex-col", minimized && "hidden")}>
-				<div className="border-b border-neutral-100 px-4 py-1 flex flex-row items-center gap-2">
-					<Label htmlFor={`${mode}-from`} className="text-sm text-neutral-500">{t("compose.from")}</Label>
+				<div className="border-b border-neutral-100 px-4 py-1 flex flex-row items-center gap-3">
+					<Label htmlFor={`${mode}-from`} className="w-10 shrink-0 text-sm text-neutral-500">{t("compose.from")}</Label>
 					<Select
 						id={`${mode}-from`}
 						value={selectedMailbox && selectedFrom ? `${selectedMailbox.id}|${selectedFrom}` : ""}
@@ -712,7 +712,7 @@ export function ComposeForm({
 						// placeholder="Select a mailbox first"
 						required
 						disabled={loadingDraft || senderOptions.length === 0}
-						className="h-8 px-0 py-1 text-sm shadow-none focus-visible:ring-0"
+						className="h-8 px-2 py-1 text-sm shadow-none focus-visible:ring-0"
 						containerClassName="min-w-0 border-0 flex-1"
 					>
 						{senderOptions.length === 0 && <option value="">{t("compose.selectMailboxFirst")}</option>}
@@ -776,7 +776,7 @@ export function ComposeForm({
 						placeholder={t("compose.subject")}
 						required
 						disabled={loadingDraft}
-						className="h-8 border-0 px-0 py-1 shadow-none focus-visible:ring-0"
+						className="h-8 border-0 px-2 py-1 shadow-none focus-visible:ring-0"
 					/>
 				</div>
 				<Label htmlFor={`${mode}-text`} className="sr-only">{t("compose.body")}</Label>

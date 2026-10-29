@@ -522,3 +522,34 @@ button {
   outline: 2px solid #8ab4f8;
   outline-offset: -2px;
 }
+
+/* Mail action feedback must never replace or cover the mail toolbar.
+   Explicit colours stay distinct from the theme's neutral surface remapping. */
+.mail-action-notice {
+  position: fixed;
+  inset: auto auto max(5rem, env(safe-area-inset-bottom)) 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  width: max-content;
+  max-width: min(28rem, calc(100vw - 2rem));
+  border: 1px solid #166534;
+  border-radius: .75rem;
+  background: #166534;
+  color: #fff;
+  padding: .375rem .5rem .375rem .875rem;
+  font-size: .875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  box-shadow: 0 4px 16px #0003;
+  overflow-wrap: anywhere;
+}
+.dark .mail-action-notice { background: #bbf7d0; color: #052e16; border-color: #4ade80; box-shadow: 0 4px 20px #0006; }
+.mail-action-notice-error { background: #b91c1c; border-color: #991b1b; }
+.dark .mail-action-notice-error { background: #fecaca; color: #450a0a; border-color: #f87171; }
+.mail-action-notice-dismiss { display: grid; place-items: center; width: 2rem; height: 2rem; flex-shrink: 0; border-radius: .5rem; cursor: pointer; }
+.mail-action-notice-dismiss:hover { background: #0002; }
+.mail-action-notice-dismiss:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+@media (min-width: 768px) { .mail-action-notice { bottom: max(1.25rem, env(safe-area-inset-bottom)); } }
