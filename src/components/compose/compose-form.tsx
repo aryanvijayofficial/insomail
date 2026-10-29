@@ -30,6 +30,7 @@ import { isPastSchedule } from "./schedule-send-utils";
 import {
 	applyMailboxSignatureHtml,
 	hasMeaningfulHtml,
+	isSignatureOnlyHtml,
 	htmlToPlainText,
 	joinQuotedHtml,
 	splitQuotedHtml,
@@ -251,10 +252,9 @@ export function ComposeForm({
 
 	useEffect(() => {
 		pendingSave.current = null;
-		const bodyContent = htmlToPlainText(html).trim();
-		const signatureOnly = bodyContent === (selectedMailbox?.signature?.trim() ?? "");
+		const signatureOnly = isSignatureOnlyHtml(html, selectedMailbox?.signature);
 		const hasContent =
-			to.length > 0 || cc.length > 0 || bcc.length > 0 || subject.trim() || quotedHtml || attachments.length > 0 || (bodyContent && !signatureOnly);
+			to.length > 0 || cc.length > 0 || bcc.length > 0 || subject.trim() || quotedHtml || attachments.length > 0 || storedAttachments.length > 0 || (hasMeaningfulHtml(html) && !signatureOnly);
 		if (!fromAddr || !hasContent || loadingDraft || reviewInProgressRef.current) return;
 		if (saveTimer.current) clearTimeout(saveTimer.current);
 
@@ -316,7 +316,7 @@ export function ComposeForm({
 		return () => {
 			if (saveTimer.current) clearTimeout(saveTimer.current);
 		};
-	}, [attachments, bcc, cc, fromAddr, html, loadingDraft, quotedHtml, selectedMailbox?.id, selectedMailbox?.signature, subject, threading, to]);
+	}, [attachments, storedAttachments, bcc, cc, fromAddr, html, loadingDraft, quotedHtml, selectedMailbox?.id, selectedMailbox?.signature, subject, threading, to]);
 
 	useEffect(() => {
 		if (!draftIdToLoad || loadingDraft) return;

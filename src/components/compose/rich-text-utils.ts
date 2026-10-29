@@ -62,6 +62,23 @@ export function signatureToHtml(signature: string | null | undefined): string {
 	return textToHtml(value).replace(/^<div>|<\/div>$/g, "");
 }
 
+/** Compare rendered signature content, never plain text against stored HTML.
+ * Include links/media so added images or changed targets are real draft content.
+ */
+export function isSignatureOnlyHtml(html: string, signature: string | null | undefined): boolean {
+	const signatureHtml = signatureToHtml(signature);
+	if (!signatureHtml) return false;
+	if (htmlToPlainText(html).trim() !== htmlToPlainText(signatureHtml).trim()) return false;
+	if (typeof DOMParser === "undefined") return html === signatureBlock(signature);
+	const contentAssets = (value: string) => {
+		const body = new DOMParser().parseFromString(value, "text/html").body;
+		return JSON.stringify(Array.from(body.querySelectorAll("a,img,video,audio,iframe,object,embed")).map((node) =>
+			[node.tagName, node.getAttribute("href"), node.getAttribute("src"), node.getAttribute("data"), node.getAttribute("alt")],
+		));
+	};
+	return contentAssets(html) === contentAssets(signatureHtml);
+}
+
 function signatureBlock(signature: string | null | undefined): string {
 	const html = signatureToHtml(signature);
 	return html ? `<div ${SIGNATURE_ATTRIBUTE}="1"><br><br>${html}</div>` : "";
