@@ -303,3 +303,17 @@ test("free features retain booking-host and branding authorization", async t=>{
  assert.equal((await brandingRoute.PUT(f.request("sam","/api/branding","PUT",new FormData()))).status,403);
  assert.equal((await brandingRoute.PUT(f.request("manager","/api/branding","PUT",new FormData()))).status,403);
 });
+
+test("notifications never include domain administrators for another user's personal mail", async t => {
+ const f=await fixture(t);
+ assert.deepEqual(await getMailboxNotificationUserIds(f.env,"m-sam","sam"),["sam"]);
+ assert.deepEqual(await getMailboxNotificationUserIds(f.env,"m-sam","primary"),["sam"],"ignore stale caller owner hint");
+ assert.deepEqual(await getMailboxNotificationUserIds(f.env,"m-remote","remote"),["remote"]);
+ assert.deepEqual(await getMailboxNotificationUserIds(f.env,"m-owner","primary"),["primary"]);
+ assert.deepEqual(await getMailboxNotificationUserIds(f.env,"m-disabled","sam"),[]);
+ assert.deepEqual(await getMailboxNotificationUserIds(f.env,"missing","primary"),[]);
+ f.sql.exec("INSERT INTO mailbox_access (id,mailbox_id,user_id,permission,created_by_user_id,created_at) VALUES ('personal-grant','m-sam','primary','read_only','primary',1)");
+ assert.deepEqual(await getMailboxNotificationUserIds(f.env,"m-sam","sam"),["sam"],"personal mailbox cannot be shared accidentally");
+ f.sql.exec("INSERT INTO mailbox_access (id,mailbox_id,user_id,permission,created_by_user_id,created_at) VALUES ('shared-grant','m-shared','sam','read_only','primary',1)");
+ assert.deepEqual(new Set(await getMailboxNotificationUserIds(f.env,"m-shared","primary")),new Set(["primary","sam"]));
+});

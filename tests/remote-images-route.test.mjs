@@ -9,12 +9,13 @@ const project = join(dirname(fileURLToPath(import.meta.url)), "..");
 const temporary = mkdtempSync(join(project, "node_modules", "remote-route-test-"));
 after(() => { rmSync(temporary, { recursive: true, force: true }); delete globalThis.proxyAuth; delete globalThis.proxyEnv; delete globalThis.proxyFetch; });
 const mocks = {
+ "@/lib/tracking/self-open": "export async function ownedTrackingTokens(){return new Set(globalThis.proxyOwnedTokens ?? [])}",
 	"@/lib/cloudflare": "export function getEnv(){return globalThis.proxyEnv}",
 	"@/lib/api/auth": "export async function requireSessionUser(){return globalThis.proxyAuth}",
 	"@/lib/remote-images/fetch": "export class RemoteImageError extends Error { constructor(message,status){super(message);this.status=status} } export function fetchRemoteImage(...args){return globalThis.proxyFetch(...args)}",
 };
 await build({ entryPoints: [join(project, "src/app/api/remote-images/route.ts")], outfile: join(temporary, "route.mjs"), bundle: true, platform: "node", format: "esm", packages: "external", alias: { "@": join(project, "src") }, logLevel: "silent", plugins: [{ name: "route-fixtures", setup(builder) {
-	builder.onResolve({ filter: /^@\/lib\/(cloudflare|api\/auth|remote-images\/fetch)$/ }, args => ({ path: args.path, namespace: "mock" }));
+	builder.onResolve({ filter: /^@\/lib\/(cloudflare|api\/auth|remote-images\/fetch|tracking\/self-open)$/ }, args => ({ path: args.path, namespace: "mock" }));
 	builder.onLoad({ filter: /.*/, namespace: "mock" }, args => ({ contents: mocks[args.path], loader: "js" }));
 } }] });
 const { GET } = await import(pathToFileURL(join(temporary, "route.mjs")).href);
@@ -45,4 +46,13 @@ test("authenticated Worker responses use private image headers and block the app
 	assert.equal(response.headers.get("X-Content-Type-Options"), "nosniff");
 	assert.equal(response.headers.get("Content-Type"), "image/png");
 	assert.deepEqual([...new Uint8Array(await response.arrayBuffer())], [1, 2, 3]);
+});
+
+test("owner pixel proxy returns an inert GIF without fetching or recording an open", async () => {
+ const token="abcdefghijklmnopqrstuvwx";
+ globalThis.proxyAuth={user:{id:"user"},error:null};globalThis.proxyEnv={};globalThis.proxyOwnedTokens=[token];
+ globalThis.proxyFetch=()=>{throw new Error("Self pixel must not be fetched")};
+ const response=await GET(new Request("https://mail.example/api/remote-images?url="+encodeURIComponent("https://pixel.example/api/i/"+token+".gif")));
+ assert.equal(response.status,200);assert.equal(response.headers.get("Content-Type"),"image/gif");
+ delete globalThis.proxyOwnedTokens;
 });

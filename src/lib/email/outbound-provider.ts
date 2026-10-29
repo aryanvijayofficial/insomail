@@ -58,7 +58,7 @@ function toBase64(buffer: ArrayBuffer): string {
 	return btoa(binary);
 }
 
-/** Resend does not return the RFC 5322 Message-ID, so we mint one for replies to thread against. */
+/** Requested ID is a fallback only: Resend/SES can replace it on delivery. */
 function mintMessageId(from: string): string {
 	const domain = getEmailAddress(from).split("@")[1] || "mailflare.local";
 	return `<${crypto.randomUUID()}@${domain}>`;
@@ -68,7 +68,7 @@ async function sendWithResend(
 	apiKey: string,
 	message: OutboundProviderMessage,
 	idempotencyKey?: string,
-): Promise<{ messageId: string }> {
+): Promise<{ messageId: string; providerDeliveryId?: string }> {
 	const messageId = message.headers?.["Message-ID"] ?? mintMessageId(message.from);
 	const response = await fetch(RESEND_ENDPOINT, {
 		method: "POST",
@@ -98,7 +98,20 @@ async function sendWithResend(
 		const body = (await response.json().catch(() => null)) as { message?: string } | null;
 		throw new Error(`Resend: ${body?.message ?? `request failed (${response.status})`}`);
 	}
-	return { messageId };
+	const accepted = await response.json() as { id?: string; message_id?: string };
+	const actual = accepted.message_id ?? (accepted.id ? await getResendDeliveredMessageId(apiKey, accepted.id) : null);
+	return { messageId: actual ?? messageId, providerDeliveryId: accepted.id };
+}
+
+
+/** Read the actual RFC Message-ID; an accepted send must not fail if this read is delayed. */
+export async function getResendDeliveredMessageId(apiKey: string, id: string): Promise<string | null> {
+ try {
+  const response = await fetch(`${RESEND_ENDPOINT}/${encodeURIComponent(id)}`, { headers: { Authorization: `Bearer ${apiKey}` } });
+  if (!response.ok) return null;
+  const data = await response.json() as { message_id?: string };
+  return typeof data.message_id === "string" && /^[<]?[A-Za-z0-9.!#$%&'*+\/=?^_`{|}~@-]+[>]?$/.test(data.message_id) ? data.message_id : null;
+ } catch { return null; }
 }
 
 export async function sendThroughProvider(
@@ -106,7 +119,7 @@ export async function sendThroughProvider(
 	config: OutboundProviderConfig,
 	message: OutboundProviderMessage,
 	idempotencyKey?: string,
-): Promise<{ messageId: string }> {
+): Promise<{ messageId: string; providerDeliveryId?: string }> {
 	if (config.provider === "resend") return sendWithResend(config.apiKey, message, idempotencyKey);
 	if (config.provider === "ses") return sendSesEmail(config.config, message);
 	const response = await env.EMAIL.send({

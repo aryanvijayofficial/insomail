@@ -1,3 +1,4 @@
+import { suppressOwnPixels } from "@/lib/tracking/self-open";
 import { and, asc, eq, inArray, isNull, notInArray } from "drizzle-orm";
 import { getDb } from "@/db";
 import { messageAttachments, messages } from "@/db/schema";
@@ -80,7 +81,7 @@ export async function getMessageThreadForUser(env: CloudflareEnv, user: SessionU
 
 	return {
 		threadId: message.threadId,
-		messages: rows.map((row) => ({
+		messages: (await suppressOwnPixels(env, user.id, rows)).map((row) => ({
 			...withoutRawKey(row),
 			fromContactName: contactMap.get(normalizeEmailAddress(row.fromAddr)) ?? null,
 			fromContactHasAvatar: contactAvatarMap.get(normalizeEmailAddress(row.fromAddr)) ?? false,

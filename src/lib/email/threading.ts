@@ -1,6 +1,7 @@
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import type { getDb } from "@/db";
-import { messages } from "@/db/schema";
+import { messages, outboundJobs } from "@/db/schema";
+import { getResendApiKey, getResendDeliveredMessageId } from "@/lib/email/outbound-provider";
 import { newId } from "@/lib/ids";
 import type { ResolveThreadInput } from "@/lib/email/threading-types";
 import { normalizeMessageId, selectThreadLookupIds } from "@/lib/email/thread-lookup";
@@ -46,7 +47,7 @@ export function buildReplyReferences(parentReferences: string[], parentMessageId
  * new message joins the parent's thread. Otherwise it starts a thread keyed by
  * its own Message-ID so later replies can find it.
  */
-export async function resolveThreadId(db: Db, input: ResolveThreadInput): Promise<string> {
+export async function resolveThreadId(db: Db, input: ResolveThreadInput, env?: CloudflareEnv): Promise<string> {
 	const candidates = selectThreadLookupIds(input.inReplyTo, input.references ?? []);
 
 	if (input.mailboxId && candidates.length > 0) {
@@ -62,6 +63,24 @@ export async function resolveThreadId(db: Db, input: ResolveThreadInput): Promis
 			return parent.threadId ?? normalizeMessageId(parent.providerMessageId) ?? newId("thr");
 		}
 	}
+
+
+ // For rewritten Resend IDs, use the retained provider email ID to recover an exact
+ // References match. Never join by subject, participant or time alone.
+ if (env && input.mailboxId && candidates.length) {
+  const jobs = await db.select({ payload: outboundJobs.payload, threadId: messages.threadId, providerMessageId: messages.providerMessageId })
+   .from(outboundJobs).innerJoin(messages, eq(messages.id, outboundJobs.messageId))
+   .where(and(eq(messages.mailboxId, input.mailboxId), eq(outboundJobs.status, "sent")))
+   .orderBy(desc(outboundJobs.createdAt)).limit(10);
+  const retained = jobs.flatMap(job => { try { const value = JSON.parse(job.payload).providerDeliveryId; return typeof value === "string" ? [{ ...job, deliveryId: value }] : []; } catch { return []; } });
+  if (retained.length) {
+   const key = await getResendApiKey(env).catch(() => null);
+   if (key) for (const job of retained) {
+    const actual = normalizeMessageId(await getResendDeliveredMessageId(key, job.deliveryId));
+    if (actual && candidates.includes(actual)) return job.threadId ?? normalizeMessageId(job.providerMessageId) ?? actual;
+   }
+  }
+ }
 
 	return normalizeMessageId(input.messageId) ?? newId("thr");
 }

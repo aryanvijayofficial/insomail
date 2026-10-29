@@ -1,3 +1,5 @@
+import { getCurrentUser } from "@/lib/auth/cookies";
+import { ownedTrackingTokens } from "@/lib/tracking/self-open";
 import { getEnv } from "@/lib/cloudflare";
 import { recordOpen } from "@/lib/tracking/open-tracking";
 import { parseTrackingToken, TRACKING_PIXEL_GIF, TRACKING_PIXEL_HEADERS } from "@/lib/tracking/open-tracking-utils";
@@ -10,7 +12,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ file
 	if (token) {
 		const cf = (request as CloudflareRequest).cf;
 		try {
-			await recordOpen(getEnv(), token, {
+			const env = getEnv();
+			const user = await getCurrentUser(env, request);
+			if (user && (await ownedTrackingTokens(env, user.id, [token])).has(token)) {
+				return new Response(TRACKING_PIXEL_GIF, { headers: TRACKING_PIXEL_HEADERS });
+			}
+			await recordOpen(env, token, {
 				userAgent: request.headers.get("user-agent"),
 				asn: typeof cf?.asn === "number" ? cf.asn : undefined,
 				country: cf?.country ?? request.headers.get("cf-ipcountry"),

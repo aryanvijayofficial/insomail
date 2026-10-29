@@ -1,3 +1,4 @@
+import { suppressOwnPixels } from "@/lib/tracking/self-open";
 import { and, eq, isNotNull } from "drizzle-orm";
 import { getDb } from "@/db";
 import { domains, mailboxAliases, mailboxes, messages, outboundJobs, users } from "@/db/schema";
@@ -170,7 +171,7 @@ export async function processInboundMessage(
 			messageId: parsed.messageId,
 			inReplyTo: parsed.inReplyTo,
 			references: parsed.references,
-		});
+		}, env);
 	} catch (error) {
 		console.error("Inbound thread lookup failed", {
 			rawR2Key: payload.rawR2Key,
@@ -327,7 +328,8 @@ export async function getMessageWithBodyForUser(env: CloudflareEnv, user: Sessio
 	const contactNames = await getMessageContactNames(env, message.userId, message.fromAddr, message.toAddr);
 	const attachments = await listMessageAttachments(env, messageId);
 	const unsubscribeUrl = await getUnsubscribeUrlFromRawR2Key(env, message.rawR2Key);
-	return { message: { ...message, ...contactNames }, body: message, attachments, unsubscribeUrl };
+	const [safeMessage] = await suppressOwnPixels(env, user.id, [message]);
+	return { message: { ...safeMessage, ...contactNames }, body: safeMessage, attachments, unsubscribeUrl };
 }
 
 export async function getMessageMetadataForUser(env: CloudflareEnv, user: SessionUser, messageId: string) {

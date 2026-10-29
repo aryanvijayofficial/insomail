@@ -1,3 +1,6 @@
+import { ownedTrackingTokens } from "@/lib/tracking/self-open";
+import { trackingTokenFromUrl } from "@/lib/tracking/self-open-utils";
+import { TRACKING_PIXEL_GIF, TRACKING_PIXEL_HEADERS } from "@/lib/tracking/open-tracking-utils";
 import { requireSessionUser } from "@/lib/api/auth";
 import { getEnv } from "@/lib/cloudflare";
 import { fetchRemoteImage, RemoteImageError } from "@/lib/remote-images/fetch";
@@ -25,6 +28,10 @@ export async function GET(request: Request) {
 	const requestUrl = new URL(request.url);
 	const remoteUrl = requestUrl.searchParams.get("url") ?? "";
 	try {
+		const token = trackingTokenFromUrl(remoteUrl);
+		if (token && (await ownedTrackingTokens(env, auth.user.id, [token])).has(token)) {
+			return new Response(TRACKING_PIXEL_GIF, { headers: { ...TRACKING_PIXEL_HEADERS, ...IMAGE_HEADERS } });
+		}
 		const image = await fetchRemoteImage(remoteUrl, { blockedOrigins: [requestUrl.origin] });
 		const body = new ArrayBuffer(image.body.byteLength);
 		new Uint8Array(body).set(image.body);

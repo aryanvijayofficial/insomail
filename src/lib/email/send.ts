@@ -248,7 +248,8 @@ async function deliverEmail(env: CloudflareEnv, delivery: PreparedDelivery): Pro
 				threadId: input.threadId ?? normalizeMessageId(response.messageId) ?? messageId,
 			})
 			.where(eq(messages.id, messageId));
-		await db.update(outboundJobs).set({ status: "sent", updatedAt: new Date() }).where(eq(outboundJobs.id, jobId));
+		const [acceptedJob] = response.providerDeliveryId ? await db.select({ payload: outboundJobs.payload }).from(outboundJobs).where(eq(outboundJobs.id, jobId)).limit(1) : [];
+		await db.update(outboundJobs).set({ status: "sent", updatedAt: new Date(), ...(acceptedJob && response.providerDeliveryId ? { payload: JSON.stringify({ ...JSON.parse(acceptedJob.payload), providerDeliveryId: response.providerDeliveryId }) } : {}) }).where(eq(outboundJobs.id, jobId));
 		if (input.followUpDays) {
 			// The message is already out; a reminder that cannot be stored must not fail the send.
 			await setFollowUp(env, { messageId, userId: input.userId, days: input.followUpDays }).catch((error) => console.error("Follow-up reminder skipped", error));

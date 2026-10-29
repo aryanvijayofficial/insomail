@@ -16,6 +16,7 @@ import { MessageDetailSkeleton } from "@/components/page-skeletons";
 import { usePageLoading } from "@/components/page-loading";
 import { PreviousMessage } from "@/components/previous-message";
 import { ConversationThread } from "@/components/messages/conversation-thread";
+import { MessageOpenStatus } from "@/components/messages/message-open-status";
 import { MessageDetailNavigation } from "@/components/messages/message-detail-navigation";
 import { MessageReadingHeaderButton } from "@/components/messages/message-reading-header-button";
 import { ScheduledSendBanner } from "@/components/messages/scheduled-send-banner";
@@ -297,6 +298,11 @@ export default function MessageDetailPage() {
             )}
           </div>
           {scheduledAt && <div className="px-4 sm:px-0 @xl:pl-10"><ScheduledSendBanner messageId={message.id} scheduledAt={scheduledAt} /></div>}
+          {message.direction === "outbound" && message.status !== "draft" && (
+            <div className="px-4 sm:px-0 @xl:pl-16">
+              <MessageOpenStatus key={message.id} messageId={message.id} />
+            </div>
+          )}
           <div className="prose max-w-none px-4 text-neutral-900 sm:px-0 @xl:pl-16">
             {htmlBody ? (
               <EmailHtmlRenderer key={message.id} className="mx-auto" html={htmlBody} autoAllowRemote={remote.autoAllow} onAllowRemote={remote.allowSender} />

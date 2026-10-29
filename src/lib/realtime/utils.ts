@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
-import { domains, mailboxAccess, mailboxes } from "@/db/schema";
+import { mailboxAccess, mailboxes } from "@/db/schema";
 import { isTeamMailboxSharingEnabled } from "@/lib/mailboxes/access-utils";
 import type { NewMessageNotification, AgentDraftNotification } from "./types";
 import { sendPushNotifications } from "@/lib/push/server";
@@ -25,15 +25,15 @@ export function getSessionTokenFromRequest(request: Request): string | undefined
 export async function getMailboxNotificationUserIds(
 	env: CloudflareEnv,
 	mailboxId: string,
-	ownerUserId: string,
+	_ownerUserId: string,
 ): Promise<string[]> {
 	const db = getDb(env);
 	const mailboxRows = await db
-		.select({ domainOwnerUserId: domains.userId, type: mailboxes.type })
+		.select({ ownerUserId: mailboxes.userId, type: mailboxes.type, disabled: mailboxes.disabled })
 		.from(mailboxes)
-		.innerJoin(domains, eq(mailboxes.domainId, domains.id))
 		.where(eq(mailboxes.id, mailboxId))
 		.limit(1);
+	if (!mailboxRows[0] || mailboxRows[0].disabled) return [];
 	const sharedUserIds = mailboxRows[0]?.type === "shared" && await isTeamMailboxSharingEnabled(db)
 		? (await db
 			.select({ userId: mailboxAccess.userId })
@@ -44,8 +44,7 @@ export async function getMailboxNotificationUserIds(
 
 	return [
 		...new Set([
-			ownerUserId,
-			mailboxRows[0]?.domainOwnerUserId,
+			mailboxRows[0].ownerUserId,
 			...sharedUserIds,
 		].filter((userId): userId is string => !!userId)),
 	];
