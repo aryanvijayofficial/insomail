@@ -21,7 +21,6 @@ import {
   Star,
   Tag,
   Trash2,
-  Users,
 } from "lucide-react";
 import { useSelectedMailbox } from "@/components/mailbox-provider";
 import { Button } from "@/components/ui/button";
@@ -57,7 +56,6 @@ import {
 } from "./dashboard-nav-utils";
 import { NavSectionHeader, useSectionOpen } from "./nav-section-header";
 import { ReorderableList } from "./reorderable-list";
-import { readStorage, writeStorage } from "./reorderable-list-utils";
 import { SidebarFooter } from "./sidebar-footer";
 import { SidebarHeader } from "./sidebar-header";
 import { SidebarScaffold } from "./sidebar-scaffold";
@@ -82,32 +80,13 @@ const links = [
 ] satisfies (Omit<NavLink, "label"> & { labelKey: TranslationKey })[];
 
 
-// Drafts, Archived, Spam and Trash start tucked under "More...".
+// Drafts, Archived, Spam and Trash always stay visible.
 const MORE_LINK_HREFS = ["/drafts", "/archived", "/spam", "/trash"];
-const MAX_VISIBLE_FOLDERS = 3;
-const MORE_OPEN_KEY = "mailflare:nav:more-open";
-const FOLDERS_OPEN_KEY = "mailflare:nav:folders-open";
-
-function NavToggle({ expanded, onClick, collapsedLabel, expandedLabel }: { expanded: boolean; onClick: () => void; collapsedLabel?: string; expandedLabel?: string }) {
-  const { t } = useLanguage();
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-expanded={expanded}
-      className="flex h-9 w-full items-center rounded-r-full pl-[52px] text-left text-sm text-neutral-700 transition-colors hover:bg-stone-200/60 max-md:min-h-11 max-md:pl-14 max-md:text-base"
-    >
-      {expanded ? (expandedLabel ?? t("navigation.less")) : (collapsedLabel ?? t("navigation.more"))}
-    </button>
-  );
-}
 
 export function DashboardNav({ className }: { className?: string }) {
   const { t } = useLanguage();
   const { minimal, mobile } = useSidebar();
   const pathname = usePathname();
-  const [moreOpen, setMoreOpen] = useState(false);
-  const [foldersOpen, setFoldersOpen] = useState(false);
   const [foldersSectionOpen, toggleFoldersSection] = useSectionOpen("mailflare:nav:folders-section-open");
   const { selectedMailbox, isLoading } = useSelectedMailbox();
   const { counts } = useMessageCounts(selectedMailbox?.id, !isLoading);
@@ -174,34 +153,15 @@ export function DashboardNav({ className }: { className?: string }) {
   });
 
   useEffect(() => {
-    setMoreOpen(readStorage(MORE_OPEN_KEY, false));
-    setFoldersOpen(readStorage(FOLDERS_OPEN_KEY, false));
-  }, []);
-
-  useEffect(() => {
     const reset = () => setFolders([]);
     window.addEventListener(AUTH_SESSION_CHANGED_EVENT, reset);
     return () => window.removeEventListener(AUTH_SESSION_CHANGED_EVENT, reset);
   }, []);
 
-  function toggleMore() {
-    writeStorage(MORE_OPEN_KEY, !moreOpen);
-    setMoreOpen(!moreOpen);
-  }
-
-  function toggleFolders() {
-    writeStorage(FOLDERS_OPEN_KEY, !foldersOpen);
-    setFoldersOpen(!foldersOpen);
-  }
-
   const isActiveHref = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
   const composeLink = linksWithCounts.find((link) => link.href === "/compose");
   const mainLinks = linksWithCounts.filter((link) => link.href !== "/compose" && !MORE_LINK_HREFS.includes(link.href!));
   const moreLinks = linksWithCounts.filter((link) => MORE_LINK_HREFS.includes(link.href!));
-  // The icon rail has no room for text toggles. When collapsed, the page you are on stays listed on its own.
-  const showAllMoreLinks = minimal || moreOpen;
-  const foldersOverflow = !minimal && folders.length > MAX_VISIBLE_FOLDERS;
-
   useEffect(() => {
     if (!selectedMailbox?.id) {
       setFolders([]);
@@ -351,8 +311,6 @@ export function DashboardNav({ className }: { className?: string }) {
           { id: "main", items: mainLinks.map((link) => ({ id: link.href!, node: <NavItem link={link} /> })) },
           {
             id: "more",
-            before: minimal ? undefined : <NavToggle expanded={moreOpen} onClick={toggleMore} />,
-            visibleIds: (ordered) => showAllMoreLinks ? ordered : ordered.filter((id) => isActiveHref(id)),
             items: moreLinks.map((link) => ({ id: link.href!, node: <NavItem link={link} /> })),
           },
         ]}
@@ -438,12 +396,6 @@ export function DashboardNav({ className }: { className?: string }) {
         enabled={!minimal}
         lists={[{
           id: "folders",
-          visibleIds: (ordered) => {
-            if (!foldersOverflow || foldersOpen) return ordered;
-            const first = ordered.slice(0, MAX_VISIBLE_FOLDERS);
-            const active = ordered.slice(MAX_VISIBLE_FOLDERS).find((id) => isActiveHref(`/folders/${id}`));
-            return active ? [...first, active] : first;
-          },
           items: folders.map((folder) => ({
             id: folder.id,
             node: (
@@ -464,7 +416,6 @@ export function DashboardNav({ className }: { className?: string }) {
           })),
         }]}
       />}
-      {foldersSectionOpen && foldersOverflow && <NavToggle expanded={foldersOpen} onClick={toggleFolders} />}
       {!minimal && (
         <NavSectionHeader label={t("navigation.labels")} open={labelsSectionOpen} onToggle={toggleLabelsSection}>
           {selectedMailbox && (
@@ -509,7 +460,6 @@ export function DashboardNav({ className }: { className?: string }) {
           </button>
         </div>
       ))}
-      {!minimal && <NavItem link={{ href: "/contacts", label: t("navigation.contacts"), icon: Users }} />}
       <Dialog open={labelDialogOpen} onOpenChange={setLabelDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -584,4 +534,4 @@ export function DashboardNav({ className }: { className?: string }) {
       </Dialog>
     </SidebarScaffold>
   );
-}
+                            }
