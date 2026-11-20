@@ -74,7 +74,7 @@ export default function MailboxesPage() {
 	const mailboxes = useQuery({
 		queryKey: ["mailboxes"],
 		queryFn: async () => {
-			const res = await authFetch("/api/mailboxes");
+			const res = await authFetch("/api/mailboxes?manage=1");
 			return (await res.json()) as MailboxesResponse;
 		},
 	});
