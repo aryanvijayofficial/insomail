@@ -19,6 +19,7 @@ import { ConversationThread } from "@/components/messages/conversation-thread";
 import { MessageOpenStatus } from "@/components/messages/message-open-status";
 import { MessageDetailNavigation } from "@/components/messages/message-detail-navigation";
 import { MessageReadingHeaderButton } from "@/components/messages/message-reading-header-button";
+import { SendFailedBanner } from "@/components/messages/send-failed-banner";
 import { ScheduledSendBanner } from "@/components/messages/scheduled-send-banner";
 import { formatScheduledSendTime } from "@/components/messages/scheduled-send-utils";
 import { QuotedEmailToggle } from "@/components/messages/quoted-email-toggle";
@@ -119,7 +120,7 @@ export default function MessageDetailPage() {
     );
   }
 
-  const { message, body, attachments = [], scheduledAt } = data;
+  const { message, body, attachments = [], scheduledAt, sendError } = data;
   const currentThreadMessage = {
     ...message,
     textBody: body?.textBody ?? null,
@@ -297,6 +298,7 @@ export default function MessageDetailPage() {
               </dl>
             )}
           </div>
+          {message.direction === "outbound" && message.status === "failed" && <div className="px-4 sm:px-0 @xl:pl-10"><SendFailedBanner messageId={message.id} error={sendError} /></div>}
           {scheduledAt && <div className="px-4 sm:px-0 @xl:pl-10"><ScheduledSendBanner messageId={message.id} scheduledAt={scheduledAt} /></div>}
           {message.direction === "outbound" && message.status !== "draft" && (
             <div className="px-4 sm:px-0 @xl:pl-16">

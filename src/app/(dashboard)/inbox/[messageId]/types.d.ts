@@ -11,6 +11,8 @@ export type MessageDetailResponse = {
 	unsubscribeUrl?: string | null;
 	/** ISO time a queued message is waiting to be sent, when it is a scheduled send. */
 	scheduledAt?: string | null;
+	/** Why the provider rejected a failed outbound message. */
+	sendError?: string | null;
 	error?: string;
 };
 
