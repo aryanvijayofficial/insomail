@@ -329,7 +329,14 @@ export async function getMessageWithBodyForUser(env: CloudflareEnv, user: Sessio
 	const attachments = await listMessageAttachments(env, messageId);
 	const unsubscribeUrl = await getUnsubscribeUrlFromRawR2Key(env, message.rawR2Key);
 	const [safeMessage] = await suppressOwnPixels(env, user.id, [message]);
-	return { message: { ...safeMessage, ...contactNames }, body: safeMessage, attachments, unsubscribeUrl };
+	const [failedJob] = message.direction === "outbound" && message.status === "failed"
+		? await db
+			.select({ error: outboundJobs.error })
+			.from(outboundJobs)
+			.where(and(eq(outboundJobs.messageId, messageId), eq(outboundJobs.status, "failed")))
+			.limit(1)
+		: [];
+	return { message: { ...safeMessage, ...contactNames }, body: safeMessage, attachments, unsubscribeUrl, sendError: failedJob?.error ?? null };
 }
 
 export async function getMessageMetadataForUser(env: CloudflareEnv, user: SessionUser, messageId: string) {
