@@ -26,3 +26,7 @@ InsoMail intentionally uses reviewed manual updates. The upstream one-click work
 ## Product identity and notices
 
 Active-plan badges show the selected per-user plan; Plans remains a neutral navigation label. Product copy uses saved instance branding. A prominent About & License link consolidates the preserved Mailflare copyright, modification notice, no-warranty and redistribution information and full AGPL text. Source download remains directly available on signed-in, login and public booking surfaces.
+
+## November 20, 2026
+
+- Failed sends now show a "Not sent" badge in Sent, a banner with the provider error and an Edit and resend action, and a notice after the undo window. Receiving MX checks accept Resend Forge hosts (receive.*.rmta.net). The admin Mailboxes page lists mailboxes of accounts the admin manages. A domain whose DNS is not in the connected Cloudflare account shows a neutral note, not an error.
