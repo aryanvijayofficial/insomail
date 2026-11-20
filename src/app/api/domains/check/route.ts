@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth/cookies";
 import { getEnv } from "@/lib/cloudflare";
-import { preflightDomain } from "@/lib/domains/preflight";
+import { preflightDomain, ZoneNotFoundError } from "@/lib/domains/preflight";
 import { setupDomainSchema } from "@/lib/validators";
 
 export async function POST(request: Request) {
@@ -15,6 +15,9 @@ export async function POST(request: Request) {
 	try {
 		return NextResponse.json({ domain: await preflightDomain(env, parsed.data.hostname) });
 	} catch (error) {
+		if (error instanceof ZoneNotFoundError) {
+			return NextResponse.json({ error: error.message, code: error.code }, { status: 404 });
+		}
 		const message = error instanceof Error ? error.message : "Domain check failed";
 		return NextResponse.json({ error: message }, { status: 502 });
 	}
