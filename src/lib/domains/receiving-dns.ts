@@ -68,4 +68,6 @@ export async function removeMx(env: CloudflareEnv, domain: DomainRow, matches: (
 	}
 }
 
-export const isInboundSmtpMx = (content: string) => /inbound-smtp\.[a-z0-9-]+\.amazonaws\.com\.?$/i.test(content.trim());
+/** Resend's receiving MX: the SES inbound host, or the newer Forge host (receive.forge.rmta.net). */
+export const isInboundSmtpMx = (content: string) =>
+	/(?:^|\.)inbound-smtp\.[a-z0-9-]+\.amazonaws\.com\.?$/i.test(content.trim()) || /^receive(?:-[a-z0-9-]+)?\.[a-z0-9-]+\.rmta\.net\.?$/i.test(content.trim());

@@ -56,7 +56,7 @@ export async function provisionDomainOnCloudflare(
 	const zone = await findZoneByHostname(env, normalized);
 	if (!zone) {
 		throw new Error(
-			`Zone not found for "${normalized}". The domain must use Cloudflare DNS on this account.`,
+			`DNS for "${normalized}" is not managed in this Cloudflare account. Turn on "Skip DNS setup" to add the domain and enter its DNS records yourself.`,
 		);
 	}
 
