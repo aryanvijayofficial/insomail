@@ -442,7 +442,14 @@ export function ComposeForm({
 				action: { label: t("compose.cancelSend"), onClick: () => void cancelSend(sentMessageId) },
 			});
 			// Refresh the lists once the queue has had time to deliver it.
-			setTimeout(() => window.dispatchEvent(new Event("mailflare:messages-changed")), (data.undoSeconds + 3) * 1000);
+			setTimeout(() => {
+				window.dispatchEvent(new Event("mailflare:messages-changed"));
+				// The queue delivers after the undo window; tell the user if the provider rejected it.
+				void authFetch(`/api/messages/${sentMessageId}`)
+					.then((r) => r.json() as Promise<{ message?: { status?: string } }>)
+					.then((d) => { if (d.message?.status === "failed") showNotice(t("compose.error.deliveryFailed"), { durationMs: 12000 }); })
+					.catch(() => undefined);
+			}, (data.undoSeconds + 6) * 1000);
 		} else {
 			showNotice(data.scheduled ? t("compose.scheduled") : t("compose.sent"));
 		}
