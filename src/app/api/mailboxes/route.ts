@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { getEnv } from "@/lib/cloudflare";
 import { getDb } from "@/db";
 import { domains, mailboxAliases, mailboxes, users } from "@/db/schema";
 import { getCurrentUser, requireUser } from "@/lib/auth/cookies";
 import { newId } from "@/lib/ids";
+import { canManageUserAccount, canManageUsers } from "@/lib/auth/admin";
 import { getLicenseEntitlements } from "@/lib/licenses/service";
 import { tracksAccountIdentity } from "@/lib/profile/identity-utils";
 import { mailboxSchema } from "@/lib/validators";
@@ -16,8 +17,47 @@ export async function GET(request: Request) {
 	const user = await getCurrentUser(env, request);
 	if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	const db = getDb(env);
-	const rows = await ensurePersonalMailbox(env, db, user);
+	const accessible = await ensurePersonalMailbox(env, db, user);
 	const entitlements = await getLicenseEntitlements(env);
+	let rows = accessible;
+	// The admin Mailboxes page also lists mailboxes owned by accounts this admin manages,
+	// not only the ones they own or are shared on. Settings access still gates opening them.
+	if (new URL(request.url).searchParams.get("manage") === "1" && canManageUsers(user) && entitlements.canManageAccounts) {
+		const seen = new Set(accessible.map((mailbox) => mailbox.id));
+		const managed = await db
+			.select({
+				id: mailboxes.id,
+				userId: mailboxes.userId,
+				domainId: mailboxes.domainId,
+				localPart: mailboxes.localPart,
+				displayName: mailboxes.displayName,
+				signature: mailboxes.signature,
+				autoReplyEnabled: mailboxes.autoReplyEnabled,
+				autoReplySubject: mailboxes.autoReplySubject,
+				autoReplyBody: mailboxes.autoReplyBody,
+				useAllDomains: mailboxes.useAllDomains,
+				avatarKey: mailboxes.avatarKey,
+				type: mailboxes.type,
+				disabled: mailboxes.disabled,
+				createdAt: mailboxes.createdAt,
+				hostname: domains.hostname,
+				ownerRole: users.role,
+				ownerIsPrimaryAdmin: users.isPrimaryAdmin,
+			})
+			.from(mailboxes)
+			.innerJoin(domains, eq(mailboxes.domainId, domains.id))
+			.innerJoin(users, eq(mailboxes.userId, users.id))
+			.where(and(eq(mailboxes.disabled, false), isNull(users.deletedAt)));
+		const extra = managed
+			.filter((row) => !seen.has(row.id) && canManageUserAccount(user, { role: row.ownerRole, isPrimaryAdmin: row.ownerIsPrimaryAdmin }))
+			.map(({ avatarKey, ownerRole: _role, ownerIsPrimaryAdmin: _primary, ...mailbox }) => ({
+				...mailbox,
+				hasAvatar: !!avatarKey,
+				permission: "full_access" as const,
+				isPrimary: false,
+			}));
+		rows = [...accessible, ...extra];
+	}
 	return NextResponse.json({
 		mailboxes: await Promise.all(rows.map(async (mailbox) => ({
 			...mailbox,
