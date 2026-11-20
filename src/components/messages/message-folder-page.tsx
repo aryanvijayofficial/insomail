@@ -174,6 +174,7 @@ function MessageListRow({
 						className={`mt-1 block truncate text-sm ${unread ? "font-semibold text-neutral-900" : "text-neutral-700"
 							}`}
 					>
+						{message.status === "failed" && <span className="mr-2 rounded bg-red-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-red-700">{t("send.failed.badge")}</span>}
 						{message.subject ?? t("list.noSubject")}
 					</span>
 					<span className="mt-0.5 block truncate text-xs leading-5 text-neutral-500">
@@ -246,6 +247,7 @@ function MessageListRow({
 					className="focus-visible:outline-none after:absolute after:inset-0"
 				>
 					<span className={unread ? "font-semibold text-neutral-900" : ""}>
+						{message.status === "failed" && <span className="mr-2 rounded bg-red-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-red-700">{t("send.failed.badge")}</span>}
 						{rowMessage.subject ?? t("list.noSubject")}
 					</span>
 					<span className="text-neutral-500"> - {getMessagePreview(rowMessage, config.folder, t)}</span>
