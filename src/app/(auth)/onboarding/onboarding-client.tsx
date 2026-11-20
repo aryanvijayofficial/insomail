@@ -24,6 +24,7 @@ export function OnboardingClient() {
 	const [domainId, setDomainId] = useState("");
 	const [localPart, setLocalPart] = useState("me");
 	const [error, setError] = useState<string | null>(null);
+	const [note, setNote] = useState<string | null>(null);
 	const [mxConflict, setMxConflict] = useState(false);
 	const [loading, setLoading] = useState(false);
 
@@ -88,13 +89,15 @@ export function OnboardingClient() {
 
 		setDomainChecking(true);
 		setError(null);
+		setNote(null);
 		setMxConflict(false);
 		const result = await checkDomain(normalized);
 		setDomainChecking(false);
 		if (!result.ok || !result.domain) {
 			setDomainCheck(null);
 			setEnableSending(false);
-			setError(result.error ?? t("onboarding.domainCheckFailed"));
+			if (result.code === "ZONE_NOT_FOUND") setNote(result.error ?? null);
+			else setError(result.error ?? t("onboarding.domainCheckFailed"));
 			return;
 		}
 
@@ -257,6 +260,11 @@ export function OnboardingClient() {
 							{loading ? t("setup.creating") : t("onboarding.goToInbox")}
 						</Button>
 					</>
+				)}
+				{note && !skipDns && !error && (
+					<p className="rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-700">
+						{note}
+					</p>
 				)}
 				{error && (
 					<p role="alert" className="rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">

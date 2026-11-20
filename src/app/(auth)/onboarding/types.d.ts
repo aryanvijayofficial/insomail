@@ -17,6 +17,8 @@ export type DomainPreflightResponse = {
 	ok: boolean;
 	domain?: DomainPreflight;
 	error?: string;
+	/** ZONE_NOT_FOUND means the DNS is managed elsewhere; show it as a note, not an error. */
+	code?: string;
 };
 
 export type MailboxCreateResult = {
