@@ -82,7 +82,10 @@ export async function GET(request: Request) {
 			conditions.push(notInArray(messages.status, ["trash", "spam"]));
 		}
 	}
-	if (status) {
+	if (status === "sent") {
+		// Failed sends stay visible in Sent, flagged, so a rejected message is never silently lost.
+		conditions.push(inArray(messages.status, ["sent", "failed"]));
+	} else if (status) {
 		conditions.push(eq(messages.status, status));
 	}
 	// Composer templates are stored as messages but never listed.
