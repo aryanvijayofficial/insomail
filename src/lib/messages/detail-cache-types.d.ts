@@ -14,5 +14,6 @@ export type CachedMessageDetail = {
 	}>;
 	unsubscribeUrl?: string | null;
 	scheduledAt?: string | null;
+	sendError?: string | null;
 	error?: string;
 };
