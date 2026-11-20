@@ -42,6 +42,7 @@ export default function DomainsPage() {
   const [sendingProvider, setSendingProvider] = useState<SendingProvider>("cloudflare");
   const [receivingProvider, setReceivingProvider] = useState<ReceivingProvider>("cloudflare");
   const [domainCheckError, setDomainCheckError] = useState<string | null>(null);
+  const [domainCheckNote, setDomainCheckNote] = useState<string | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [setupRecord, setSetupRecord] = useState<DnsAuthRecord | null>(null);
   const [setupMessage, setSetupMessage] = useState<string | null>(null);
@@ -262,11 +263,13 @@ export default function DomainsPage() {
 
     setDomainChecking(true);
     setDomainCheckError(null);
+    setDomainCheckNote(null);
     const result = await checkDomain(normalized);
     setDomainChecking(false);
     if (!result.ok || !result.domain) {
       setDomainCheck(null);
-      setDomainCheckError(result.error ?? t("onboarding.domainCheckFailed"));
+      if (result.code === "ZONE_NOT_FOUND") setDomainCheckNote(result.error ?? null);
+      else setDomainCheckError(result.error ?? t("onboarding.domainCheckFailed"));
       return;
     }
 
@@ -388,6 +391,11 @@ export default function DomainsPage() {
                   <CheckCircle2 className="h-4 w-4" />
                   {t("setup.domainFound", { zone: domainCheck.zone.name })}
                 </div>
+              )}
+              {domainCheckNote && !skipDns && (
+                <p className="rounded-xl bg-neutral-100 px-4 py-3 text-sm text-neutral-700">
+                  {domainCheckNote}
+                </p>
               )}
               {domainCheckError && (
                 <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
